@@ -68,7 +68,7 @@ Cross-level ideas: tier `age4` letters/phonics/colours-to-words, a sticker book 
 - **Elements**: Fire = Flame Burst (burns thorns, lights caves); Water = Healing Wave (heal, bubble shield, speed, douses fire walls); Earth = Rock Pillar (platform, smashes crates, stuns); Air = Whirlwind (push, giant jump, glide).
 
 ## Stormi, the Level 1 guide (marker `stormi-guide-2026-10-11`)
-* Stormi is the family's real dog, drawn in canvas as a cute blue-grey Staffordshire bull terrier puppy (white chest patch,
+* Stormi is the family's real dog, drawn in canvas as a cute blue-grey puppy (white chest patch,
   dark eyes, folded rose ears, stocky). No photos are embedded.
 * Start of Level 1: she tells the quest in speech bubbles (tap / E / Enter to advance, **Skip** button). She then follows as a
   companion with contextual bubbles (element needed at obstacles, gate hints, side-path tips), Fact Scrolls (10 real dog facts,
@@ -77,3 +77,11 @@ Cross-level ideas: tier `age4` letters/phonics/colours-to-words, a sticker book 
   2nd quiz clue, Lv3 crosses out a wrong answer + speed cheer, Lv4 helps at the start of each question, Lv5 cheer can give a shield.
   Cheer boost also adds damage in the boss duel. She reappears at the boss and in the end-of-level story.
 * Dog name is editable (default Stormi): Choose Heroes screen, Pause menu, or the Stormi tab (`SV.dogName`).
+
+
+## Puzzle rooms, rescue sprites and Stormi hints (Oct 2026)
+* Level 1 now has 6 puzzle rooms: Lever Gate, Crate Steps, Heavy Plate Bridge (crate or Stormi on the plate), Sleepy Shadow Imps (hide in shadows / behind crates, sneak while they snooze), Rescue Bridge (timed bridge + leading sprites) and Echo Trail (crumb trail pattern). Failing a room just respawns you at its start.
+* E = interact / grab-push crate / call sprites / pull levers. 💡 button (or H) = lantern hint. Each room ends with a fact scroll plus a gentle logic question. Rescue 2 / 5 / 8 sprites for bonuses.
+* Stormi no longer follows you. She pops in from a screen corner only when you seem stuck (30s Few / 20s More, age-4 mode quicker) or near a secret (More mode), with a 60-90s cooldown and 3 (Few) / 6 (More) visits per level. Pause menu or title screen: Stormi hints Off / Few / More.
+* Hero cards on the Choose Heroes screen have a Reset button. `#selftest`, `#roomtest` and `#shot-*` never write to localStorage.
+* Headless tests: `google-chrome --headless=new --no-sandbox --virtual-time-budget=120000 --dump-dom "file://$PWD/index.html#roomtest" | grep -o "<title>.*</title>"`
