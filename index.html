@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="sg-build" content="idol-audio-elements-2026-10-11">
+<meta name="sg-build" content="stormi-guide-2026-10-11">
 <title>Stick Girl: Colour Quest</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#4cc3ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -198,7 +198,7 @@ const SWATCH=['#ff4fa3','#3aa8ff','#ffb000','#2fc46b','#a35cff','#ff5a3c','#18c9
 
 /* ================= SAVE ================= */
 const SKEY='stickgirl.v1';
-const newProg=()=>({xp:0,lvl:1,stars:0,treats:3,pets:{},active:null,scrolls:[],cp:0,gates:[],dug:[],elem:0,quest:false,boss:false,intro:false,bestCatch:0});
+const newProg=()=>({xp:0,lvl:1,stars:0,treats:3,pets:{},active:null,scrolls:[],cp:0,gates:[],dug:[],elem:0,quest:false,boss:false,intro:false,bestCatch:0,dog:{bond:0,intro:false,facts:[],pat:0}});
 let SV;
 try{SV=JSON.parse(localStorage.getItem(SKEY));}catch(e){SV=null;}
 if(!SV||!SV.players){SV={sel:0,mute:false,players:[{name:'Stick Girl 7',color:'#ff4fa3',tier:'age7'},{name:'Stick Girl 4',color:'#3aa8ff',tier:'age4'}],prog:[newProg(),newProg()]};}
@@ -293,7 +293,9 @@ const SFX={
  smash:t=>{nz(t,.22,.16,'highpass',1500,600);tn(t,230,.12,'square',.07,60);},
  douse:t=>{nz(t,.55,.1,'highpass',3500,1600);tn(t,900,.3,'sine',.04,300);},
  burn:t=>{for(let i=0;i<6;i++)nz(t+i*.06,.05,.08,'highpass',2500+i*300,0,1);nz(t,.4,.08,'bandpass',600,1800,1);},
- pop:t=>tn(t,900,.07,'sine',.1,300),
+ bark:t=>{[[0,430,230,.14],[.2,520,280,.12]].forEach(([d,f1,f2,du])=>{tn(t+d,f1,du,'sawtooth',.11,f2,SB,{lp:1500});tn(t+d,f1*2.1,du*.8,'square',.03,f2*2,SB,{lp:2600});nz(t+d,du*.8,.09,'bandpass',1100,700,1.5);});},
+  yip:t=>{tn(t,780,.07,'triangle',.08,1100);tn(t+.09,900,.06,'triangle',.07,1250);},
+pop:t=>tn(t,900,.07,'sine',.1,300),
  shield:t=>{tn(t,500,.22,'sine',.08,1100);tn(t+.1,800,.18,'sine',.06,1500);}};
 function sfx(n){if(!AC||SV.mute||!SFX[n])return;try{SFX[n](AC.currentTime+.003);}catch(e){}}
 /* ---- jingles ---- */
@@ -420,6 +422,39 @@ function petSprite(id,x,y,face,s,t){s=s||1;ctx.save();ctx.translate(x,y);ctx.sca
   const rc=['#ff3b5c','#ffb000','#2fc46b','#3aa8ff','#a35cff'];rc.forEach((c,i)=>{ctx.strokeStyle=c;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(9,-34+bob);ctx.quadraticCurveTo(-4-i*2,-34+bob+i*3,-8-i,-24+bob+Math.sin(t/6+i)*2);ctx.stroke();});
   ctx.lineWidth=2;ctx.strokeStyle='#333';eye(18,-31+bob);}
  ctx.restore();}
+
+/* ================= STORMI, THE FAMILY'S STAFFY (canvas cartoon, no photos) ================= */
+function dogSprite(x,y,face,s,t,o){o=o||{};const run=o.run?Math.sin(o.ph||0):0,wag=Math.sin(t/(o.fast?2.2:4.5))*(o.fast?13:7),bob=o.run?Math.abs(run)*-2.2:Math.sin(t/22)*.7+(o.hop||0);
+ ctx.save();ctx.translate(x,y);ctx.scale(face*s,s);ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle='#2e3846';
+ const G1='#74869b',G2='#93a5b8',G3='#5a6a7e';
+ const el=(cx,cy,rx,ry,c,r,ns)=>{ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,r||0,0,7);ctx.fillStyle=c;ctx.fill();if(!ns)ctx.stroke();};
+ const leg=(lx,c,sw)=>{rr(lx-5.5+sw,-17,11,17,5);ctx.fillStyle=c;ctx.fill();ctx.stroke();};
+ // short thin tail that wags
+ ctx.beginPath();ctx.moveTo(-19,-31+bob);ctx.quadraticCurveTo(-27,-33+bob,-29+wag*.3,-41+bob-Math.abs(wag)*.2);ctx.lineWidth=6;ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle=G1;ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#2e3846';
+ // far legs, then stocky body with a deep, wide chest
+ leg(-12,G3,run*5);leg(14,G3,-run*5);
+ el(-3,-27+bob,22,15,G1);el(12,-26+bob,14,16,G1);el(-2,-18+bob,15,5,G2,0,1);
+ leg(-9,G1,-run*5);leg(19,G1,run*5);
+ // white paws tips
+ ctx.fillStyle='#e8eef5';for(const px of[-9-run*5,19+run*5]){ctx.beginPath();ctx.ellipse(px,-2,5.5,3,0,0,Math.PI);ctx.fill();}
+ // white chest patch
+ el(22,-22+bob,5.8,10.5,'#fff',-.1);
+ // collar + tag
+ ctx.save();ctx.translate(18,-33+bob);ctx.rotate(-.2);rr(-3.5,-6,7,14,3);ctx.fillStyle='#ff4f8a';ctx.fill();ctx.stroke();ctx.restore();el(24,-25+bob,2.3,2.3,'#ffd23f');
+ // big round puppy head, broad short muzzle
+ const hb=bob*.6;
+ el(27,-42+hb,19,16.5,G1);el(32,-36+hb,14,9,G2,0,1);
+ el(40,-37+hb,9.5,7.5,G2);el(47,-40+hb,3.7,2.9,'#1c2129');
+ ctx.beginPath();ctx.moveTo(47,-35.5+hb);ctx.quadraticCurveTo(43,-31.5+hb,37,-33.5+hb);ctx.lineWidth=1.6;ctx.stroke();
+ if(o.mouth){ctx.beginPath();ctx.ellipse(41,-30+hb,3.4,4.4+Math.sin(t/3)*.8,0,0,Math.PI);ctx.fillStyle='#ff7b9c';ctx.fill();ctx.lineWidth=1.6;ctx.stroke();}
+ // dark shiny eyes
+ el(33,-46+hb,3.8,4.2,'#12161c');el(32.2,-47.5+hb,1.3,1.3,'#fff',0,1);el(42,-45+hb,2.8,3.2,'#12161c');el(41.4,-46.2+hb,.9,.9,'#fff',0,1);
+ ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(29,-52+hb);ctx.quadraticCurveTo(33,-54+hb,37,-51.5+hb);ctx.stroke();
+ // rose ear: small, folded back and down
+ const ef=Math.sin(t/30)*.6+(o.mouth?-1.5:0);
+ ctx.beginPath();ctx.moveTo(12,-49+hb);ctx.lineTo(22,-59+hb+ef);ctx.quadraticCurveTo(32,-55+hb,24,-44+hb);ctx.closePath();ctx.fillStyle=G3;ctx.fill();ctx.lineWidth=2;ctx.stroke();
+ ctx.beginPath();ctx.moveTo(17,-50+hb);ctx.quadraticCurveTo(22,-53+hb,24,-48+hb);ctx.strokeStyle='#d99aa8';ctx.lineWidth=1.6;ctx.stroke();
+ ctx.restore();}
 function drawPlaceholderPet(x,y,s){ctx.save();ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(x,y-12*s,18*s,16*s,0,0,7);ctx.fill();txt('?',x,y-14*s,26*s,'#fff');ctx.restore();}
 
 /* ================= MATH QUESTION GENERATOR ================= */
@@ -446,12 +481,114 @@ function addXP(n){const p=PR();p.xp+=n;floatText('+'+n+' XP',P?P.x+10:480,P?P.y-
 function addStars(n){PR().stars+=n;}
 function bumpBond(n){const a=PR().active;if(a&&PR().pets[a]){const before=bondLv(PR().pets[a].bond);PR().pets[a].bond+=n;if(bondLv(PR().pets[a].bond)>before){toast(petOf(a).name+' bond grew to level '+bondLv(PR().pets[a].bond)+'!',220);sfx('lvl');}}}
 
+
+/* ================= STORMI: GUIDE, COMPANION & BOND ================= */
+const DN=()=>SV.dogName||'Stormi';
+const DG=()=>{const p=PR();if(!p.dog)p.dog={bond:0,intro:false,facts:[],pat:0};return p.dog;};
+const dogLv=()=>bondLv(DG().bond);
+const DOGFACTS=[
+ "Staffies are loving family dogs. People even call them 'nanny dogs' because they adore children!",
+ "A grown-up Staffy is only about 36 to 41 cm tall, but she is super strong and muscly for her size!",
+ "A dog's nose is up to 100,000 times better at smelling than yours. Sniff sniff!",
+ "Every dog's nose print is different, just like your fingerprints are different from everyone else's.",
+ "Dogs can hear very high sounds that people can't, like the squeak of a dog whistle.",
+ "Dogs see blue and yellow best. Red and green look greyish-brown to them, a bit like the Storm Cloud!",
+ "Puppies have 28 baby teeth. Grown-up dogs have 42 teeth!",
+ "Puppies are born with their eyes and ears shut. They open up after about two weeks.",
+ "Dogs talk with their tails, ears and eyes. A wagging tail often means happy, but check the whole dog!",
+ "Dogs dream too! If a sleeping pup twitches her paws, she might be chasing something in her dreams."];
+const DOGUNL=['','Friend for life! Hints at obstacles and gates.','Secret-path tips + a 2nd quiz clue!','Crosses out a wrong answer + speed cheer!','Helps at the start of every question!','MAX! Her cheer can make a bubble shield!'];
+const newSF=x=>({x:x,y:440,gy:440,face:1,vx:0,ph:0,wag:0,mouth:0,pc:0,cheer:1500,cd:0});
+let SF=newSF(0),DB={cur:null,q:[]},DT=null;
+function dogBark(){sfx('bark');SF.wag=70;SF.mouth=32;}
+function dogBond(n){const d=DG(),b=dogLv();d.bond+=n;const a=dogLv();if(a>b){toast('🐶 '+DN()+' bond level '+a+'!',240);toast(DOGUNL[a],240);sfx('lvl');dogBark();}}
+function dogSay(text,o){o=o||{};const m={text,fact:!!o.fact,t:0,ttl:o.ttl||Math.min(620,170+text.length*5),bark:o.bark!==false};
+ if(DB.cur){if(DB.q.length>=2){const i=DB.q.findIndex(x=>x.fact);DB.q.splice(i>=0?i:0,1);}DB.q.push(m);}else{DB.cur=m;if(m.bark)dogBark();}}
+function dogNext(){DB.cur=DB.q.shift()||null;if(DB.cur&&DB.cur.bark)dogBark();}
+function dogFact(){const d=DG(),left=DOGFACTS.map((f,i)=>i).filter(i=>!d.facts.includes(i));if(!left.length)return;const i=left[0];d.facts.push(i);addXP(5);dogSay('📜 Fact Scroll: '+DOGFACTS[i],{fact:true});save();}
+function petDog(){if(mode!=='play'||!P||Math.abs(SF.x-P.x)>190)return;SF.wag=90;SF.mouth=60;sfx('yip');floatText('♥',SF.x,SF.y-62,'#ff5a8a');
+ if(SF.pc<=0){SF.pc=2400;dogBond(1);dogSay(pick(['Woof! Thanks for the pat, '+PL().name+'!','Wag wag wag! I love you!','Best pat ever! Let\'s go find colours!']),{bark:false});}}
+function dogFollow(){const p=P,L=LV,off=activePet()?72:46,tx=p.x+10-p.face*off;
+ if(Math.abs(SF.x-p.x)>640){SF.x=tx;SF.y=p.y+p.h;SF.gy=SF.y;}
+ const dx=tx-SF.x;SF.vx=Math.abs(dx)>7?clamp(dx*.1,-6,6):0;SF.x+=SF.vx;SF.face=Math.abs(SF.vx)>.4?Math.sign(SF.vx):p.face;SF.ph+=Math.abs(SF.vx)*.32;
+ let gy=null;const fy=p.y+p.h;for(const q of L.plats){if(q.t==='b')continue;if(SF.x>=q.x&&SF.x<=q.x+q.w&&q.y>=fy-26&&(gy===null||q.y<gy))gy=q.y;}
+ if(gy!==null)SF.gy=gy;SF.y+=clamp(SF.gy-SF.y,-10,10);}
+function updDog(){const p=P,L=LV;dogFollow();if(SF.wag>0)SF.wag--;if(SF.mouth>0)SF.mouth--;if(SF.pc>0)SF.pc--;if(SF.cd>0)SF.cd--;
+ if(DB.cur&&++DB.cur.t>DB.cur.ttl)dogNext();
+ const lv=dogLv();
+ if(T%10===0){
+  for(const o of L.obst){if(o.gone||o.dying||o.dogSaid)continue;if(Math.abs(o.x+o.w/2-p.x)<340){o.dogSaid=true;const el=o.k==='thorn'?0:o.k==='crate'?2:1,E=ELEMS[el];
+   dogSay((o.k==='thorn'?'Prickly thorns!':o.k==='crate'?'Heavy crates!':'Hot flames!')+' Press Q to pick '+E.ic+' '+E.n+', then V to use your special. '+(p.ch<100?'Fight and collect stars to fill your meter first!':'Your meter is ready!'));}}
+  for(const g of L.gates){if(g.open||g.dogSaid||g.x<p.x||g.x-p.x>560)continue;g.dogSaid=true;
+   dogSay(g.kind==='might'?'Test Your Might! Answer the sums fast to break the boards!':GATENAME[g.kind]+' ahead! Answer the questions to set a colour free.'+(lv>=2?' Wrong tries are okay, I will sniff out clues!':''));}
+  for(const h of L.hints){if(h.done||Math.abs(p.x-h.x)>110||lv<h.min)continue;h.done=true;dogSay(h.t);}
+  if(p.hp<=2&&SF.cd<=0&&DB.cur===null){SF.cd=1500;dogSay(pick(['Stay brave! You can do it!','Take a breath. I am right here with you!']));}}
+ if(lv>=2&&++SF.cheer>2100&&!DB.cur&&mode==='play'){SF.cheer=0;dogBark();p.ch=Math.min(100,p.ch+6+4*lv);if(lv>=3)p.speedT=Math.max(p.speedT,150);if(lv>=5)p.shield=Math.max(p.shield,480);
+   floatText('🐶 Cheer boost!',SF.x,SF.y-70,'#9cf');addParts(p.x+10,p.y+20,10,'#9cf',{star:true});dogSay(pick(['WOOF! Cheer boost! Go go go!','You are amazing! Here is a boost!','Yip yip! Believe in yourself!']),{bark:false});}}
+function dogQuizHelp(start){if(!QZ||QZ.done)return;const q=QZ.qs[QZ.i],lv=dogLv();const left=q.opts.map((o,i)=>i).filter(i=>i!==q.c&&!QZ.rem.includes(i));
+ if(start){QZ.dm=QZ.i===0?DN()+': Take your time. I believe in you!':'';if(lv>=4&&left.length>=2){QZ.rem.push(left[ri(0,left.length-1)]);QZ.dm=DN()+' crossed one out for you!';}return;}
+ if(lv>=3&&left.length>=2){QZ.rem.push(left[ri(0,left.length-1)]);QZ.dm=DN()+' crossed out a wrong answer!';}
+ else if(lv>=2&&QZ.wrong>=2){QZ.dm=DN()+' sniffs: the answer starts with "'+Array.from(String(q.opts[q.c]))[0]+'"';}
+ else if(lv>=2)QZ.dm=DN()+': Read the clue again, you are close!';}
+function dogTalk(lines,onEnd,ret){DT={lines,i:0,t:0,onEnd,ret:ret||'play'};mode='dogtalk';SF.wag=60;if(lines[0].b)sfx('bark');}
+function dogTalkEnd(){const f=DT.onEnd,r=DT.ret;DT=null;mode=r;if(f)f();}
+function dogTalkAdv(){const full=DT.lines[DT.i].s.length*1.2;if(DT.t<full){DT.t=1e4;return;}DT.i++;DT.t=0;if(DT.i>=DT.lines.length){dogTalkEnd();return;}SF.wag=60;if(DT.lines[DT.i].b)sfx('bark');else sfx('yip');}
+function dogIntro(ret){const n=PL().name;dogTalk([
+ {s:'Woof woof! Hi '+n+'! I am '+DN()+', a Staffordshire bull terrier puppy, and I am your guide!',b:1},
+ {s:'Oh no! The grumpy Storm Cloud stole all the colours of the world. Everything has gone grey!'},
+ {s:'Your quest: collect the colour stars ⭐ and rescue the colours, one glowing gate at a time.'},
+ {s:'Every gate asks questions. Answer them to open it. If you get stuck, I will whisper hints!'},
+ {s:'Make friends with the animal pets you find. Press E near them and pick their favourite food!'},
+ {s:'At the end you will face the Storm Cloud itself. Together we can do it! Ready? Let\'s go!',b:1}],
+ ()=>{DG().intro=true;save();if(ret!=='pets'){dogBark();dogSay('Tip: tap me or press E (when nobody is near) to give me a pat. It makes our bond stronger!',{bark:false});}},ret);}
+function updDogTalk(){T++;DT.t++;if(tap('interact')||tap('jump'))dogTalkAdv();}
+function drawDogTalk(){if(DT.ret==='pets')drawPetsBG();else drawWorld();ctx.fillStyle='rgba(10,10,40,.38)';ctx.fillRect(0,0,VW,VH);
+ const L=DT.lines[DT.i],spk=DT.t<L.s.length*1.2;
+ ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(175,474,120,14,0,0,7);ctx.fill();
+ dogSprite(170,470,1,2.9,T,{fast:SF.wag>0||!spk,mouth:SF.wag>0||spk,hop:SF.wag>0?-Math.abs(Math.sin(T/3))*3:0});
+ const bx=330,by=70,bw=600,bh=250;rr(bx,by,bw,bh,26);ctx.fillStyle='#fffdf2';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle='#3b6ea8';ctx.stroke();
+ ctx.beginPath();ctx.moveTo(bx+14,by+bh-2);ctx.lineTo(bx-26,by+bh+30);ctx.lineTo(bx+66,by+bh-2);ctx.fillStyle='#fffdf2';ctx.fill();ctx.beginPath();ctx.moveTo(bx+14,by+bh);ctx.lineTo(bx-26,by+bh+30);ctx.lineTo(bx+66,by+bh);ctx.strokeStyle='#3b6ea8';ctx.lineWidth=6;ctx.stroke();ctx.fillStyle='#fffdf2';ctx.fillRect(bx+16,by+bh-6,48,8);
+ rr(bx+24,by-18,170,38,14);ctx.fillStyle='#3b6ea8';ctx.fill();txt('🐶 '+DN(),bx+109,by+2,22,'#fff');
+ const shown=L.s.slice(0,Math.floor(DT.t/1.2));wrap(shown,bx+bw/2,by+72,bw-60,38,27,'#2b2b55');
+ if(!spk)txt('Tap or press E ▶',bx+bw-30,by+bh-24,18,'#e0409a','right');
+ txt((DT.i+1)+'/'+DT.lines.length,bx+34,by+bh-24,16,'#777','left');
+ NUI.push({x:0,y:0,w:VW,h:VH,fn:dogTalkAdv});
+ btn('Skip ⏭',VW-140,VH-56,124,42,()=>{dogTalkEnd();},{size:20,col:'#ffd0d8'});}
+function drawDogUI(){const sx=SF.x-Math.round(cam.x),sy=SF.y,lv=dogLv(),d=DG();
+ // bond chip
+ rr(322,8,118,52,12);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();dogSprite(350,53,1,.5,T,{});txt('♥'+lv,402,24,17,'#ffd','left','#2b2b55');
+ const nx=[2,5,9,14][lv-1],pv=[0,2,5,9][lv-1];bar(380,38,52,9,nx?(d.bond-pv)/(nx-pv):1,'#ff7aa8');
+ NUI.push({x:sx-36,y:sy-62,w:72,h:64,fn:petDog});
+ const m=DB.cur;if(!m)return;
+ ctx.font=F(17);const mw=m.fact?360:320,words=m.text.split(' ');let line='',ls=[];
+ for(const wd of words){const t=line?line+' '+wd:wd;if(ctx.measureText(t).width>mw&&line){ls.push(line);line=wd;}else line=t;}ls.push(line);
+ const w=Math.max(...ls.map(l=>ctx.measureText(l).width),90)+28,h=ls.length*22+34;
+ const bx=clamp(sx-w/2,8,VW-w-8),by=Math.max(126,sy-80-h);
+ rr(bx,by,w,h,14);ctx.fillStyle=m.fact?'#fffbe0':'#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=m.fact?'#a36b1d':'#3b6ea8';ctx.stroke();
+ const tx=clamp(sx+8*SF.face,bx+18,bx+w-18);ctx.beginPath();ctx.moveTo(tx-9,by+h-1);ctx.lineTo(sx+6*SF.face,Math.min(sy-62,by+h+16));ctx.lineTo(tx+9,by+h-1);ctx.fillStyle=m.fact?'#fffbe0':'#fff';ctx.fill();ctx.stroke();
+ ctx.fillStyle=m.fact?'#fffbe0':'#fff';ctx.fillRect(tx-8,by+h-4,16,6);
+ txt('🐶 '+DN(),bx+12,by+13,14,m.fact?'#a36b1d':'#3b6ea8','left');ls.forEach((l,i)=>txt(l,bx+w/2,by+34+i*22,17,'#2b2b55'));
+ NUI.push({x:bx,y:by,w,h,fn:()=>{if(DB.cur)dogNext();}});}
+function drawDogTab(){const dg=DG(),lv=dogLv(),pr=PR();
+ rr(30,112,440,410,18);ctx.fillStyle='rgba(255,255,255,.96)';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#3b6ea8';ctx.stroke();
+ txt('🐶 '+DN(),250,134,28,'#3b6ea8');dogSprite(250,300,1,2.3,T,{fast:true,mouth:true});
+ txt('Always a friend! Bond '+'♥'.repeat(lv)+'♡'.repeat(5-lv),250,318,19,'#ff3b5c');
+ const nx=[2,5,9,14][lv-1],pv=[0,2,5,9][lv-1];if(nx)bar(150,332,200,12,(dg.bond-pv)/(nx-pv),'#ff7aa8');else txt('MAX BOND!',250,338,14,'#e0409a');
+ for(let i=1;i<=5;i++)txt((lv>=i?'✔ ':'🔒 ')+'♥'+i+': '+DOGUNL[i],46,358+(i-1)*19,13,lv>=i?'#2b7a2b':'#888','left');
+ btn('Feed 🍎 ('+pr.treats+')',44,464,128,46,()=>{if(pr.treats>0){pr.treats--;dogBond(1);dogBark();toast(DN()+' loved the treat! ♥',100);save();}else toast('Collect 🍎 treats in the level!',90);},{size:16,col:pr.treats>0?'#ffe066':'#ddd'});
+ btn('✏ Rename',180,464,128,46,renameDog,{size:16});btn('▶ Intro',316,464,140,46,()=>{dogIntro('pets');},{size:16});
+ rr(490,112,440,410,18);ctx.fillStyle='rgba(255,255,255,.96)';ctx.fill();ctx.strokeStyle='#a36b1d';ctx.stroke();
+ txt('📜 Fact Scrolls ('+dg.facts.length+'/'+DOGFACTS.length+')',710,132,22,'#a36b1d');
+ DOGFACTS.forEach((f,i)=>{const y=148+i*37,got=dg.facts.includes(i);ctx.font=F(12);
+  if(got)wrap(f,506,y+11,408,15,12,'#2b2b55','left');else txt('❓ '+DN()+' will share this one soon...',506,y+18,13,'#999','left');});}
+function renameDog(){const n=prompt('Dog name?',DN());if(n&&n.trim()){SV.dogName=n.trim().slice(0,14);save();}}
+
 /* ================= LEVEL 1 BUILD ================= */
 function mkEnemy(t,x,y){const e={t,x,y:0,w:22,h:56,vx:0,vy:0,hp:2,dir:-1,cd:ri(30,90),home:x,flash:0,stun:0,wind:0,t0:ri(0,99),onGround:false,y0:y};
  if(t==='hopper'){e.w=30;e.h=26;e.hp=1;}if(t==='cloud'){e.w=36;e.h=26;e.hp=1;}
  e.y=(y===undefined||t!=='cloud'&&y===undefined)?440-e.h:(t==='cloud'?y:y-e.h);if(easy()&&e.hp>1)e.hp=1;return e;}
 function buildLevel(){
- const L={plats:[],spikes:[],movers:[],enemies:[],items:[],balls:[],gates:[],pets:[],mounds:[],scrolls:[],water:[],checks:[],dark:[],signs:[],obst:[],springs:[],npcs:[],eproj:[],proj:[],W:0,bossX:0};
+ const L={plats:[],spikes:[],movers:[],enemies:[],items:[],balls:[],gates:[],pets:[],mounds:[],scrolls:[],water:[],checks:[],dark:[],signs:[],obst:[],springs:[],npcs:[],eproj:[],proj:[],hints:[],W:0,bossX:0};
  let cx=0,gid=0;
  const G=(len,y)=>{y=y||440;L.plats.push({x:cx,y,w:len,h:Math.max(100,580-y),t:'g'});const s=cx;cx+=len;return s;};
  const gap=n=>{cx+=n;};
@@ -474,46 +611,47 @@ function buildLevel(){
  const PT=(id,x,y)=>{if(!PR().pets[id])L.pets.push({id,x,y});};
  const SPR=(x,y)=>L.springs.push({x,y:y-12,w:38,h:12,sq:0});
  const SC=(id,x,y)=>L.scrolls.push({id,x,y});
+ const HS=(x,t,min,pet)=>{if(pet&&PR().pets[pet])return;L.hints.push({x,t,min:min||1,done:false});};
  const TR=(x,y)=>L.items.push({x,y,k:'treat'});
  const fill=(x0,x1,n,types)=>{for(let i=0;i<n;i++)EN(pick(types),rnd(x0,x1));};
  let s;
  // ---- 1: Meadow tutorial
  s=G(2000);CK(s+60);SG(s+120,'← → move   ↑ / Space jump');SG(s+520,'Z punch · X kick · C throw star');SG(s+1000,'Stomp enemies or punch them! V = bending special');
- arc(s+300,390,5,60);row(s+800,400,5);arc(s+1250,390,6,70);
+ arc(s+300,390,5,60);row(s+800,400,5);HS(s+260,'Collect the colour stars ⭐ as you go. Each one brings a little colour back!',1);arc(s+1250,390,6,70);
  PT('fox',s+1250,440);SG(s+1130,'A friend! Press E near animals');EN('ninja',s+1550);EN('ninja',s+1800);fill(s+250,s+1000,1,['hopper']);TR(s+700,330);
  gap(120);
  // ---- 2: Spiky hills + secret sky chain
  s=G(2300);CK(s+40);SP(s+360,3);arc(s+330,380,6,70);SP(s+820,2);EN('ninja',s+560);TH(s+1800);
- FL(s+1000,350,90);FL(s+1130,270,90);FL(s+1260,190,90);FL(s+1400,190,220);row(s+1410,150,4);SC('cloud',s+1580,150);TR(s+1470,150);
+ FL(s+1000,350,90);FL(s+1130,270,90);FL(s+1260,190,90);FL(s+1400,190,220);row(s+1410,150,4);HS(s+900,'Psst! Jump up the floating ledges. There is a secret sky path up there!',1);SC('cloud',s+1580,150);TR(s+1470,150);
  EN('hopper',s+1050);EN('ninja2',s+1650);EN('ninja',s+1900);row(s+1800,400,5);GT(s+2200,'maths');
  // ---- 3: Bouncy bamboo road with panda pit
  s=G(1000);CK(s+40);EN('hopper',s+300);EN('hopper',s+520);BALL(s+640,s+900);arc(s+500,390,6,70);
  const pit=cx;L.plats.push({x:pit,y:520,w:300,h:60,t:'g'});gap(300);
- MV(pit+150,436,100,100,0,.02);PT('panda',pit+90,520);SPR(pit+235,520);row(pit+40,480,3);ST(pit+130,470);
- s=G(1100);L.mounds.push({id:'m1',x:s+300});CR(s+900);EN('ninja',s+500);BALL(s+700,s+1000);EN('hopper',s+800);arc(s+150,390,5,60);CK(s+60);
+ HS(pit-160,'I smell a friend down in that pit! Hop in, then bounce back out on the spring.',2,'panda');MV(pit+150,436,100,100,0,.02);PT('panda',pit+90,520);SPR(pit+235,520);row(pit+40,480,3);ST(pit+130,470);
+ s=G(1100);L.mounds.push({id:'m1',x:s+300});HS(s+180,'Dig dig dig! Treasure is buried by that mound. A panda friend could dig it up!',2);CR(s+900);EN('ninja',s+500);BALL(s+700,s+1000);EN('hopper',s+800);arc(s+150,390,5,60);CK(s+60);
  gap(140);
  s=G(1900);CK(s+40);FL(s+300,350,100);FL(s+450,270,100);FL(s+600,190,100);FL(s+720,190,520);
- L.dark.push({x:s+700,y:40,w:560,h:150});row(s+760,150,5);ST(s+1000,120);ST(s+1040,150);PT('owl',s+1180,190);SC('sun',s+1260,150);
+ HS(s+250,'Climb the ledges to a dark cave. Fire lights it up, and an owl friend lives inside!',2,'owl');L.dark.push({x:s+700,y:40,w:560,h:150});row(s+760,150,5);ST(s+1000,120);ST(s+1040,150);PT('owl',s+1180,190);SC('sun',s+1260,150);
  EN('ninja',s+500);EN('ninja',s+950);EN('ninja2',s+1400);SP(s+1500,2);arc(s+1380,380,5,60);GT(s+1800,'reading');
  // ---- 4: Splash pond
- s=G(600);CK(s+60);SG(s+300,'Swim! Tap jump to paddle up');
+ s=G(600);CK(s+60);SG(s+300,'Swim! Tap jump to paddle up');HS(s+420,'Splash! A dolphin friend and a Rainbow Scroll are hiding in the water. Dive in!',2,'dolphin');
  const x0=cx;G(1100,520);L.water.push({x:x0,y:410,w:1100,h:110});FL(x0+300,425,70);FL(x0+720,425,70);
  PT('dolphin',x0+500,495);row(x0+100,470,5);row(x0+620,480,5);ST(x0+250,440);SC('rain',x0+980,490);arc(x0+860,420,4,40);
  s=G(1700);CK(s+40);FW(s+1480);L.npcs.push({id:'pip',x:s+300});EN('ninja',s+700);EN('hopper',s+900);BALL(s+1000,s+1300);EN('ninja2',s+1450);arc(s+1200,380,5,60);
  // ---- 5: Dojo and sky
  s=G(1400);CK(s+40);EN('ninja',s+500);EN('ninja',s+800);EN('ninja2',s+1050);row(s+600,400,6);SG(s+1000,'Master Moo guards the dojo gate...');GT(s+1300,'might');
- s=G(1500);CK(s+40);EN('cloud',s+400,300);EN('cloud',s+700,280);EN('cloud',s+1100,300);SPR(s+280,440);FL(s+430,170,330);
+ s=G(1500);CK(s+40);EN('cloud',s+400,300);EN('cloud',s+700,280);EN('cloud',s+1100,300);SPR(s+280,440);HS(s+180,'Bounce on the red spring to reach the sky ledge. A unicorn friend lives up there!',2,'unicorn');FL(s+430,170,330);
  PT('unicorn',s+640,170);row(s+450,130,3);SC('bee',s+720,130);TR(s+520,130);SP(s+900,3);arc(s+870,370,6,70);BALL(s+1050,s+1400);
  const pit2=cx;gap(280);MV(pit2+140,436,110,95,0,.025);
  s=G(900);CK(s+40);EN('hopper',s+300);EN('ninja2',s+500);GT(s+800,'science');
  // ---- 6: Ember cave and storm approach
  s=G(1600);CK(s+40);TH(s+1400);BALL(s+120,s+420);FL(s+300,350,90);FL(s+430,270,90);FL(s+560,190,90);FL(s+680,190,400);
- L.dark.push({x:s+660,y:40,w:440,h:150});row(s+720,150,4);ST(s+900,130);PT('dragon',s+950,190);SC('bolt',s+1040,150);
+ HS(s+250,'More ledges lead up to an ember cave. Sparky the dragon lives there!',2,'dragon');L.dark.push({x:s+660,y:40,w:440,h:150});row(s+720,150,4);ST(s+900,130);PT('dragon',s+950,190);SC('bolt',s+1040,150);
  EN('ninja2',s+620);EN('hopper',s+1200);EN('ninja',s+1350);BALL(s+1150,s+1500);SP(s+1000,2);
  const pit3=cx;gap(150);
- s=G(1700);CK(s+40);FL(s+1300,150,150);row(s+1320,112,4);SG(s+1000,'🌪️ Air special = giant jump to the sky ledge, then hold jump to glide!');EN('cloud',s+300,300);EN('ninja',s+500);SP(s+700,3);arc(s+680,370,6,80);EN('ninja2',s+900);BALL(s+1000,s+1300);EN('hopper',s+1350);GT(s+1600,'mixed');
+ s=G(1700);CK(s+40);FL(s+1300,150,150);row(s+1320,112,4);HS(s+800,'See that high ledge? Switch to 🌪️ Air (Q) and press V for a giant jump!',1);SG(s+1000,'🌪️ Air special = giant jump to the sky ledge, then hold jump to glide!');EN('cloud',s+300,300);EN('ninja',s+500);SP(s+700,3);arc(s+680,370,6,80);EN('ninja2',s+900);BALL(s+1000,s+1300);EN('hopper',s+1350);GT(s+1600,'mixed');
  // ---- 7: Storm arena
- s=G(1800);CK(s+40);row(s+300,400,5);EN('ninja',s+500);EN('cloud',s+700,300);arc(s+900,380,6,70);SG(s+1000,'The grumpy Storm Cloud is ahead!');L.bossX=s+1250;
+ s=G(1800);CK(s+40);row(s+300,400,5);EN('ninja',s+500);EN('cloud',s+700,300);arc(s+900,380,6,70);SG(s+1000,'The grumpy Storm Cloud is ahead!');HS(s+900,'The Storm Cloud is just ahead! I will be right behind you. You can do it!',1);L.bossX=s+1250;
  L.W=cx;
  // apply save
  const pr=PR();L.gates.forEach(g=>{if(pr.gates.includes(g.id)){g.open=true;L.plats.splice(L.plats.indexOf(g.barrier),1);}});
@@ -531,7 +669,8 @@ function moveBody(b,solids){b.x+=b.vx;
   else if(b.vy>0||(b.vy===0&&py+b.h<=s.y+1)){b.y=s.y-b.h;b.vy=0;b.onGround=true;b.gnd=s;}
   else if(b.vy<0){b.y=s.y+s.h;b.vy=0;}}}
 function startPlay(){LV=buildLevel();const cp=PR().cp||60;P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];mode='play';
- const n=LV.gates.filter(g=>g.open).length;sat=0.15+0.14*n;if(PR().boss)sat=1;}
+ const n=LV.gates.filter(g=>g.open).length;sat=0.15+0.14*n;if(PR().boss)sat=1;
+ SF=newSF(cp>100?cp-70:24);DB={cur:null,q:[]};if(!DG().intro&&!PR().cp)dogIntro();}
 function respawn(msg){P.x=P.safe.x;P.y=P.safe.y-2;P.vx=0;P.vy=0;P.inv=120;if(msg)toast(msg,120);addParts(P.x+10,P.y+28,16,'#fff',{sp:1.5});}
 function hurt(dmg,dir,src){if(P.inv>0||mode!=='play')return;
  if(P.shield>0){P.shield=0;P.inv=90;sfx('pop');addParts(P.x+10,P.y+28,14,'#bdf',{sp:1.4});floatText('Bubble pop!',P.x,P.y-10,'#7df');return;}dmg=easy()?Math.max(1,Math.ceil(dmg/2)):dmg;P.hp-=dmg;P.inv=easy()?140:95;P.hurtT=12;P.vx=-(dir||P.face)*5;P.vy=-6;P.atk=null;sfx('hurt');shake=8;addParts(P.x+10,P.y+20,8,'#ffd23f',{star:true});
@@ -637,9 +776,9 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
    else if(it.k==='treat'){pr.treats++;toast('Pet treat found! Feed your friends in the 🐾 screen.',120);sfx('pet');}
    else if(it.k==='heart'){if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);}floatText('+♥',it.x,it.y,'#f66');sfx('pet');}}}
  L.items=L.items.filter(i=>!i.got);
- for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';}}
+ for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';}}
  L.scrolls=L.scrolls.filter(c=>!c.got);
- for(const c of L.checks)if(!c.on&&p.x>c.x){L.checks.forEach(o=>o.on=false);c.on=true;if(pr.cp!==c.x){pr.cp=c.x;p.hp=Math.min(p.max,p.hp+2);if(c.x>100)toast('Checkpoint! ⚑',90);save();}}
+ for(const c of L.checks)if(!c.on&&p.x>c.x){L.checks.forEach(o=>o.on=false);c.on=true;if(pr.cp!==c.x){pr.cp=c.x;p.hp=Math.min(p.max,p.hp+2);if(c.x>100){toast('Checkpoint! ⚑',90);dogFact();}save();}}
  // gates
  for(const g of L.gates)if(!g.open&&p.gcool<=0&&p.x+p.w>g.x-70&&Math.abs(p.y-300)<400){if(g.kind==='might')startBoards(g);else startQuiz(g.kind,g);return;}
  if(p.x>L.bossX&&!pr.boss){startDuel();return;}
@@ -661,7 +800,8 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.vy+=q.g;q.life--;}parts=parts.filter(q=>q.life>0);
  const tgt=p.x-420+p.face*50;cam.x+=(tgt-cam.x)*.1;cam.x=clamp(cam.x,0,L.W-VW);
  const n=L.gates.filter(g=>g.open).length;const st=pr.boss?1:.15+.14*n;sat+=(st-sat)*.02;
- if(T%300===0)save();}
+ updDog();if(tap('interact')&&!p.near)petDog();
+  if(T%300===0)save();}
 
 /* ================= WORLD DRAWING ================= */
 function drawBGscene(parx){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,Hc(205,85,62));g.addColorStop(1,Hc(190,75,90));ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
@@ -727,6 +867,7 @@ for(const q of L.plats)if(q.rock&&vis(q)){ctx.globalAlpha=q.tmp<60&&q.tmp%8<4?.5
  for(const e of L.enemies)if(vis(e))drawEnemy(e);
  stormCloud(L.bossX+330,260+Math.sin(T/30)*8,.9,'angry');if(!PR().boss&&Math.abs(p.x-L.bossX)<400)txt('⚡',L.bossX+330,180,30);
  const ap=activePet();if(ap)petSprite(ap.def.id,PF.x,PF.y,PF.face,1,T);
+ dogSprite(SF.x,SF.y,SF.face,.95,T,{run:Math.abs(SF.vx)>.3,ph:SF.ph,fast:SF.wag>0,mouth:SF.wag>0});
  // player
  if(!(p.inv>0&&Math.floor(p.inv/4)%2)){const a=p.atk;const pose=a?(a.type==='punch'?'punch':a.type==='kick'?'kick':'cast'):p.idolT>0&&p.onGround?'idol':p.hurtT>0?'hurt':p.swim?'jump':!p.onGround?'jump':Math.abs(p.vx)>.5?'run':'idle';
   stick(p.x+10,p.y+56,{col:PL().color,idol:SV.idol,face:p.face,pose,ph:p.ph,at:a?a.t/a.dur:0,glow:PR().lvl>=6?'#ffd23f':null});
@@ -758,6 +899,7 @@ function drawHUD(){const pr=PR(),p=P;if(p.stageT>0)stageLights(p.stageT);
  txt('⭐ '+pr.stars,22,82,18,'#ffe066','left','#2b2b55');txt('🍎 '+pr.treats,100,82,18,'#fff','left','#2b2b55');
  const el=ELEMS[pr.elem];bar(22,98,150,14,p.ch/100,el.c);txt(el.ic+' '+el.n+(p.ch>=100?' READY! V':''),180,105,14,'#fff','left','#2b2b55');txt(el.ab+': '+el.sh.split(',')[0].split(' ').slice(0,5).join(' '),22,126,13,'#fff','left','#2b2b55');
  const ap=activePet();if(ap){rr(264,8,52,52,12);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();petSprite(ap.def.id,290,52,1,.75,T);txt('♥'+ap.lv,290,64,12,'#ffd','center','#2b2b55');}
+ drawDogUI();
  btn('🐾',VW-190,8,56,44,()=>openPets('play'),{size:22});btn(SV.mute?'🔇':'🔊',VW-128,8,56,44,toggleMute,{size:22});btn('⏸',VW-66,8,56,44,()=>{mode='pause';},{size:22});
  let y=130;for(const t of toasts){t.t--;ctx.globalAlpha=clamp(t.t/30,0,1);ctx.font=F(20);const w=ctx.measureText(t.s).width+30;rr(VW/2-w/2,y-16,w,32,16);ctx.fillStyle='rgba(255,255,255,.93)';ctx.fill();txt(t.s,VW/2,y,20,'#2b2b55');ctx.globalAlpha=1;y+=38;}
  toasts=toasts.filter(t=>t.t>0);
@@ -771,12 +913,12 @@ const volBtns=(x,y,w,h,sz)=>{btn('🎵 Music '+Math.round(SV.mv*100)+'%',x,y,w,h
 /* ================= QUIZ GATE ================= */
 function startQuiz(kind,gate){const tier=PL().tier,cats=GATE[tier][kind];const n=easy()?2:3;const qs=[];
  for(let i=0;i<n;i++){let q;if(tier==='age7'&&(kind==='maths'||kind==='mixed')&&Math.random()<.4){const g=genMath(tier,PR().lvl>3?1:0);q={q:g.q,opts:g.opts,c:g.c,h:g.h};}else q=drawQ(tier,cats[i%cats.length]);qs.push(q);}
- QZ={kind,gate,qs,i:0,hint:'',rem:[],ok:0,wrong:0,done:false,t:0,msg:''};quizFox();mode='quiz';}
+ QZ={kind,gate,qs,i:0,hint:'',rem:[],ok:0,wrong:0,done:false,t:0,msg:'',dm:''};quizFox();dogQuizHelp(true);mode='quiz';}
 function quizFox(){const f=hasPet('fox');QZ.rem=[];QZ.msg='';if(!f)return;const q=QZ.qs[QZ.i];const wr=q.opts.map((o,i)=>i).filter(i=>i!==q.c);shuffle(wr);const n=Math.min(f>=3?2:1,q.opts.length-2);QZ.rem=wr.slice(0,n);if(n>0)QZ.msg=petOf('fox').name+' whispers: "Not those!" 🦊';}
 function quizAnswer(i){if(!QZ||QZ.done)return;const q=QZ.qs[QZ.i];if(i<0||i>=q.opts.length||QZ.rem.includes(i))return;
  if(i===q.c){sfx('ok');addXP(QZ.wrong?8:15);addStars(2);addStars(0);QZ.i++;QZ.hint='';QZ.wrong=0;if(QZ.i>=QZ.qs.length){QZ.done=true;QZ.t=0;
-   const g=QZ.gate;g.open=true;LV.plats.splice(LV.plats.indexOf(g.barrier),1);PR().gates.push(g.id);addXP(20);addStars(5);bumpBond(1);save();addParts(g.x,300,50,'#fff',{star:true,sp:2});}else{quizFox();bumpBond(0);}}
- else{sfx('bad');QZ.wrong++;QZ.hint=q.h;QZ.rem.push(i);}}
+   const g=QZ.gate;g.open=true;LV.plats.splice(LV.plats.indexOf(g.barrier),1);PR().gates.push(g.id);addXP(20);addStars(5);bumpBond(1);dogBond(1);dogBark();save();addParts(g.x,300,50,'#fff',{star:true,sp:2});}else{quizFox();dogQuizHelp(true);bumpBond(0);}}
+ else{sfx('bad');QZ.wrong++;QZ.hint=q.h;QZ.rem.push(i);dogQuizHelp(false);}}
 function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.done&&(tap('interact')||QZ.t>400)){mode='play';P.gcool=30;toast('A colour returns to the world! 🌈',150);}}
 function panel(x,y,w,h,col){ctx.fillStyle='rgba(10,10,40,.55)';ctx.fillRect(0,0,VW,VH);rr(x,y,w,h,26);ctx.fillStyle='#fffdf2';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle=col||'#2b2b55';ctx.stroke();}
 function drawQuiz(){drawWorld();drawHUD();const e=easy(),col={maths:'#ff7a3c',reading:'#3aa8ff',science:'#2fc46b',mixed:'#a35cff'}[QZ.kind];panel(60,40,840,470,col);
@@ -788,12 +930,14 @@ function drawQuiz(){drawWorld();drawHUD();const e=easy(),col={maths:'#ff7a3c',re
  else{for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>quizAnswer(i),{size:28,col:rm?'#ddd':null,tc:rm?'#aaa':null,dis:rm});}}
  if(QZ.hint){rr(100,e?440:430,760,52,14);ctx.fillStyle='#fff3b0';ctx.fill();wrap('💡 Not quite - try again! '+QZ.hint,480,e?466:456,720,22,e?20:19,'#7a4a00');}
  else if(QZ.msg){txt(QZ.msg,480,e?466:456,20,'#7a4a00');}
+ if(QZ.dm)txt('🐶 '+QZ.dm,480,e?503:497,e?16:17,'#2d5f8a');
+ dogSprite(850,98,-1,.62,T,{fast:QZ.done,mouth:QZ.done});
  btn('Back',74,52,90,38,()=>{mode='play';P.x=Math.max(10,QZ.gate.x-170);P.vx=0;P.gcool=150;},{size:18,col:'#fff'});}
 
 /* ================= PET FEEDING / BEFRIENDING ================= */
 function startFeed(def,first,ret){const foods=shuffle([def.food,...shuffle(FOODS.filter(f=>f!==def.food)).slice(0,2)]);FD={def,first,foods,hint:'',ok:false,t:0,ret:ret||'play'};mode='feed';}
 function feedAnswer(i){if(FD.ok)return;if(FD.foods[i]===FD.def.food){FD.ok=true;sfx('pet');const pr=PR();
-  if(FD.first){pr.pets[FD.def.id]={bond:1};if(!pr.active)pr.active=FD.def.id;LV.pets=LV.pets.filter(q=>q.id!==FD.def.id);addXP(25);addStars(5);addParts(P.x,P.y,30,'#ff8ab0',{star:true,sp:2});}
+  if(FD.first){dogBond(1);pr.pets[FD.def.id]={bond:1};if(!pr.active)pr.active=FD.def.id;LV.pets=LV.pets.filter(q=>q.id!==FD.def.id);addXP(25);addStars(5);addParts(P.x,P.y,30,'#ff8ab0',{star:true,sp:2});}
   else{pr.treats--;pr.pets[FD.def.id].bond++;const b=bondLv(pr.pets[FD.def.id].bond);addXP(5);if(b>FD.lvBefore)toast('Bond level up!',100);}
   save();}else{sfx('bad');FD.hint=FD.def.hint;}}
 function updFeed(){FD.t++;if(FD.lvBefore===undefined&&!FD.first)FD.lvBefore=bondLv(PR().pets[FD.def.id].bond);if(digit>=0&&digit<3)feedAnswer(digit);if(FD.ok&&tap('interact'))endFeed();}
@@ -815,8 +959,8 @@ function updPets(){if(tap('pets')||tap('pause')){closePets();return;}if(tap('lef
  if(tap('interact')){const d=PETS[petSel];if(PR().pets[d.id]){PR().active=d.id;save();sfx('pet');}}}
 function closePets(){if(petRet==='title')mode='title';else mode='play';}
 function drawPets(){drawPetsBG();const pr=PR();txt('Pet Friends',480,34,40,'#e0409a','center','#fff');
- btn('Pets',250,64,130,38,()=>{petTab=0;},{size:20,col:petTab===0?'#ffe066':'#fff'});btn('Scrolls ('+pr.scrolls.length+'/'+Object.keys(SCROLLS).length+')',390,64,230,38,()=>{petTab=1;},{size:20,col:petTab===1?'#ffe066':'#fff'});
- btn('Back',830,16,110,40,closePets,{size:22,col:'#ff9aa8'});txt('🍎 '+pr.treats+' treats',740,84,20,'#2b2b55');
+ btn('Pets',250,64,130,38,()=>{petTab=0;},{size:20,col:petTab===0?'#ffe066':'#fff'});btn('Scrolls ('+pr.scrolls.length+'/'+Object.keys(SCROLLS).length+')',390,64,230,38,()=>{petTab=1;},{size:20,col:petTab===1?'#ffe066':'#fff'});btn('🐶 '+DN().slice(0,10),630,64,150,38,()=>{petTab=2;},{size:20,col:petTab===2?'#ffe066':'#fff'});
+ btn('Back',830,16,110,40,closePets,{size:22,col:'#ff9aa8'});txt('🍎 '+pr.treats+' treats',880,84,17,'#2b2b55');if(petTab===2){drawDogTab();return;}
  if(petTab===1){const ids=Object.keys(SCROLLS);ids.forEach((id,i)=>{const got=pr.scrolls.includes(id),y=120+i*66;rr(40,y,880,58,12);ctx.fillStyle=got?'#fffbe0':'rgba(255,255,255,.55)';ctx.fill();ctx.strokeStyle='#a36b1d';ctx.lineWidth=3;ctx.stroke();
    txt(got?'📜':'❓',72,y+29,28);if(got){txt(SCROLLS[id][0],110,y+14,17,'#a36b1d','left');wrap(SCROLLS[id][1],110,y+38,780,0,16,'#2b2b55','left');}else txt('Hidden in a secret place... keep exploring!',110,y+29,18,'#777','left');});return;}
  PETS.forEach((d,i)=>{const x=30+(i%3)*155,y=112+Math.floor(i/3)*200,got=pr.pets[d.id],sel=i===petSel;rr(x,y,145,188,16);ctx.fillStyle=got?'#fff':'rgba(255,255,255,.55)';ctx.fill();ctx.lineWidth=sel?7:3;ctx.strokeStyle=sel?'#ff5a8a':'#2b2b55';ctx.stroke();NUI.push({x,y,w:145,h:188,fn:()=>{petSel=i;}});
@@ -863,25 +1007,26 @@ function drawBoards(){const e=easy();ctx.save();if(shake>0){ctx.translate(rnd(-s
   btn('Back',20,16,90,36,()=>{mode='play';P.x=Math.max(10,BD.gate.x-170);P.vx=0;P.gcool=150;},{size:18});}}
 
 /* ================= BOSS DUEL ================= */
-function startDuel(){D={ph:'intro',t:0,php:100,bhp:100,combo:0,turn:0,q:null,qt:0,qmax:1,hint:'',rem:[],anim:null,m:null,say:'GRUMBLE! I hate colours!',flash:0,sh:0};mode='duel';}
+function startDuel(){D={ph:'intro',t:0,php:100,bhp:100,combo:0,turn:0,q:null,qt:0,qmax:1,hint:'',rem:[],anim:null,m:null,say:'GRUMBLE! I hate colours!',flash:0,sh:0,ds:null};mode='duel';SF.wag=90;duelDog('Woof! That is the Storm Cloud! You can do it, '+PL().name+'! Answer fast and I will cheer for you!',320,true);}
 function duelNext(){D.turn++;D.hint='';D.rem=[];
  if(D.turn%3===0){const N=easy()?6:10;let g,k=0;do{g=genMath(PL().tier,0);k++;}while((g.ans<1||g.ans>N)&&k<80);if(g.ans<1||g.ans>N){const t=ri(2,N),a=ri(1,t-1);g={q:`${a} + ${t-a} = ?`,ans:t};}
   D.m={x:0,dir:1,sp:easy()?.045:.1,target:g.ans,q:g.q,N,res:null};D.ph='meter';D.t=0;}
  else{D.q=genMath(PL().tier,PR().lvl>3?1:0);D.qmax=D.qt=(easy()?26:13)*60;D.ph='ask';D.t=0;const f=hasPet('fox');if(f){const wr=D.q.opts.map((o,i)=>i).filter(i=>i!==D.q.c);shuffle(wr);D.rem=wr.slice(0,Math.min(f>=3?2:1,D.q.opts.length-2));}}}
-function duelAnim(who,dmg,name){D.anim={who,t:0,dmg,name,ap:false};D.ph='anim';}
+function duelAnim(who,dmg,name){if(who==='p')dmg=Math.round(dmg*(1+.06*dogLv()));D.anim={who,t:0,dmg,name,ap:false};D.ph='anim';}
+function duelDog(text,ttl,bark){D.ds={text,t:0,ttl:ttl||170};if(bark)sfx('bark');SF.wag=60;}
 function duelAnswer(i){if(D.ph!=='ask')return;const q=D.q;if(i<0||i>=q.opts.length||D.rem.includes(i))return;
  if(i===q.c){const f=D.qt/D.qmax;let dmg=Math.round(10+f*10+D.combo*3+(easy()?3:0));let name=pick(['Punch!','Flying Kick!','Star Barrage!']);D.combo++;
   if(D.combo>=3){dmg+=16;name=SV.idol?'Harmony Finale SUPER!':ELEMS[PR().elem].mv+' SUPER!';D.combo=0;sfx('spec');}else sfx('ok');addXP(3);duelAnim('p',dmg,name);}
- else{sfx('bad');D.combo=0;D.hint=q.h;D.rem.push(i);}}
+ else{sfx('bad');D.combo=0;D.hint=q.h;D.rem.push(i);if(dogLv()>=3){const lf=q.opts.map((o,k)=>k).filter(k=>k!==q.c&&!D.rem.includes(k));if(lf.length>=2){D.rem.push(lf[ri(0,lf.length-1)]);D.hint+=' 🐶 '+DN()+' crossed one out!';}}}}
 function duelStop(){const m=D.m;if(D.ph!=='meter'||m.res)return;const idx=Math.floor(m.x),d=Math.abs(idx+1-m.target);const dmg=d===0?28:d===1?16:7;m.res={d,dmg};D.t=0;sfx(d===0?'ok':'hit');}
-function updDuel(){T++;D.t++;if(D.flash>0)D.flash--;if(D.sh>0)D.sh--;
+function updDuel(){T++;D.t++;if(D.ds&&++D.ds.t>D.ds.ttl)D.ds=null;if(SF.wag>0)SF.wag--;if(D.flash>0)D.flash--;if(D.sh>0)D.sh--;
  if(digit>=0)duelAnswer(digit);
  if(D.ph==='intro'){if(D.t>110||tap('interact'))duelNext();}
  else if(D.ph==='ask'){D.qt--;if(D.qt<=0){D.combo=0;D.say='Too slow! ZAP!';duelAnim('b',easy()?6:11,'Lightning Zap');}}
  else if(D.ph==='meter'){const m=D.m;if(!m.res){m.x+=m.dir*m.sp*(1+D.t/900);if(m.x>=m.N){m.x=m.N-.001;m.dir=-1;}if(m.x<0){m.x=0;m.dir=1;}if(tap('jump')||tap('interact')||tap('punch'))duelStop();}
   else if(D.t>50){const r=m.res;D.m=null;duelAnim('p',r.dmg,r.d===0?'PERFECT STRIKE!':r.d===1?'Good hit!':'Little tap');}}
- else if(D.ph==='anim'){const a=D.anim;a.t++;if(a.t===28&&!a.ap){a.ap=true;D.sh=14;sfx('hit');if(a.who==='p'){D.bhp=Math.max(0,D.bhp-a.dmg);D.flash=12;D.say=pick(['Ow!','My clouds!','Grrr!','Not fair!']);}else{D.php=Math.max(0,D.php-a.dmg);D.flash=12;}}
-  if(a.t>78){if(a.who==='p'){if(D.bhp<=0){D.ph='win';D.t=0;sfx('win');}else if(D.turn%2===0)duelAnim('b',easy()?6:12,'Lightning Zap');else duelNext();}
+ else if(D.ph==='anim'){const a=D.anim;a.t++;if(a.t===28&&!a.ap){a.ap=true;D.sh=14;sfx('hit');if(a.who==='p'){D.bhp=Math.max(0,D.bhp-a.dmg);D.flash=12;D.say=pick(['Ow!','My clouds!','Grrr!','Not fair!']);duelDog(pick(['WOOF! Great hit!','Yay! Keep going!','You are so strong!','Cheer boost! Woof woof!']),120,true);}else{D.php=Math.max(0,D.php-a.dmg);D.flash=12;duelDog(pick(['Oh no! Get up! You can do it!','Shake it off! I believe in you!']),120);}}
+  if(a.t>78){if(a.who==='p'){if(D.bhp<=0){D.ph='win';D.t=0;sfx('win');duelDog('WE DID IT! Woof woof woof!',400,true);}else if(D.turn%2===0)duelAnim('b',easy()?6:12,'Lightning Zap');else duelNext();}
    else{if(D.php<=0){D.ph='ko';D.t=0;}else{D.say=pick(['Hehehe!','Grumble!','Rain on you!']);duelNext();}}}}
  else if(D.ph==='ko'){if(D.t>130){D.php=60;D.say='Hmph. Again!';duelNext();}}
  else if(D.ph==='win'){if(D.t>170||(D.t>60&&tap('interact')))endLevel();}}
@@ -891,6 +1036,7 @@ function drawFighters(){const a=D.anim,sx=D.sh>0?rnd(-4,4):0;
  if(D.ph==='win')ppose='cheer';if(a&&a.who==='b'&&a.t>26&&a.t<56)ppose='hurt';
  if(D.ph==='ko')ppose='hurt';
  ctx.save();ctx.translate(sx,0);
+ dogSprite(92,338,1,1.5,T,{fast:SF.wag>0||D.ph==='win',mouth:SF.wag>0||D.ph==='win',hop:D.ph==='win'?-Math.abs(Math.sin(T/4))*8:0});
  const lunge=a&&a.who==='b'?Math.sin(clamp(a.t/40,0,1)*Math.PI)*-60:0;
  stick(px,py,{col:PL().color,idol:SV.idol,face:1,s:2.3,pose:ppose,at,ph:0,glow:(a&&a.who==='p'&&/SUPER|PERFECT|Harmony/.test(a.name))?ELEMS[PR().elem].c2:null});
  ctx.save();if(D.flash>0&&D.flash%2)ctx.globalAlpha=.5;if(D.ph==='win'){ctx.translate(0,Math.min(200,D.t*3));ctx.globalAlpha=Math.max(0,1-D.t/120);}stormCloud(bx+lunge,by,1.15,D.ph==='win'?'sad':'angry');ctx.restore();
@@ -905,6 +1051,7 @@ function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.
  txt('VS',480,30,34,'#ff3b30','center','#fff');
  if(D.combo>0)txt('COMBO x'+D.combo+(D.combo>=2?'  (next hit = SPECIAL!)':''),480,92,22,'#ffe066','center','#a22');
  drawFighters();
+ if(D.ds){const m=D.ds;ctx.font=F(16);const mw=300,ws=m.text.split(' ');let ln='',ls=[];for(const wd of ws){const t=ln?ln+' '+wd:wd;if(ctx.measureText(t).width>mw&&ln){ls.push(ln);ln=wd;}else ln=t;}ls.push(ln);const h=ls.length*20+26,by=Math.max(96,214-h);rr(16,by,330,h,12);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#3b6ea8';ctx.stroke();ctx.beginPath();ctx.moveTo(60,by+h-1);ctx.lineTo(92,268);ctx.lineTo(100,by+h-1);ctx.fillStyle='#fff';ctx.fill();ctx.stroke();ctx.fillRect(61,by+h-3,38,5);txt('🐶 '+DN(),28,by+12,13,'#3b6ea8','left');ls.forEach((l,i)=>txt(l,181,by+32+i*20,16,'#2b2b55'));}
  if(D.say&&D.ph!=='win'){rr(560,96,230,40,14);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#223';ctx.stroke();txt(D.say,675,116,17,'#223');}
  if(D.anim&&D.anim.t>=10&&D.anim.t<70&&D.anim.who==='p')txt(D.anim.name,480,150,38,'#ffe066','center','#a22');
  if(D.anim&&D.anim.who==='b'&&D.anim.t>8&&D.anim.t<70)txt(D.anim.name,480,150,34,'#ffe34a','center','#335');
@@ -947,20 +1094,23 @@ function drawCatch(){const c=CT;drawBGscene(T*2);ctx.fillStyle='rgba(255,255,255
 /* ================= STORY / SCROLL / END ================= */
 let STY=null;
 function startStory(kind,lines,onEnd){STY={kind,lines,i:0,t:0,onEnd};mode='story';}
-function updStory(){STY.t++;const full=STY.lines[STY.i].length*1.6;if(tap('interact')||tap('jump')){if(STY.t<full)STY.t=full+1;else{STY.i++;STY.t=0;if(STY.i>=STY.lines.length){STY.onEnd();}}}}
+function updStory(){STY.t++;if(STY.t===1&&STY.lines[STY.i].startsWith('🐶')){sfx('bark');SF.wag=70;}if(SF.wag>0)SF.wag--;const full=STY.lines[STY.i].length*1.6;if(tap('interact')||tap('jump')){if(STY.t<full)STY.t=full+1;else{STY.i++;STY.t=0;if(STY.i>=STY.lines.length){STY.onEnd();}}}}
 function storyAdv(){if(STY.t<STY.lines[STY.i].length*1.6)STY.t=1e4;else{STY.i++;STY.t=0;if(STY.i>=STY.lines.length)STY.onEnd();}}
 function drawStory(){const e=STY.kind==='end';const old=sat;sat=e?1:.1;drawBGscene(T);sat=old;
  if(!e){stormCloud(700+Math.sin(T/40)*20,150,1.2,'angry');for(let i=0;i<30;i++){ctx.strokeStyle='rgba(200,210,230,.6)';ctx.beginPath();const x=(i*37+T*2)%VW,y=(i*53+T*8)%VH;ctx.moveTo(x,y);ctx.lineTo(x-4,y+14);ctx.stroke();}}
  else{stormCloud(700,170+Math.sin(T/30)*5,.7,'sad');for(let i=0;i<7;i++){ctx.strokeStyle=['#f33','#f93','#fd3','#3c5','#38f','#63d','#c4c'][i];ctx.lineWidth=10;ctx.beginPath();ctx.arc(480,470,300-i*10,Math.PI*1.1,Math.PI*1.9);ctx.stroke();}}
  ctx.fillStyle=Hc(110,60,45);ctx.fillRect(0,440,VW,100);stick(220,440,{col:PL().color,idol:SV.idol,s:2.4,pose:e?'cheer':'idle',face:1});
  rr(60,300,840,160,22);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='#2b2b55';ctx.stroke();
- const full=STY.lines[STY.i],shown=full.slice(0,Math.floor(STY.t/1.6));ctx.font=F(26);wrap(full===shown?full:shown+'',480,345,780,36,26,'#2b2b55');
+ const full=STY.lines[STY.i].replace(/^🐶 ?/,''),dl=STY.lines[STY.i].startsWith('🐶'),shown=full.slice(0,Math.floor(STY.t/1.6));
+ if(e){dogSprite(820,304,-1,1.5,T,{fast:dl||SF.wag>0,mouth:dl,hop:dl?-Math.abs(Math.sin(T/4))*5:0});}
+ if(dl){rr(80,282,170,34,12);ctx.fillStyle='#3b6ea8';ctx.fill();txt('🐶 '+DN(),165,299,20,'#fff');}
+ ctx.font=F(26);wrap(full===shown?full:shown+'',480,345,780,36,26,'#2b2b55');
  txt(STY.t>full.length*1.6?'Tap or press E ▶':'',820,440,18,'#e0409a');txt((STY.i+1)+'/'+STY.lines.length,100,440,16,'#777');
  NUI.push({x:0,y:0,w:VW,h:VH,fn:storyAdv});}
 function drawScroll(){drawWorld();drawHUD();panel(130,100,700,330,'#a36b1d');txt('📜 '+STO.sc[0],480,150,38,'#a36b1d');wrap(STO.sc[1],480,240,600,36,28,'#2b2b55');txt('+5 ⭐  +15 XP  (saved in your Pet & Scroll book)',480,340,20,'#2b7a2b');btn('Cool!',380,370,200,52,()=>{mode='play';},{col:'#ffe066',size:26});}
 function endLevel(){const pr=PR();pr.boss=true;pr.cp=0;addXP(80);addStars(20);pr.treats+=2;save();
- startStory('end',['POOF! The grumpy Storm Cloud shrinks into a tiny sniffly raincloud. "Okay... maybe colours are pretty," it mumbles.',pr.name?'':'','The stolen colours burst back into the sky: red, orange, yellow, green, blue and purple. A giant rainbow stretches across the world!','The Storm Cloud even makes a little puddle for the animals to splash in. Everyone cheers!',PL().name+' waves goodbye. "Next stop: the Sky Temple!" (Level 2 coming soon...)'].filter(Boolean),()=>{mode='end';});}
-function drawEnd(){drawStory();rr(180,60,600,380,26);ctx.fillStyle='rgba(255,253,242,.97)';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle='#e0409a';ctx.stroke();const pr=PR();
+ startStory('end',['POOF! The grumpy Storm Cloud shrinks into a tiny sniffly raincloud. "Okay... maybe colours are pretty," it mumbles.',pr.name?'':'','The stolen colours burst back into the sky: red, orange, yellow, green, blue and purple. A giant rainbow stretches across the world!','🐶 WOOF WOOF! We did it, '+PL().name+'! The colours are back! I am the proudest puppy in the whole world!','The Storm Cloud even makes a little puddle for the animals to splash in. Everyone cheers!','🐶 Thank you for being my friend. Let\'s go on more adventures together! Wag wag wag!',PL().name+' waves goodbye. "Next stop: the Sky Temple!" (Level 2 coming soon...)'].filter(Boolean),()=>{mode='end';sfx('bark');});}
+function drawEnd(){drawStory();dogSprite(865,440,-1,1.7,T,{fast:true,mouth:true,hop:-Math.abs(Math.sin(T/5))*6});rr(180,60,600,380,26);ctx.fillStyle='rgba(255,253,242,.97)';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle='#e0409a';ctx.stroke();const pr=PR();
  txt('LEVEL 1 COMPLETE!',480,110,46,'#e0409a','center','#fff');txt(PL().name+' freed the colours! 🌈',480,164,26,'#2b2b55');
  txt('⭐ '+pr.stars+' stars    Level '+pr.lvl+'    📜 '+pr.scrolls.length+'/6 scrolls',480,214,24,'#2b7a2b');txt('🐾 Pets befriended: '+Object.keys(pr.pets).length+' / '+PETS.length,480,254,24,'#2b2b55');
  wrap('Missed some secret nooks? Replay to find every pet and scroll, and to level up your friends!',480,310,520,28,20,'#7a4a00');
@@ -972,7 +1122,7 @@ function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b
  ctx.font=`bold 92px ${FONT}`;let x=480-ctx.measureText(t).width/2;for(let i=0;i<t.length;i++){const ch=t[i],w=ctx.measureText(ch).width;txt(ch,x+w/2,90+Math.sin(T/15+i)*6,92,cols[i%cols.length],'center','#2b2b55');x+=w;}
  txt('Colour Quest',480,160,40,'#fff','center','#2b2b55');
  ctx.fillStyle=Hc(110,60,45);ctx.fillRect(0,440,VW,100);stick(200,440,{col:SV.players[0].color,s:2.4,pose:'cheer'});stick(760,440,{col:SV.players[1].color,s:1.9,pose:'cheer',face:-1});
- const pr=PR();
+ const pr=PR();dogSprite(885,470,-1,1.15,T,{fast:T%200<60,mouth:T%200<60});
  btn('▶  Play as '+PL().name,300,200,360,64,()=>{if(!pr.intro){pr.intro=true;save();startStory('intro',['Once upon a time the world was bursting with colour: red apples, blue seas, green hills and golden sunshine.','Then a GRUMPY STORM CLOUD rumbled in. "GRUMBLE! I hate colours!" It stole them all and the world turned grey.',PL().name+' is a brave kung fu kid. With quick kicks, clever answers and new animal friends, she will bring the colours home!','Answer the glowing gates to free the colours. Befriend animals and explore secret places. You can\'t lose - you can always try again!'],startPlay);}else startPlay();},{size:28,col:'#ffe066'});
  btn('Choose Heroes',300,274,176,50,()=>{mode='select';},{size:19});btn('🐾 Pets & Scrolls',484,274,176,50,()=>openPets('title'),{size:19});
  btn('New run',300,334,176,44,()=>{if(pr.cp||pr.gates.length)resetRun();else startPlay();},{size:19});btn(SV.mute?'🔇 Sound off':'🔊 Sound on',484,334,176,44,toggleMute,{size:19});
@@ -987,23 +1137,23 @@ function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)'
   btn(pl.tier==='age4'?'Age 4: Easy mode 🌱':'Age 7: Standard ⚡',x+40,y+330,350,44,()=>{pl.tier=pl.tier==='age4'?'age7':'age4';save();},{size:20,col:pl.tier==='age4'?'#b8f5b8':'#cde6ff'});
   btn(sel?'★ Playing as '+pl.name.slice(0,10):'Play as this hero',x+40,y+380,350,36,()=>{SV.sel=i;save();},{size:18,col:sel?'#ffe066':'#fff'});
   txt('Lv '+pr.lvl+' · ⭐'+pr.stars+' · 🐾'+Object.keys(pr.pets).length,x+215,y+408,15,'#555');});
- btn('◀ Back',20,496,120,36,()=>{mode='title';},{size:18});}
+ btn('◀ Back',20,496,120,36,()=>{mode='title';},{size:18});btn('🐶 Dog name: '+DN()+'  ✏',160,496,330,36,renameDog,{size:18});}
 function drawPause(){drawWorld();drawHUD();panel(110,28,740,486,'#2b2b55');txt('Paused',250,60,34,'#2b2b55');
  btn('▶ Resume',140,90,230,44,()=>{mode='play';},{size:22,col:'#ffe066'});btn('🐾 Pets & Scrolls',140,140,230,44,()=>openPets('play'),{size:19});btn(SV.mute?'🔇 Sound off':'🔊 Sound on',140,190,230,44,toggleMute,{size:19});
  btn('🎵 Music '+Math.round(SV.mv*100)+'%',140,240,111,44,()=>cycVol('mv'),{size:15});btn('🔔 SFX '+Math.round(SV.sv*100)+'%',259,240,111,44,()=>cycVol('sv'),{size:15});
- btn('✨ Idol style: '+(SV.idol?'ON':'off'),140,290,230,44,toggleIdol,{size:18,col:SV.idol?'#ff9bf0':'#fff'});btn('Title screen',140,340,230,44,()=>{save();mode='title';},{size:19});
- wrap('Idol style: neon outfit, glow stick, shadow imps, stage lights and a Harmony light-stick beam!',255,420,225,20,14,'#a0309a');
+ btn('✨ Idol style: '+(SV.idol?'ON':'off'),140,290,230,44,toggleIdol,{size:18,col:SV.idol?'#ff9bf0':'#fff'});btn('Title screen',140,340,230,44,()=>{save();mode='title';},{size:19});btn('🐶 Dog name: '+DN().slice(0,9)+' ✏',140,388,230,38,renameDog,{size:16});
+ wrap('Idol style: neon outfit, glow stick, shadow imps, stage lights and a Harmony light-stick beam!',255,452,225,20,14,'#a0309a');
  txt('Bending powers (tap to pick, or press Q)',620,60,18,'#2b2b55');
  ELEMS.forEach((el,i)=>{const y=80+i*88,sel=PR().elem===i;rr(395,y,440,80,14);ctx.fillStyle=sel?'#fff4c2':'#f2f2fb';ctx.fill();ctx.lineWidth=sel?5:2;ctx.strokeStyle=sel?el.c:'#8a8ab0';ctx.stroke();NUI.push({x:395,y,w:440,h:80,fn:()=>{PR().elem=i;save();sfx('tick');}});
   txt(el.ic,430,y+38,36,'#000');txt(el.ab+' ('+el.n+')',470,y+20,19,el.c==='#cfeeff'?'#5a8ab0':el.c,'left');wrap(el.sh,470,y+46,350,19,14,'#2b2b55','left');});
  rr(395,436,440,66,14);ctx.fillStyle='#ffe3fb';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff3df2';ctx.stroke();txt('💖 Harmony finisher (Idol style)',410,454,16,'#a0309a','left');wrap('A light-stick beam joins every special and your boss-duel super move!',470,482,350,18,13,'#2b2b55','left');}
 
 /* ================= MAIN LOOP ================= */
-function update(){switch(mode){case 'play':updPlay();break;case 'quiz':updQuiz();break;case 'feed':updFeed();break;case 'pets':updPets();break;case 'boards':updBoards();break;case 'duel':updDuel();break;case 'catch':updCatch();break;case 'story':updStory();break;
+function update(){switch(mode){case 'play':updPlay();break;case 'quiz':updQuiz();break;case 'feed':updFeed();break;case 'pets':updPets();break;case 'boards':updBoards();break;case 'duel':updDuel();break;case 'catch':updCatch();break;case 'story':updStory();break;case 'dogtalk':updDogTalk();break;
  case 'pause':if(tap('pause'))mode='play';break;case 'scroll':if(tap('interact'))mode='play';break;case 'title':T++;if(tap('interact')){const b=UI.find(u=>u.w===360);b&&b.fn();}if(tap('mute'))toggleMute();break;case 'select':T++;if(tap('pause'))mode='title';break;case 'end':T++;break;}
  if(tap('mute')&&mode!=='play')toggleMute();}
 function draw(){NUI=[];ctx.clearRect(0,0,VW,VH);
- switch(mode){case 'play':drawWorld();drawHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'end':drawEnd();break;}
+ switch(mode){case 'play':drawWorld();drawHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'end':drawEnd();break;}
  UI=NUI;}
 function tick(){update();hit={};digit=-1;draw();}
 let last=0,acc=0;
@@ -1018,12 +1168,13 @@ function selfTest(){const log=[];try{
  mode='title';frames(5);mode='select';frames(3);
  for(const tier of['age7','age4']){SV.sel=tier==='age7'?0:1;SV.players[SV.sel].tier=tier;SV.prog[SV.sel]=newProg();
   mode='title';frames(2);startPlay();
+  if(mode==='dogtalk'){for(let i=0;i<30&&mode==='dogtalk';i++){dogTalkAdv();dogTalkAdv();tick();}}log.push('dogintro '+mode);
   // random play
   const ks=['left','right','jump','punch','kick','star','special','interact','down','elem'];
   for(let i=0;i<3000;i++){if(i%20===0){keys={right:true};if(Math.random()<.7)keys.right=true;if(Math.random()<.2)keys.left=true;if(Math.random()<.4)keys.jump=true;}if(i%7===0)press(pick(ks));if(Math.random()<.3)hit[pick(ks)]=true;
    if(mode!=='play'){break;}tick();}
   // give pets
-  for(const d of PETS){PR().pets[d.id]={bond:5};}
+  for(const d of PETS){PR().pets[d.id]={bond:5};}DG().bond=14;SF.cheer=3000;
   // teleport through each gate
   for(const g of LV.gates){mode='play';P.x=g.x-50;P.y=380;P.gcool=0;P.vy=0;frames(3);
    if(mode==='quiz'){for(let k=0;k<5&&mode==='quiz'&&!QZ.done;k++){const wrong=(QZ.qs[QZ.i].c+1)%QZ.qs[QZ.i].opts.length;quizAnswer(wrong);quizAnswer(QZ.qs[QZ.i].c);}for(let i=0;i<5;i++){tick();}if(mode==='quiz'){QZ.t=999;frames(2);}}
@@ -1034,15 +1185,15 @@ function selfTest(){const log=[];try{
   if(mode==='duel'){for(let i=0;i<4000&&mode==='duel';i++){if(D.ph==='ask'){if(i%2)duelAnswer(D.q.c);else duelAnswer((D.q.c+1)%D.q.opts.length);}if(D.ph==='meter'&&D.m&&!D.m.res&&Math.random()<.05)duelStop();tick();if(D.ph==='win'&&D.t>20)D.t=999;if(mode==='story'){STY.i=STY.lines.length-1;STY.t=0;storyAdv();}}}
   log.push('after duel '+mode);if(mode==='end')frames(3);
   mode='catch';startCatch();CT.ph='play';for(let i=0;i<2000&&CT.ph!=='done';i++){CT.bx=480+Math.sin(i/30)*300;tick();}frames(3);
-  mode='pets';frames(3);petTab=1;frames(2);petTab=0;for(let i=0;i<PETS.length;i++){petSel=i;frames(1);}
+  mode='pets';frames(3);petTab=1;frames(2);petTab=2;frames(2);petTab=0;for(let i=0;i<PETS.length;i++){petSel=i;frames(1);}
   startPlay();startFeed(PETS[0],false,'play');frames(2);feedAnswer(0);FD.ok=true;frames(2);mode='pause';frames(2);mode='play';
   P.x=LV.mounds[0].x;P.y=380;frames(3);press('interact');frames(3);
  }
  document.title='SELFTEST OK '+log.join('|');}catch(e){document.title='SELFTEST FAIL '+e.message+' '+(e.stack||'').split('\n')[1];console.error('GAMEERR',e.stack);}}
-function shot(k){const idl=/-idol$/.test(k);SV.idol=idl;k=k.replace(/-idol$/,'');SV.prog[0]=newProg();SV.sel=0;PR().lvl=3;PR().pets={fox:{bond:6},owl:{bond:3}};PR().active='fox';
+function shot(k){const idl=/-idol$/.test(k);SV.idol=idl;k=k.replace(/-idol$/,'');SV.prog[0]=newProg();SV.sel=0;PR().lvl=3;PR().pets={fox:{bond:6},owl:{bond:3}};PR().active='fox';PR().dog={bond:6,intro:k!=='dogtalk',facts:[0,2,5],pat:0};
  if(k==='title'){mode='title';}else if(k==='select'){mode='select';}else{startPlay();
   if(k==='cave'||k==='water')for(const g of LV.gates){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}if(k==='play2'){P.x=1100;cam.x=900;}if(k==='cave'){P.x=LV.dark[0].x+300;P.y=100;}if(k==='water'){const w=LV.water[0];P.x=w.x+300;P.y=450;}
-  if(k==='obst'){const o=LV.obst[0];P.x=o.x-260;P.y=300;cam.x=o.x-500;P.ch=100;P.idolT=100;P.stageT=100;PR().elem=0;if(idl)press('special');}if(k==='pause'){mode='pause';}if(k==='quiz'){startQuiz('science',LV.gates[0]);}if(k==='boards'){startBoards(LV.gates[2]);}if(k==='duel'){startDuel();duelNext();}if(k==='pets'){openPets('play');}if(k==='catch'){startCatch();CT.ph='play';}if(k==='feed'){startFeed(PETS[2],true);}}
+  if(k==='obst'){const o=LV.obst[0];P.x=o.x-260;P.y=300;cam.x=o.x-500;P.ch=100;P.idolT=100;P.stageT=100;PR().elem=0;if(idl)press('special');}if(k==='pause'){mode='pause';}if(k==='quiz'){startQuiz('science',LV.gates[0]);}if(k==='boards'){startBoards(LV.gates[2]);}if(k==='duel'){startDuel();duelNext();}if(k==='pets'){openPets('play');}if(k==='dogtab'){openPets('play');petTab=2;}if(k==='dogsay'){dogSay('Prickly thorns! Press Q to pick 🔥 Fire, then V to use your special. Your meter is ready!');}if(k==='fact'){dogFact();}if(k==='dogend'){endLevel();STY.i=1;STY.t=999;}if(k==='catch'){startCatch();CT.ph='play';}if(k==='feed'){startFeed(PETS[2],true);}}
  for(let i=0;i<40;i++){if(mode==='play'&&k==='play2')keys.right=true;tick();}document.title='SHOT '+k;}
 if(location.hash==='#selftest'){selfTest();}else if(location.hash.startsWith('#shot-')){shot(location.hash.slice(6));}else requestAnimationFrame(loop);
 })();

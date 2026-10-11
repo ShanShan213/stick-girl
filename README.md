@@ -66,3 +66,14 @@ Cross-level ideas: tier `age4` letters/phonics/colours-to-words, a sticker book 
 - **Ninja star**: synthesized girl battle cry ("hi-ya!" / "wee-ya!", formant oscillators + whoosh).
 - **Idol style** (toggle on title/pause): neon outfit + glow stick, shadow imps, stage lights and idol pose on level-up, *Harmony* light-stick beam finisher, idol chant layer on the boss track.
 - **Elements**: Fire = Flame Burst (burns thorns, lights caves); Water = Healing Wave (heal, bubble shield, speed, douses fire walls); Earth = Rock Pillar (platform, smashes crates, stuns); Air = Whirlwind (push, giant jump, glide).
+
+## Stormi, the Level 1 guide (marker `stormi-guide-2026-10-11`)
+* Stormi is the family's real dog, drawn in canvas as a cute blue-grey Staffordshire bull terrier puppy (white chest patch,
+  dark eyes, folded rose ears, stocky). No photos are embedded.
+* Start of Level 1: she tells the quest in speech bubbles (tap / E / Enter to advance, **Skip** button). She then follows as a
+  companion with contextual bubbles (element needed at obstacles, gate hints, side-path tips), Fact Scrolls (10 real dog facts,
+  collected in the 🐾 book > Stormi tab), synthesized barks and a tail wag. Tap her or press E (nobody else near) for a pat.
+* Bond meter (HUD chip + 🐾 > Stormi tab): grows with gates, scrolls, new pet friends, pats and 🍎 treats. Lv2 secret-path tips +
+  2nd quiz clue, Lv3 crosses out a wrong answer + speed cheer, Lv4 helps at the start of each question, Lv5 cheer can give a shield.
+  Cheer boost also adds damage in the boss duel. She reappears at the boss and in the end-of-level story.
+* Dog name is editable (default Stormi): Choose Heroes screen, Pause menu, or the Stormi tab (`SV.dogName`).
