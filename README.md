@@ -59,3 +59,10 @@ Everything is data near the top of `index.html`:
 4. **Earth Dojo (earth)**: caves, digging puzzles, pushable rocks; mole & tortoise pets; maths: area/perimeter, money.
 5. **Rainbow Finale**: remix boss rush with a chosen-element duel, plus a free-roam "Pet Park" to train bonds and a story mode credits scene.
 Cross-level ideas: tier `age4` letters/phonics/colours-to-words, a sticker book for scrolls, daily star missions, co-op two-player mode, voice-over reading of questions (speechSynthesis), pet outfits bought with stars.
+
+## v2: Idol style, music & element powers
+- **Audio** (100% WebAudio synthesis, no samples): chiptune loops for overworld / caves / boss duel (synth-pop hook), level-up & victory jingles, separate Music and SFX volume + mute (title and pause menu).
+- **SFX**: boing jump, punch, kick, coin/star, pet bond, quiz right/wrong, hurt (original descending "oof-ish" blip), poof, plus element, shield, smash, douse sounds.
+- **Ninja star**: synthesized girl battle cry ("hi-ya!" / "wee-ya!", formant oscillators + whoosh).
+- **Idol style** (toggle on title/pause): neon outfit + glow stick, shadow imps, stage lights and idol pose on level-up, *Harmony* light-stick beam finisher, idol chant layer on the boss track.
+- **Elements**: Fire = Flame Burst (burns thorns, lights caves); Water = Healing Wave (heal, bubble shield, speed, douses fire walls); Earth = Rock Pillar (platform, smashes crates, stuns); Air = Whirlwind (push, giant jump, glide).
