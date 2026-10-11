@@ -91,3 +91,9 @@ Cross-level ideas: tier `age4` letters/phonics/colours-to-words, a sticker book 
 * **Pacing:** seeded "action stretches" (spike runs, gap hops, moving-platform crossings, enemy groups, secret side paths with treats, spring ledges, gauntlets, hearts) now sit between every gate/puzzle room, so there is roughly 20–30 s of play before the next question. Level is ~64,000 px long. Layout is deterministic, so checkpoints stay valid.
 * **Animation:** the stick figure uses 2-bone IK limbs, keyframed punches/kicks (wind-up, extend, recoil, torso twist), swoosh trails, hit-stop + screen shake, a proper run cycle, jump squash & stretch, idle breathing, and ponytail / headband-ribbon follow-through. Works for both heroes and Idol style.
 * **New moves:** 🦶💨 **Flying Kick** (kick while running at speed, or kick while moving in the air; dives sideways, 4 damage, brief recovery) and 🦸 **Superman Punch** (punch in the air, `B`, or the 🦸 touch button; body goes horizontal, 3 damage). Listed in Pause → 🥋 Moves & tips, plus a one-off tutorial toast.
+
+### Down button / mounds / concealed secrets
+* ▼ / S / ↓: hold to duck (shurikens pass overhead), tap on a thin ledge to drop through, tap in the air to ground-pound (stuns foes, smashes crates), tap near a mound to dig.
+* Buried mounds can be dug with E, ▼, a ground-pound, the Earth special (Q then V) or a panda friend, and reveal stars, a pet treat and a fact scroll.
+* Portals activate by walking in or pressing E; the E button (and ▼ near mounds) glows when something is interactable.
+* Secret scrolls and ledges are tucked behind bushes with only subtle sparkles up close (age 4 keeps stronger cues).
