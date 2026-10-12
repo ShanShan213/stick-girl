@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="sg-build" content="v8-qa5-2026-10-12">
+<meta name="sg-build" content="v8-qa6-2026-10-13">
 <title>Stick Girl: Colour Quest</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#4cc3ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -15,28 +15,28 @@ canvas{background:#000;display:block;touch-action:none}
 #tc.space button:not([data-a=left]):not([data-a=right]):not([data-a=jump]):not([data-a=punch]):not([data-a=interact]){display:none}
 #tc.sea button:not([data-a=left]):not([data-a=right]):not([data-a=jump]):not([data-a=down]){display:none}
 #tc.sea.seaexit #bE{display:block}
-#tc button{--c:#7a6cff;--k:#4b3fc0;pointer-events:auto;position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.55) 0 18%,transparent 42%),var(--c);color:#fff;font:bold 24px/1 "Comic Sans MS","Chalkboard SE","Trebuchet MS",sans-serif;text-shadow:0 2px 0 rgba(0,0,0,.35);touch-action:none;padding:0;box-shadow:inset 0 -5px 0 var(--k),0 4px 6px rgba(0,0,0,.35);opacity:.45;transition:opacity .12s,transform .08s;will-change:transform}
+#tc button{--c:#7a6cff;--k:#4b3fc0;pointer-events:auto;position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.55) 0 18%,transparent 42%),var(--c);color:#fff;font:bold 24px/1 "Comic Sans MS","Chalkboard SE","Trebuchet MS",sans-serif;text-shadow:0 2px 0 rgba(0,0,0,.35);touch-action:none;padding:0;box-shadow:inset 0 -5px 0 var(--k),0 4px 6px rgba(0,0,0,.35);opacity:.45;transition:opacity .25s,transform .08s,visibility 0s;will-change:transform}
 #tc [data-a=left],#tc [data-a=right],#tc [data-a=down]{--c:#3aa8ff;--k:#1f6fb8}#tc [data-a=jump]{--c:#2fc46b;--k:#1c8a49;font-size:30px}
-#tc [data-a=punch]{--c:#ff5a6e;--k:#b8303f}#tc [data-a=kick]{--c:#ff9a1f;--k:#b86500}#tc [data-a=star],#tc [data-a=super]{--c:#ffc41f;--k:#b88a00}
-#tc [data-a=special]{--c:#c26bff;--k:#7e35b8}#tc [data-a=interact]{--c:#ff4fa3;--k:#b82a6c}#tc [data-a=hint],#tc [data-a=elem]{--c:#18c9c9;--k:#0e8686}
+#tc [data-a=punch]{--c:#ff5a6e;--k:#b8303f}#tc [data-a=kick]{--c:#ff9a1f;--k:#b86500}#tc [data-a=star]{--c:#ffc41f;--k:#b88a00}
+#tc [data-a=special]{--c:#c26bff;--k:#7e35b8}#tc [data-a=interact]{--c:#ff4fa3;--k:#b82a6c}#tc [data-a=elem]{--c:#18c9c9;--k:#0e8686}
 #tc button.rdy{border-color:#ffe066;box-shadow:inset 0 -5px 0 var(--k),0 0 16px 6px rgba(255,224,102,.9);animation:rd .7s infinite alternate;opacity:.95}@keyframes rd{to{box-shadow:inset 0 -5px 0 var(--k),0 0 5px 1px rgba(255,224,102,.6)}}
 #tc button:active,#tc button.d{--c:#ffe066;--k:#c9a200;color:#2b2b55;text-shadow:none;opacity:1;transform:translateY(3px) scale(.9);box-shadow:inset 0 -2px 0 var(--k),0 1px 2px rgba(0,0,0,.3)}
-@media (max-height:520px){#tc button{zoom:.85}#bQ,#tc [data-a=hint]{width:52px!important;height:52px!important}}@media (max-height:400px){#tc button{zoom:.8}#bE,#bQ,#tc [data-a=hint]{width:56px!important;height:56px!important}}
+@media (max-height:520px){#tc button{zoom:.85}#bQ{width:52px!important;height:52px!important}}@media (max-height:400px){#tc button{zoom:.8}#bE,#bQ{width:56px!important;height:56px!important}}
+#tc button.cx:not(.sh){opacity:0!important;visibility:hidden;pointer-events:none;transform:scale(.6);transition:opacity .25s,transform .25s,visibility 0s .25s}
+#tc.sea.seaexit #bE,#tc.space #bE{opacity:.45;visibility:visible;pointer-events:auto;transform:none}
 </style></head><body>
 <canvas id="c" width="960" height="540"></canvas>
 <div id="tc">
 <button data-a="left" style="left:14px;bottom:20px">◀</button>
 <button data-a="right" style="left:90px;bottom:20px">▶</button>
-<button id="bD" data-a="down" style="left:46px;bottom:88px;width:60px;height:56px;font-size:20px">▼</button>
+<button id="bD" class="cx" data-a="down" style="left:46px;bottom:88px;width:60px;height:56px;font-size:20px">▼</button>
 <button data-a="jump" style="right:14px;bottom:20px;width:76px;height:76px">⤒</button>
 <button data-a="punch" style="right:100px;bottom:20px">👊</button>
 <button data-a="kick" style="right:100px;bottom:90px">🦶</button>
-<button data-a="star" style="right:170px;bottom:50px">⭐</button>
-<button data-a="super" style="right:170px;bottom:122px">🦸</button>
-<button id="bV" data-a="special" style="right:14px;bottom:104px">✨</button>
-<button id="bE" data-a="interact" style="right:240px;bottom:20px;width:56px;height:56px;font-size:20px">E</button>
-<button data-a="hint" style="right:240px;bottom:136px;width:50px;height:50px;font-size:20px">💡</button>
-<button id="bQ" data-a="elem" style="right:240px;bottom:78px;width:50px;height:50px;font-size:18px">🔄</button>
+<button id="bS" class="cx" data-a="star" style="right:170px;bottom:20px">⭐</button>
+<button id="bV" class="cx" data-a="special" style="right:14px;bottom:104px">✨</button>
+<button id="bE" class="cx" data-a="interact" style="right:240px;bottom:20px;width:56px;height:56px;font-size:20px">E</button>
+<button id="bQ" class="cx" data-a="elem" style="right:170px;bottom:90px;width:50px;height:50px;font-size:18px">🔄</button>
 </div>
 <script>
 (()=>{'use strict';
@@ -337,8 +337,8 @@ const TTS={voice:null,last:'',lastT:0,log:[]};
 const ttsOn=()=>{const p=SV&&SV.players&&SV.players[SV.sel];if(!p)return false;return p.tts!==undefined?!!p.tts:p.tier==='age4';};
 function ttsVoice(){try{const vs=speechSynthesis.getVoices();if(!vs.length)return null;const f=r=>vs.find(v=>r.test(String(v.lang).replace('_','-')));TTS.voice=f(/^en-AU/i)||f(/^en-GB/i)||f(/^en-NZ/i)||f(/^en/i)||null;}catch(e){}return TTS.voice;}
 try{if(window.speechSynthesis){ttsVoice();speechSynthesis.addEventListener('voiceschanged',ttsVoice);}}catch(e){}
-const TTSBTN={'◀ ▶':'the arrow buttons','◀':'the left button','▶':'the right button','⤒':'the jump button','▼':'the down button','👊':'the punch button','🦶':'the kick button','⭐':'the star button','✨':'the sparkle button','🔄':'the swap button','🦸':'the hero button','💡':'the light bulb button'};
-const ttsBtns=s=>String(s).replace(/(\b(?:tap|Tap|then|or|and|with|hold|Hold|\+)\s)(◀ ▶|◀|▶|⤒|▼|👊|🦶|⭐|✨|🔄|🦸|💡)\uFE0F?/gu,(m,a,g)=>a+TTSBTN[g]);
+const TTSBTN={'◀ ▶':'the arrow buttons','◀':'the left button','▶':'the right button','⤒':'the jump button','▼':'the down button','👊':'the punch button','🦶':'the kick button','⭐':'the star button','✨':'the sparkle button','🔄':'the swap button'};
+const ttsBtns=s=>String(s).replace(/(\b(?:tap|Tap|then|or|and|with|hold|Hold|\+)\s)(◀ ▶|◀|▶|⤒|▼|👊|🦶|⭐|✨|🔄)\uFE0F?/gu,(m,a,g)=>a+TTSBTN[g]);
 const ttsClean=s=>ttsBtns(s).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{2300}-\u{23FF}\u{25A0}-\u{25FF}\u{FE0F}\u{200D}\u{20E3}]/gu,' ').replace(/[⤒⏭⏸✔✖♥♡★☆⚑·]/g,' ').replace(/\(\s*(?:or\s*)?\)/g,' ').replace(/\s+/g,' ').replace(/\s+([!?.,:;])/g,'$1').replace(/^[\s:;,.!-]+/,'').trim();
 function say(text,o){o=o||{};if(!o.force&&!ttsOn())return;const t=ttsClean(text);if(!t)return;const now=Date.now();if(!o.again&&t===TTS.last&&now-TTS.lastT<6000)return;TTS.last=t;TTS.lastT=now;TTS.log.push(t);if(TTS.log.length>300)TTS.log.shift();
  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;
@@ -347,7 +347,7 @@ function shush(){TTS.last='';try{window.speechSynthesis&&speechSynthesis.cancel(
 function toggleTTS(){const p=PL();p.tts=!ttsOn();save();sfx('tick');if(p.tts)say('Read aloud is on!',{again:true});else shush();}
 
 /* ================= INPUT ================= */
-const ACT={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',ArrowDown:'down',KeyS:'down',KeyZ:'punch',KeyJ:'punch',KeyX:'kick',KeyK:'kick',KeyC:'star',KeyL:'star',KeyV:'special',KeyU:'special',KeyE:'interact',Enter:'interact',KeyQ:'elem',KeyP:'pets',Escape:'pause',KeyM:'mute',KeyH:'hint',KeyB:'super'};
+const ACT={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',ArrowDown:'down',KeyS:'down',KeyZ:'punch',KeyJ:'punch',KeyX:'kick',KeyK:'kick',KeyC:'star',KeyL:'star',KeyV:'special',KeyU:'special',KeyE:'interact',Enter:'interact',KeyQ:'elem',KeyP:'pets',Escape:'pause',KeyM:'mute',KeyB:'super'};
 let keys={},hit={},digit=-1;
 const press=a=>{if(!keys[a])hit[a]=true;keys[a]=true;};
 const rel=a=>{keys[a]=false;};
@@ -959,7 +959,7 @@ function buildLevel(){
   s=G(1800);CK(s+40);row(s+300,400,5);EN('imp',s+500);arc(s+900,380,6,70);SG(s+1000,'The grumpy Magma Golem is ahead!');HS(s+900,'The Magma Golem is just ahead! You can do it!',1);L.bossX=s+1250;};
  if(L.lvl===2)L2script();else{
  // ---- 1: Meadow tutorial
- s=G(2000);CK(s+60);SG(s+120,'Tap ◀ ▶ to move and ⤒ to jump');SG(s+520,'Tap 👊 to punch and 🦶 to kick. Tap ⭐ to throw a star!');SG(s+1000,'Stomp enemies or punch them! Tap ✨ for your bending special');SG(s+1450,'New! Run and tap 🦶 for a Flying Kick. Tap 👊 in the air for a Superman Punch!');
+ s=G(2000);CK(s+60);SG(s+120,'Tap ◀ ▶ to move and ⤒ to jump');SG(s+520,'Tap 👊 to punch and 🦶 to kick. Tap ⭐ to throw a star when it pops up!');SG(s+1000,'Stomp enemies or punch them! Tap ✨ for your bending special when your meter is full');SG(s+1450,'New! Run and tap 🦶 for a Flying Kick. Tap 👊 in the air for a Superman Punch!');
  arc(s+300,390,5,60);row(s+800,400,5);HS(s+260,'Collect the colour stars ⭐ as you go. Each one brings a little colour back!',1);arc(s+1250,390,6,70);
  PT('fox',s+1250,440);SG(s+1130,'A friend! Tap E near animals');EN('ninja',s+1550);EN('ninja',s+1800);fill(s+250,s+1000,1,['hopper']);TR(s+700,330);
  STRETCH(1900,1);roomR1();gap(120);BONUS('o1','sea');
@@ -1123,7 +1123,7 @@ function updFinale(){const L=LV,f=L.fin,p=P;f.t++;
 function inWater(b){return LV.water.find(w=>b.x+b.w/2>w.x&&b.x+b.w/2<w.x+w.w&&b.y+28>w.y&&b.y+28<w.y+w.h);}
 
 function updPlay(){T++;const p=P,L=LV,pr=PR(),E=easy();
- if(tap('pause')){mode='pause';pmoves=false;return;}if(tap('pets')){openPets('play');return;}if(tap('hint'))lanternHint();if(tap('mute'))toggleMute();if(hstop>0){hstop--;return;}
+ if(tap('pause')){mode='pause';pmoves=false;return;}if(tap('pets')){openPets('play');return;}if(tap('mute'))toggleMute();if(hstop>0){hstop--;return;}
  if(tap('elem')){pr.elem=(pr.elem+1)%4;toast('Bending: '+ELEMS[pr.elem].n,60);}
  for(const m of L.movers){m.ph+=m.sp;const nx=m.ox+Math.sin(m.ph)*m.rx,ny=m.oy+Math.sin(m.ph)*m.ry;m.dx=nx-m.x;m.dy=ny-m.y;m.x=nx;m.y=ny;}
  if(p.inv>0)p.inv--;if(p.starCd>0)p.starCd--;if(p.gcool>0)p.gcool--;
@@ -1211,7 +1211,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';say(SCROLLS[c.id][0]+'! '+SCROLLS[c.id][1],{again:true});}}
  L.scrolls=L.scrolls.filter(c=>!c.got);
  for(const c of L.checks)if(!c.reached&&p.x>c.x){c.reached=true;const lp=LP();if(c.x>(lp.cp||0)){lp.cp=c.x;L.checks.forEach(o=>o.on=o===c);p.hp=Math.min(p.max,p.hp+2);if(c.x>100){floatText(easy()?'⚑ ✔':'⚑ Checkpoint',c.x+20,440-150,'#bfffbf');{const lt=parts[parts.length-1];lt.life=lt.max=72;lt.vy=-.5;lt.ck=1;}fireworks(c.x+18,440-130);sfx('chime');}save();}} // one-way: each flag fires once; only the furthest counts
- if(!pr.tipMoves&&p.onGround&&!activeRoom()&&++tipT>300){pr.tipMoves=true;const tc=tcEl.classList.contains('on');toast(tc?'🦶💨 Flying Kick: tap 🦶 while running or jumping!':'🦶💨 Flying Kick: press X while running or jumping!',330);toast(tc?'🦸 Superman Punch: tap 👊 in the air, or tap 🦸!':'🦸 Superman Punch: press Z in the air (or B)!',330);toast(tc?'▼ Hold to duck, tap to drop through ledges, tap in the air to ground-pound!':'S / ↓: hold to duck, tap to drop through ledges or ground-pound in the air!',330);save();}
+ if(!pr.tipMoves&&p.onGround&&!activeRoom()&&++tipT>300){pr.tipMoves=true;const tc=tcEl.classList.contains('on');toast(tc?'🦶💨 Flying Kick: tap 🦶 while running or jumping!':'🦶💨 Flying Kick: press X while running or jumping!',330);toast(tc?'🦸 Superman Punch: jump, then tap 👊 in the air!':'🦸 Superman Punch: press Z in the air (or B)!',330);toast(tc?'▼ Hold to duck, tap to drop through ledges, tap in the air to ground-pound!':'S / ↓: hold to duck, tap to drop through ledges or ground-pound in the air!',330);save();}
  updRooms();if(mode!=='play')return;
  // gates
  for(const g of L.gates)if(!g.open&&p.gcool<=0&&p.x+p.w>g.x-70&&Math.abs(p.y-300)<400){if(g.kind==='might')startBoards(g);else startQuiz(g.kind,g);return;}
@@ -1383,7 +1383,6 @@ function drawRooms(){const L=LV,p=P,x0=cam.x-160,x1=cam.x+VW+160,vis=(x,w)=>x+(w
 function bigChip(x,y){const n=LP().bigs.length;rr(x,y,180,32,14);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();starShape(x+20,y+16,11,'#ffd23f',T/40);txt('Big Stars '+n+'/3',x+102,y+16,16,'#fff','center','#2b2b55');}
 function drawRoomHUD(){const r=activeRoom(),n=RSC().length;let y=Math.max(56,cornerSz()+14);if(curLv()===1){rr(VW-190,y,180,32,14);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();txt('✨ Sprites '+n+'/'+RESC_TOTAL,VW-100,y+16,16,'#fff','center','#2b2b55');y+=36;}
  bigChip(VW-190,y);y+=36;
- if(r&&mode==='play'){btn('💡 Hint',VW-190,y,180,66,lanternHint,{size:20,col:'#fff3b0'});}
  if(HN&&HN.t>0&&!(easy()&&HN.x<-900)){ctx.font=F(18);const ls=wrapLines('💡 '+HN.txt,480),w=Math.min(520,Math.max(...ls.map(l=>ctx.measureText(l).width))+34),h=22*ls.length+16,hy=toasts.length?142+toasts.length*40:142;ctx.globalAlpha=clamp(HN.t/30,0,1);rr(480-w/2,hy,w,h,14);ctx.fillStyle='rgba(255,250,215,.96)';ctx.fill();ctx.strokeStyle='#a36b1d';ctx.lineWidth=3;ctx.stroke();ls.forEach((l,i)=>txt(l,480,hy+19+i*22,18,'#2b2b55'));ctx.globalAlpha=1;}}
 /* ---- Stormi: rare helper ---- */
 function stormiIn(c){SF.st='in';SF.corner=c||-1;SF.hold=0;SF.x=cam.x+(SF.corner<0?-90:VW+90);SF.vx=0;SF.y=SF.gy=P.y+P.h;SF.face=-SF.corner;}
@@ -1452,7 +1451,7 @@ function leaveSpace(){const S=SPC;if(!S)return;SPC=null;const p=P,po=S.po;mode='
 function spWin(S){S.won=true;const lp=LP();lp.space=lp.space||[];const first=!lp.space.includes(S.po.r.id);if(first){lp.space.push(S.po.r.id);addStars(15);addXP(20);}else addStars(5);
  for(const r of S.rocks)addParts(r.x,r.y,6,'#ccc',{sp:1.2,g:0});S.rocks=[];sfx('lvl');banner={t:200,title:first?'SPACE STAR!':'Great flying, '+hero()+'!',sub:(first?'Well done, '+hero()+'! ':'')+(first?'+15 ⭐':'+5 ⭐')+' The portal home is open 🏠'};S.ft=0;S.fact=S.fact2;say(S.fact,{queue:true});save();}
 function updSpace(){T++;const S=SPC,E=easy(),sh=S.ship;S.t++;S.ft++;if(S.cd>0)S.cd--;if(sh.inv>0)sh.inv--;if(S.lockT>0)S.lockT--;
- if(tap('mute'))toggleMute();if(tap('pause')){leaveSpace();return;}tap('kick');tap('star');tap('special');tap('elem');tap('hint');tap('down');
+ if(tap('mute'))toggleMute();if(tap('pause')){leaveSpace();return;}tap('kick');tap('star');tap('special');tap('elem');tap('down');
  const fire=tap('punch')|tap('interact')|(keys.punch&&S.cd<=0);
  if(S.won&&fire){leaveSpace();return;}
  if(E){const ax=(keys.right?1:0)-(keys.left?1:0),ay=(keys.down?1:0)-(keys.jump?1:0);sh.vx+=(ax*3.2-sh.vx)*.1;sh.vy+=(ay*3.2-sh.vy)*.1;
@@ -2045,7 +2044,7 @@ function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)'
 function drawMoves(){panel(110,28,740,486,'#2b2b55');txt('🥋 Stick Girl moves',480,62,32,'#2b2b55');
  const rows=[['👊','Punch','Z or J  ·  tap 👊','Quick and snappy: wind up, strike, recoil.'],['🦶','Kick','X or K  ·  tap 🦶','Slower but hits harder.'],
   ['🦶💨','Flying Kick','Run + kick, or kick while jumping','Dive-kick sideways! Bonus damage, then a short recovery. Hold ▶ and tap 🦶.'],
-  ['🦸','Superman Punch','Punch in the air, or B  ·  tap 🦸','Leap forward with a flat, flying punch. Bonus damage!'],
+  ['🦸','Superman Punch','Punch in the air, or B  ·  jump + tap 👊','Leap forward with a flat, flying punch. Bonus damage!'],
   ['⤒','Jump','↑ / W / Space  ·  tap ⤒','Tap again in the air for a double jump (later levels).'],['⭐','Throw star','C or L  ·  tap ⭐','Fills your bending meter.'],['✨','Special','V  ·  tap ✨','Needs a full bending meter. Switch with Q. Earth pops mounds!'],
   ['▼','Duck, drop & dig','S / ↓  ·  tap ▼','Hold: duck. On a thin ledge: drop through. In the air: ground-pound. By a mound: dig!']];
  rows.forEach((r,i)=>{const y=78+i*48;rr(140,y,680,44,11);ctx.fillStyle=i===2||i===3||i===7?'#fff4c2':'#f2f2fb';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=i===2||i===3||i===7?'#ffb000':'#8a8ab0';ctx.stroke();
@@ -2066,11 +2065,20 @@ function drawPause(){drawWorld();drawHUD();BTNHIT=true;panel(110,28,740,486,'#2b
 function update(){switch(mode){case 'play':updPlay();break;case 'quiz':updQuiz();break;case 'feed':updFeed();break;case 'pets':updPets();break;case 'boards':updBoards();break;case 'duel':updDuel();break;case 'catch':updCatch();break;case 'story':updStory();break;case 'dogtalk':updDogTalk();break;case 'rq':updRQ();break;case 'sea':updSea();break;case 'space':updSpace();break;
  case 'pause':if(tap('pause')){if(pmoves)pmoves=false;else mode='play';}break;case 'scroll':if(tap('interact'))mode='play';break;case 'title':T++;if(tap('interact')){const b=UI.find(u=>u.w===360);b&&b.fn();}if(tap('mute'))toggleMute();break;case 'select':T++;if(tap('pause'))mode='title';break;case 'end':T++;break;}
  if(tap('mute')&&mode!=='play')toggleMute();}
-const bEl=document.getElementById('bE'),bDl=document.getElementById('bD'),bQl=document.getElementById('bQ'),bVl=document.getElementById('bV');
+const bSl=document.getElementById('bS'),bEl=document.getElementById('bE'),bDl=document.getElementById('bD'),bQl=document.getElementById('bQ'),bVl=document.getElementById('bV');
 function tcFrame(){if(!tcEl.classList.contains('on')||tcEl.classList.contains('menu'))return null;tcTop(0,1);let l=0,r=VW;for(const b of tcR){if(b.y>VH*.45){if((b.x0+b.x1)/2<VW/2)l=Math.max(l,b.x1);else r=Math.min(r,b.x0);}}l=clamp(l,0,VW*.3);r=clamp(r,VW*.6,VW);return{l,r};}
 function tcTop(x0,x1){if(!tcEl.classList.contains('on')||tcEl.classList.contains('menu'))return VH;if(!tcR||T-tcRT>60){tcRT=T;const cr=cv.getBoundingClientRect(),k=VW/(cr.width||VW);tcR=[];tcEl.querySelectorAll('button').forEach(b=>{const r=b.getBoundingClientRect();if(r.width)tcR.push({x0:(r.left-cr.left)*k,x1:(r.right-cr.left)*k,y:(r.top-cr.top)*k});});}let t=VH;for(const r of tcR)if(r.x1>x0&&r.x0<x1)t=Math.min(t,r.y);return t;}
 function rdy(){tcEl.classList.toggle('sea',mode==='sea');tcEl.classList.toggle('space',mode==='space');tcEl.classList.toggle('seaexit',mode==='sea'&&!!SEA&&!!SEA.exitOpen);tcEl.classList.toggle('menu',!(mode==='play'||mode==='sea'||mode==='space'));const on=(mode==='play'&&P&&P.near)||(mode==='space'&&SPC&&SPC.won)||(mode==='sea'&&SEA&&SEA.exitOpen&&P&&Math.abs(P.x+10-SEA.exit.x)<130),dn=mode==='play'&&P&&LV&&P.near&&P.near.k==='mound';bEl.classList.toggle('rdy',!!on);bDl.classList.toggle('rdy',!!dn);
- const ne=mode==='play'&&LV?elemNeed():null,right=ne&&PR().elem===ne.el;bQl.classList.toggle('rdy',!!(ne&&!right));bVl.classList.toggle('rdy',!!(right&&P.ch>=100));}
+ const ne=mode==='play'&&LV?elemNeed():null,right=ne&&PR().elem===ne.el;bQl.classList.toggle('rdy',!!(ne&&!right));bVl.classList.toggle('rdy',!!(right&&P.ch>=100));
+ const pl=mode==='play'&&P&&LV,fin=pl&&!!LV.fin&&!LV.fin.done&&LV.fin.ph!=='done',px=pl?P.x+10:0,ez=easy();
+ const enN=pl&&LV.enemies.some(e=>!e.dead&&e.hp>0&&Math.abs(e.x+(e.w||30)/2-px)<560);
+ const thin=pl&&((P.onGround&&P.gnd&&P.gnd.t==='p')||LV.plats.some(s=>s.t==='p'&&px>s.x-20&&px<s.x+s.w+20&&s.y>P.y+40&&s.y<P.y+260&&P.onGround&&P.gnd&&P.gnd.t==='p'));
+ const shoot=pl&&LV.eproj.some(q=>Math.abs(q.x-px)<420);
+ bDl.classList.toggle('sh',!!(pl&&(nearMound(P,140)||thin||shoot)));
+ bEl.classList.toggle('sh',!!(pl&&P.near));
+ bSl.classList.toggle('sh',!!(pl&&(enN||fin)));
+ bVl.classList.toggle('sh',!!(pl&&(P.ch>=100||fin)));
+ bQl.classList.toggle('sh',!!(pl&&(fin||(ne&&(!ez||!right)))));}
 function draw(){rdy();NUI=[];BTNHIT=false;ctx.clearRect(0,0,VW,VH);
  switch(mode){case 'play':drawWorld();drawHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'rq':drawRQ();break;case 'sea':drawSea();break;case 'space':drawSpace();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'end':drawEnd();break;}
  UI=NUI;}
