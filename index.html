@@ -2002,15 +2002,20 @@ function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b
  if(!tcEl.classList.contains('on'))txt('Keys: ←→ move · ↑/Space jump · Z punch · X kick · C star · V special · Q element · E talk · P pets · M mute',480,522,14,'#fff','center','#2b2b55');}
 function doResetHero(i){SV.prog[i]=newProg();save();}
 function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(0,0,VW,VH);txt('Choose Your Hero',480,34,40,'#e0409a','center','#fff');
- SV.players.forEach((pl,i)=>{const x=40+i*450,y=70,pr=SV.prog[i],sel=SV.sel===i;rr(x,y,430,420,22);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=sel?8:3;ctx.strokeStyle=sel?'#ff5a8a':'#2b2b55';ctx.stroke();
-  btn('🗑 Reset',x+430-Math.max(98,MH())-10,y+10,Math.max(98,MH()),Math.max(32,MH()),()=>{if(confirm('Start '+pl.name+' over from scratch? Pets, stars and levels will be erased.'))doResetHero(i);},{size:15,col:'#ffd0d8'});
-  stick(x+215,y+160,{col:pl.color,s:2.6,pose:sel?'cheer':'idle',seed:i});
-  btn('✏ '+fullName(pl),x+40,y+185,350,50,()=>{const n=prompt('Hero name? (Stickgirl is added for you)',pl.name);const sn=shortName(n);if(sn){pl.name=sn.slice(0,14);save();}},{size:24});
-  txt('Colour',x+60,y+262,18,'#2b2b55','left');SWATCH.forEach((c,k)=>{const sx=x+40+k*43,sy=y+280;ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx+18,sy+18,17,0,7);ctx.fill();ctx.lineWidth=pl.color===c?5:2;ctx.strokeStyle=pl.color===c?'#222':'#fff';ctx.stroke();NUI.push({x:sx,y:sy,w:36,h:36,fn:()=>{pl.color=c;save();}});});
-  btn(pl.tier==='age4'?'Age 4: Easy mode 🌱':'Age 7: Standard ⚡',x+40,y+330,350,44,()=>{pl.tier=pl.tier==='age4'?'age7':'age4';save();},{size:20,col:pl.tier==='age4'?'#b8f5b8':'#cde6ff'});
-  btn(sel?'★ Playing as '+pl.name.slice(0,10):'Play as this hero',x+40,y+380,350,36,()=>{SV.sel=i;save();},{size:18,col:sel?'#ffe066':'#fff'});
-  txt('Lv '+pr.lvl+' · ⭐'+pr.stars+' · 🐾'+Object.keys(pr.pets).length,x+215,y+408,15,'#555');});
- btn('◀ Back',20,496,120,36,()=>{mode='title';},{size:18});btn('🐶 Dog name: '+DN()+'  ✏',160,496,330,36,renameDog,{size:18});}
+ const mh=MH(),g=6,botY=VH-mh-6,y0=56,cardH=botY-g-y0;
+ SV.players.forEach((pl,i)=>{const x=40+i*450,y=y0,pr=SV.prog[i],sel=SV.sel===i;rr(x,y,430,cardH,22);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=sel?8:3;ctx.strokeStyle=sel?'#ff5a8a':'#2b2b55';ctx.stroke();
+  btn('🗑 Reset',x+430-Math.max(98,mh)-10,y+8,Math.max(98,mh),mh,()=>{if(confirm('Start '+pl.name+' over from scratch? Pets, stars and levels will be erased.'))doResetHero(i);},{size:15,col:'#ffd0d8'});
+  const playY=y+cardH-mh-10,ageY=playY-g-mh,nameY=Math.min(y+170,Math.max(y+96,ageY-mh-90));
+  const stickY=nameY-Math.min(30,Math.max(18,(nameY-y)*.24|0)),stickS=Math.min(2.6,1.65+(nameY-y)/130);
+  stick(x+215,stickY,{col:pl.color,s:stickS,pose:sel?'cheer':'idle',seed:i});
+  btn('✏ '+fullName(pl),x+40,nameY,350,mh,()=>{const n=prompt('Hero name? (Stickgirl is added for you)',pl.name);const sn=shortName(n);if(sn){pl.name=sn.slice(0,14);save();}},{size:Math.min(24,Math.max(16,mh*.35|0))});
+  const colY=nameY+mh+18,swH=Math.max(30,Math.min(40,ageY-colY-18)),swY=colY+18,swR=Math.min(17,(swH-2)/2);
+  txt('Colour',x+60,colY+2,16,'#2b2b55','left');
+  txt('Lv '+pr.lvl+' · ⭐'+pr.stars+' · 🐾'+Object.keys(pr.pets).length,x+390,colY+2,15,'#555','right');
+  SWATCH.forEach((c,k)=>{const sx=x+40+k*43,sy=swY;ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx+18,sy+swR,swR,0,7);ctx.fill();ctx.lineWidth=pl.color===c?5:2;ctx.strokeStyle=pl.color===c?'#222':'#fff';ctx.stroke();NUI.push({x:sx,y:sy,w:36,h:swR*2+2,fn:()=>{pl.color=c;save();}});});
+  btn(pl.tier==='age4'?'Age 4: Easy mode 🌱':'Age 7: Standard ⚡',x+40,ageY,350,mh,()=>{pl.tier=pl.tier==='age4'?'age7':'age4';save();},{size:Math.min(20,Math.max(16,mh*.3|0)),col:pl.tier==='age4'?'#b8f5b8':'#cde6ff'});
+  btn(sel?'★ Playing as '+pl.name.slice(0,10):'Play as this hero',x+40,playY,350,mh,()=>{SV.sel=i;save();},{size:18,col:sel?'#ffe066':'#fff'});});
+ btn('◀ Back',20,botY,Math.max(120,mh+20),mh,()=>{mode='title';},{size:18});btn('🐶 Dog name: '+DN()+'  ✏',160,botY,330,mh,renameDog,{size:18});}
 function drawMoves(){panel(110,28,740,486,'#2b2b55');txt('🥋 Stick Girl moves',480,62,32,'#2b2b55');
  const rows=[['👊','Punch','Z or J  ·  tap 👊','Quick and snappy: wind up, strike, recoil.'],['🦶','Kick','X or K  ·  tap 🦶','Slower but hits harder.'],
   ['🦶💨','Flying Kick','Run + kick, or kick while jumping','Dive-kick sideways! Bonus damage, then a short recovery. Hold ▶ and tap 🦶.'],
