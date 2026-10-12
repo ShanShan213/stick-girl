@@ -972,6 +972,17 @@ function buildLevel(){
 
 /* ================= PLAYER & PHYSICS ================= */
 let PF={x:0,y:0,face:1};
+/* active pet companion: small helper actions on a cooldown (fetch a star, sniff out a portal/secret, cheer) + blocks one enemy hit every ~45 s */
+let PH={cd:300,blk:0,pt:null,sn:new Set()};
+function petName(){const a=activePet();return a?a.def.name.split(' the ')[0]:'';}
+function petHelp(){const ap=activePet();if(PH.blk>0)PH.blk--;if(PH.pt&&--PH.pt.t<=0)PH.pt=null;if(!ap||mode!=='play')return;if(PH.cd>0){PH.cd--;return;}
+ const p=P,L=LV,px=p.x+10,nm=petName();
+ const st=L.items.filter(i=>i.k==='star'&&!i.got&&Math.abs(i.x-px)>50&&Math.abs(i.x-px)<300&&i.y>250).sort((a,b)=>Math.abs(a.x-px)-Math.abs(b.x-px))[0];
+ if(st){addParts(st.x,st.y,4,'#ffd23f',{star:true,g:0});st.x=px;st.y=p.y+28;floatText(nm+' fetched a ⭐',PF.x,PF.y-60,'#ffe066');PH.cd=720;return;}
+ const tg=[...L.portals.map(o=>({x:o.x,k:'p'})),...L.bonus.filter(o=>!bigsGot().includes(o.id)).map(o=>({x:o.x,k:'p'})),...L.scrolls.map(o=>({x:o.x,k:'s'}))].filter(o=>o.x>px+200&&o.x<px+1000&&!PH.sn.has(o.x)).sort((a,b)=>a.x-b.x)[0];
+ if(tg){PH.sn.add(tg.x);PH.pt={x:tg.x,t:300,k:tg.k};floatText('👃 '+(tg.k==='p'?'A portal ahead!':'A secret nearby!'),PF.x,PF.y-60,'#bff');say(nm+(tg.k==='p'?' sniffed out a portal ahead!':' smells a secret nearby!'),{queue:true});sfx('pet');PH.cd=900;return;}
+ if(p.onGround&&Math.random()<.35){floatText(['Go go! 💛','You can do it! ✨','Yay! 🎉'][Math.floor(Math.random()*3)],PF.x,PF.y-60,'#ffb3d1');PH.cd=1200;return;}
+ PH.cd=240;}
 function newPlayer(x,y){return{x,y,w:20,h:56,vx:0,vy:0,face:1,hp:6,max:6,inv:0,ch:0,atk:null,starCd:0,jumps:0,coy:0,jbuf:0,safe:{x,y},ph:0,onGround:false,gnd:null,ride:null,glide:false,heal:0,gcool:0,hurtT:0,spr:false,near:null,swim:false,aura:0,shield:0,speedT:0,lightT:0,airT:0,stageT:0,idolT:0,sq:0,hx:0,hv:0,hy:0,hw:0,xcd:0,lvy:0,wasG:true,dropT:0,duck:false,pound:false};}
 function moveBody(b,solids){b.x+=b.vx;
  for(const s of solids){if(s.t==='p')continue;if(ov(b,s)){if(b.vx>0)b.x=s.x-b.w;else if(b.vx<0)b.x=s.x+s.w;else b.x+=(b.x+b.w/2<s.x+s.w/2?-1:1);b.vx=0;}}
@@ -983,13 +994,14 @@ function moveBody(b,solids){b.x+=b.vx;
 const bossAtk=()=>curLv()===2?'Lava Splash':'Lightning Zap',bossName=()=>curLv()===2?'Grumbly the Magma Golem':'Grumbler the Storm Cloud';
 const L2INTRO=()=>{const n=PL().name;return[{s:'Woof! We made it to Ember Mountain, '+n+'!',b:1},{s:'A grumpy Magma Golem woke up and made the whole mountain hot and grumbly. The colours are hiding again!'},
  {s:'Watch out for lava, fire geysers and falling rocks. Water 💧 cools lava into rock, and Earth 🪨 raises rock pillars!'},{s:'Find three Big Stars 🌟 in the crystal portals, answer the Volcano Gates, and we will calm the Golem down. Let\'s go!',b:1}];};
-function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;SPC=null;LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}for(const c of LV.checks)if(c.x<=cp){c.reached=true;c.on=c.x===cp;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
+function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;SPC=null;PH={cd:300,blk:0,pt:null,sn:new Set()};LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}for(const c of LV.checks)if(c.x<=cp){c.reached=true;c.on=c.x===cp;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
  const n=LV.gates.filter(g=>g.open).length;sat=0.15+0.14*n;if(LP().boss)sat=1;
  SF=newSF(cp>100?cp-70:24);DB={cur:null,q:[]};ST={best:cp,idle:0,fails:0,cd:1200,n:0};HN=null;RQ=null;if(!DG().intro&&!LP().cp)dogIntro();else if(curLv()===2&&!LP().intro){LP().intro=true;save();dogTalk(L2INTRO(),null,'play');}}
 function lavaBounce(){const p=P;if((p.bnc||0)>=2)return false;p.bnc=(p.bnc||0)+1;const px=p.x+10;let best=null;for(const q of LV.plats)if(q.y>=330&&q.y<=440&&q.w>=40){const tx=clamp(px,q.x+Math.min(30,q.w/2),q.x+q.w-Math.min(30,q.w/2)),d=Math.abs(tx-px);if(d<260&&(!best||d<best.d))best={d,tx};}
  p.vy=-17;p.bTx=best?best.tx:null;p.vx=best?clamp((best.tx-px)/34,-5,5):p.face*3;p.y=Math.min(p.y,440-p.h-6);p.inv=Math.max(p.inv,40);sfx('spring');addParts(px,470,14,'#ff8a1f',{sp:1.5});if(p.bnc===1)toast('Ouch, hot! Boing! Grab a rock!',110);return true;}
 function respawn(msg){P.x=P.safe.x;P.y=P.safe.y-2;P.vx=0;P.vy=0;P.inv=120;if(msg)toast(msg,120);addParts(P.x+10,P.y+28,16,'#fff',{sp:1.5});}
 function hurt(dmg,dir,src,msg){if(P.inv>0||mode!=='play')return;
+ if(!src&&PH.blk<=0&&activePet()){PH.blk=2700;P.inv=60;sfx('pop');addParts(PF.x,PF.y-20,10,'#fff',{sp:1.3});floatText('🛡 '+petName()+' blocked it!',PF.x,PF.y-50,'#bfffbf');return;}
  if(P.shield>0){P.shield=0;P.inv=90;sfx('pop');addParts(P.x+10,P.y+28,14,'#bdf',{sp:1.4});floatText('Bubble pop!',P.x,P.y-10,'#7df');return;}dmg=easy()?Math.max(1,Math.ceil(dmg/2)):dmg;P.hp-=dmg;P.inv=easy()?140:95;P.hurtT=12;P.vx=-(dir||P.face)*5;P.vy=-6;P.atk=null;sfx('hurt');shake=8;addParts(P.x+10,P.y+20,8,'#ffd23f',{star:true});
  if(src==='spike'||P.hp<=0){respawn(P.hp<=0?'Oops! A rainbow hug puts you back on your feet!':(msg||'Boing! Back to safe ground.'));}
  if(P.hp<=0)P.hp=P.max;}
@@ -1192,7 +1204,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  if(p.near){const nk=p.near.k+':'+Math.round(p.near.x);if(nk!==nearKey){nearKey=nk;say(p.near.l.replace(/^E: /,'Tap E to '));}}else nearKey='';
  for(const s of L.signs)if(!s.said&&Math.abs(p.x-s.x)<170){s.said=true;say(s.s,{queue:true});}
  // pet follower & powers
- const ap=activePet();const tx=p.x+10-p.face*36;PF.face=p.face;PF.x+=(tx-PF.x)*.12;
+ petHelp();const ap=activePet();const tx=p.x+10-p.face*36;PF.face=p.face;PF.x+=(tx-PF.x)*.12;
  let fy=p.y+p.h;if(ap&&['owl','dragon','dolphin'].includes(ap.def.id))fy-=30+Math.sin(T/15)*6;PF.y+=(fy-PF.y)*.15;
  if(ap&&ap.def.id==='unicorn'){p.heal++;if(p.heal>(1900-250*ap.lv)&&p.hp<p.max){p.heal=0;p.hp++;floatText('+♥',p.x,p.y-10,'#f9c');sfx('pet');addParts(PF.x,PF.y-20,10,'#f9c',{star:true});}}
  if(pr.lvl>=6){p.aura++;if(p.aura>1200&&p.hp<p.max){p.aura=0;p.hp++;floatText('+♥',p.x,p.y-10,'#fc6');}}
@@ -1692,12 +1704,14 @@ const dkc=document.createElement('canvas');dkc.width=VW;dkc.height=VH;const dkx=
 function stageLights(t){ctx.save();ctx.globalCompositeOperation='lighter';const cs=['#ff3df2','#19e6ff','#ffe14d','#7dff6a'],f=Math.min(1,t/30);for(let i=0;i<4;i++){const bx=100+i*250,sw=Math.sin(T/9+i*1.7)*130;ctx.globalAlpha=.3*f;ctx.fillStyle=cs[i];ctx.beginPath();ctx.moveTo(bx-8,0);ctx.lineTo(bx+8,0);ctx.lineTo(bx+sw+80,VH);ctx.lineTo(bx+sw-80,VH);ctx.fill();}
  if(t%24<3){ctx.globalAlpha=.22*f;ctx.fillStyle='#fff';ctx.fillRect(0,0,VW,VH);}ctx.restore();}
 function drawHUD(){const pr=PR(),p=P;if(p.stageT>0)stageLights(p.stageT);
+ {const ap=activePet();if(ap&&mode==='play'){
+  if(PH.pt){const sx=PF.x-cam.x;txt('👃 '+(PH.pt.x>PF.x?'➜':'⬅'),clamp(sx,60,VW-60),PF.y-70,22,'#fff','center','#2b2b55');}}}
  rr(8,8,250,118,14);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();
  for(let i=0;i<3;i++)heart(30+i*34,28,1.3,clamp((p.hp-i*2)/2,0,1));
  txt('Lv '+pr.lvl,22,56,18,'#fff','left','#2b2b55');bar(62,48,186,16,pr.xp/xpNeed(pr.lvl),'#7be34a');
  txt('⭐ '+pr.stars,22,82,18,'#ffe066','left','#2b2b55');txt('🍎 '+pr.treats,100,82,18,'#fff','left','#2b2b55');
  const el=ELEMS[pr.elem];bar(22,100,130,16,p.ch/100,el.c);txt(el.ic+' '+el.n+(p.ch>=100?' ✨!':''),160,108,15,'#fff','left','#2b2b55');
- const ap=activePet();if(ap){rr(264,8,52,52,12);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();petSprite(ap.def.id,290,52,1,.75,T);txt('♥'+ap.lv,290,64,12,'#ffd','center','#2b2b55');}
+ const ap=activePet();if(ap){rr(264,8,52,52,12);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();if(mode==='play')NUI.push({x:258,y:2,w:68,h:68,fn:()=>openPets('play')});if(PH.blk<=0)txt('🛡',306,16,13);petSprite(ap.def.id,290,52,1,.75,T);txt('♥'+ap.lv,290,64,12,'#ffd','center','#2b2b55');}
  drawDogUI();drawRoomHUD();
  {const cb=cornerSz(),live=mode==='play';btn(SV.mute?'🔇':'🔊',VW-(live?2:1)*(cb+6),8,cb,cb,toggleMute,{size:22});if(live){btn('🐾',VW-3*(cb+6),8,cb,cb,()=>openPets('play'),{size:22});btn('⏸',VW-cb-6,8,cb,cb,()=>{mode='pause';pmoves=false;},{size:22});}}
  drawToasts(142);
