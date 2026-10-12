@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="sg-build" content="v8-qa1-2026-10-12">
+<meta name="sg-build" content="v8-qa2-2026-10-12">
 <title>Stick Girl: Colour Quest</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#4cc3ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -15,7 +15,9 @@ canvas{background:#000;display:block;touch-action:none}
 #tc.sea button:not([data-a=left]):not([data-a=right]):not([data-a=jump]):not([data-a=down]){display:none}
 #tc button{pointer-events:auto;position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid rgba(255,255,255,.8);background:rgba(30,30,60,.45);color:#fff;font-size:24px;touch-action:none;padding:0}
 #tc button.rdy{border-color:#ffe066;background:rgba(255,200,0,.5);box-shadow:0 0 16px 6px rgba(255,224,102,.9);animation:rd .7s infinite alternate}@keyframes rd{to{box-shadow:0 0 5px 1px rgba(255,224,102,.6)}}
-#tc button:active,#tc button.d{background:rgba(255,200,0,.7)}
+#tc button:active,#tc button.d{background:rgba(255,200,0,.7);opacity:1}
+#tc button{opacity:.45;transition:opacity .12s}#tc button.rdy{opacity:.9}
+@media (max-height:520px){#tc button{zoom:.85}#bQ,#tc [data-a=hint]{width:52px!important;height:52px!important}}@media (max-height:400px){#tc button{zoom:.8}#bE,#bQ,#tc [data-a=hint]{width:56px!important;height:56px!important}}
 </style></head><body>
 <canvas id="c" width="960" height="540"></canvas>
 <div id="tc">
@@ -358,7 +360,7 @@ cv.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();const p=cpo
  for(let i=UI.length-1;i>=0;i--){const b=UI[i];if(p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h){if(!b.dis){b.fn(p);}return;}}
  if(mode==='catch')catchPtr=p.x;else if(mode==='story'||mode==='dogtalk'||mode==='scroll'||(mode==='duel'&&D&&D.ph!=='ask'))hit.interact=true;});
 cv.addEventListener('pointermove',e=>{mouse=cpos(e);if(mode==='catch'&&e.buttons)catchPtr=mouse.x;});
-let CSS_S=1,tcR=null,tcRT=0;const cornerSz=()=>Math.max(56,Math.ceil(46/CSS_S));
+let CSS_S=1,tcR=null,tcRT=0;const MH=()=>Math.max(34,Math.ceil(46/CSS_S));const cornerSz=()=>Math.max(56,Math.ceil(46/CSS_S));
 function fit(){const s=Math.min(innerWidth/VW,innerHeight/VH);CSS_S=s||1;tcR=null;cv.style.width=Math.floor(VW*s)+'px';cv.style.height=Math.floor(VH*s)+'px';}
 addEventListener('resize',fit);fit();
 
@@ -805,9 +807,9 @@ function buildLevel(){
  const GT=(x,kind)=>{const g={id:'g'+(++gid),x,kind,open:false,barrier:{x,y:0,w:26,h:440,t:'b'}};L.gates.push(g);L.plats.push(g.barrier);};
  const CK=x=>L.checks.push({x,on:false});
  const OB=(k,x,w,h,sg)=>{const o={k,x,y:440-h,w,h,hintT:0,dying:0};if(k!=='fire'){o.plat={x,y:o.y,w,h,t:'b'};L.plats.push(o.plat);}L.obst.push(o);if(sg)L.signs.push({x:x-260,s:sg});return o;};
- const TH=x=>{OB('thorn',x,46,170,'Thorny wall! Switch to 🔥 Fire (Q) and use your special (V)');row(x+110,400,3);};
- const CR=x=>{OB('crate',x,58,168,'Heavy crates! Switch to 🪨 Earth (Q) and use your special (V)');row(x+110,400,3);};
- const FW=x=>{OB('fire',x,96,150,'Flames ahead! Switch to 💧 Water (Q) and use your special (V)');row(x+150,400,3);};
+ const TH=x=>{OB('thorn',x,46,170,'Thorny wall! Tap 🔄 to pick 🔥 Fire, then tap ✨');row(x+110,400,3);};
+ const CR=x=>{OB('crate',x,58,168,'Heavy crates! Tap 🔄 to pick 🪨 Earth, then tap ✨');row(x+110,400,3);};
+ const FW=x=>{OB('fire',x,96,150,'Flames ahead! Tap 🔄 to pick 💧 Water, then tap ✨');row(x+150,400,3);};
  const SG=(x,s)=>L.signs.push({x,s});
  const BALL=(x0,x1)=>L.balls.push({x0,x1,x:x0,y:420,vx:E_BALL(),vy:0,r:15});
  const E_BALL=()=>easy()?1.4:2.2;
@@ -866,7 +868,7 @@ function buildLevel(){
   const HEART=(x,y)=>L.items.push({x,y,k:'heart'});
   const mods=[
    ()=>{const a=G(950);if(n%2===0)CK(a+70);SP(a+280,Ez?2:3);arc(a+250,378,Ez?5:6,78);EN('ninja',a+500);SP(a+640,2);arc(a+625,378,5,70);EN('hopper',a+800);row(a+380,400,3);},
-   ()=>{const g1=Ez?85:115,g2=Ez?95:125;const a=G(260);arc(a+250,372,4,55);gap(g1);const b=G(190);ST(b+95,380);arc(b+185,372,4,55);gap(g2);const c=G(200);if(Ez)ST(c+100,390);else EN('hopper',c+100);arc(c+190,372,4,55);gap(g1);G(300);EN('ninja',cx-150);},
+   ()=>{const g1=Ez?62:105,g2=Ez?70:112;const a=G(260);arc(a+250,372,4,55);gap(g1);const b=G(190);ST(b+95,380);arc(b+185,372,4,55);gap(g2);const c=G(200);if(Ez)ST(c+100,390);else EN('hopper',c+100);arc(c+190,372,4,55);gap(g1);G(300);EN('ninja',cx-150);},
    ()=>{const a=G(280);const g=Ez?240:290;const gx=cx;gap(g);MV(gx+g/2,436,110,g/2-45,0,.025);row(gx+40,330,Math.floor(g/45));const b=G(260);EN('ninja',b+140);HEART(b+200,400);},
    ()=>{const a=G(1150);EN('ninja',a+330);EN('ninja',a+470);EN('hopper',a+650);EN('cloud',a+560,300);BALL(a+740,a+1000);EN(Ez?'ninja':'ninja2',a+1000);row(a+300,400,5);ST(a+900,380);HEART(a+1080,400);},
    ()=>{const a=G(1200);CK(a+60);FL(a+300,350,95);FL(a+440,270,95);FL(a+580,200,300);row(a+600,160,6);TR(a+830,160);HEART(a+720,160);EN('ninja',a+640);SP(a+960,2);arc(a+930,380,5,70);EN('hopper',a+1080);HS(a+240,'A secret path up there! Hop up the ledges for stars and a treat.',1);},
@@ -895,18 +897,18 @@ function buildLevel(){
    fact:['Cooling Scroll','When lava touches cold water it cools fast and turns into hard black rock called basalt.'],q:{q:'What turned the lava into a rock bridge?',o:['Cold water','A pillow','Music'],ic:['💧','🛏️','🎵'],c:0}});
   const pl=PLT(r,x0+330),cr=CRT(r,x0+(E4?230:140)),br=BRG(r,x0+520,420);br.lava=true;r.tick=()=>setBridge(br,pl.on||r.done,L);gap(420);G(560);PTL(r,x0+1330);SG(x0+90,'Heavy plate = water pipe = rock bridge');
   r.hint=()=>!pl.on?(cr.x+28<pl.x||cr.x+28>pl.x+pl.w+10?{x:cr.x+28,y:400,k:'crate',t:'Push the crate onto the plate. Stormi can sit on it too: tap E near the plate!'}:{x:pl.x+35,y:420,k:'plate',t:'Almost! Push the crate right onto the plate.'}):{x:x0+940,y:380,k:'cross',t:'The rock bridge is ready! Cross it to the portal.'};};
- const RISE=()=>{let a=G(420);CK(a+60);SG(a+160,'Rising lava! Hop up the steps quickly ⬆');row(a+220,400,3);const x0=cx,ys=[410,370,330,295,270,270,280,300,320];ys.forEach((y,i)=>{FL(x0+40+i*150,y,110);ST(x0+95+i*150,y-40);});gap(1400);
-  L.rise={x0,x1:cx,lv:505,base:505,min:easy()?385:335,sp:easy()?.2:.33};SC('crystal',x0+40+4*150+55,230);a=G(520);CK(a+90);};
+ const RISE=()=>{let a=G(420);CK(a+60);SG(a+160,'Rising lava! Hop up the steps quickly ⬆');row(a+220,400,3);const x0=cx,ys=[410,370,330,295,270,270,280,300,320];const sw=easy()?140:122;ys.forEach((y,i)=>{FL(x0+40+i*150-(sw-110)/2,y,sw);ST(x0+95+i*150,y-40);});gap(1400);
+  L.rise={x0,x1:cx,lv:505,base:505,min:easy()?395:345,sp:easy()?.11:.24,hold:0};SC('crystal',x0+40+4*150+55,230);a=G(520);CK(a+90);};
  const L2script=()=>{const Ez=easy();
   const POOL=w=>{L.pools.push({x:cx,w,cooled:false,ct:0});gap(w);};
   const PIT=w=>{L.pits.push({x:cx,w,pil:null});gap(w);};
   s=G(2000);CK(s+60);SG(s+120,'🌋 Ember Mountain! Hot lava below: do not fall in!');SG(s+560,'Fire imps 🔥 hop about. Stomp or punch them!');SG(s+1080,'Fire geysers whoosh up! Wait, then run past');
   arc(s+300,390,5,60);EN('imp',s+700);EN('imp',s+900);GEY(s+1250,0);GEY(s+1480,120);row(s+1300,400,4);PT('redpanda',s+1820,440);SG(s+1700,'A friend! Tap E near animals');TR(s+1640,330);
   gap(GAPE(150));LSTRETCH(2200,21);
-  s=G(700);CK(s+60);SG(s+300,'Lava lake! 💧 Water (Q) + special (V) cools it into rock');row(s+200,400,4);POOL(Ez?360:400);s=G(900);arc(s+100,380,5,60);EN('imp',s+400);EN('ninja',s+650);GT(s+820,'maths');
+  s=G(700);CK(s+60);SG(s+300,'Lava lake! Tap 🔄 to pick 💧 Water, then tap ✨ to cool it into rock');row(s+200,400,4);POOL(Ez?360:400);s=G(900);arc(s+100,380,5,60);EN('imp',s+400);EN('ninja',s+650);GT(s+820,'maths');
   LSTRETCH(3000,22);roomL2A();
   LSTRETCH(1500,23);BONUS('c1','ice');
-  s=G(800);CK(s+60);SG(s+350,'Too wide to jump! 🪨 Earth (Q) + special (V) raises a rock pillar');row(s+300,400,3);PIT(Ez?400:430);s=G(1100);arc(s+60,380,5,60);EN('imp',s+400);EN('imp',s+600);SP(s+760,2);
+  s=G(800);CK(s+60);SG(s+350,'Too wide to jump! Stand at the edge, tap 🔄 to pick 🪨 Earth, then tap ✨ for a rock pillar');row(s+300,400,3);PIT(Ez?340:420);s=G(1100);arc(s+60,380,5,60);EN('imp',s+400);EN('imp',s+600);SP(s+760,2);
   L.mounds.push({id:'m2',x:s+980,scroll:'pumice'});BU(s+1010,440,1);HS(s+800,'Something is buried in that lumpy mound! Dig with ▼, Earth power, or a panda friend.',2);
   gap(GAPE(140));LSTRETCH(2600,24);s=G(800);CK(s+40);GT(s+650,'volcano');
   LSTRETCH(1800,25);RISE();LSTRETCH(1500,26);BONUS('c2','ice');
@@ -978,9 +980,11 @@ function moveBody(b,solids){b.x+=b.vx;
 const bossAtk=()=>curLv()===2?'Lava Splash':'Lightning Zap',bossName=()=>curLv()===2?'Grumbly the Magma Golem':'Grumbler the Storm Cloud';
 const L2INTRO=()=>{const n=PL().name;return[{s:'Woof! We made it to Ember Mountain, '+n+'!',b:1},{s:'A grumpy Magma Golem woke up and made the whole mountain hot and grumbly. The colours are hiding again!'},
  {s:'Watch out for lava, fire geysers and falling rocks. Water 💧 cools lava into rock, and Earth 🪨 raises rock pillars!'},{s:'Find three Big Stars 🌟 in the crystal portals, answer the Volcano Gates, and we will calm the Golem down. Let\'s go!',b:1}];};
-function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
+function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}for(const c of LV.checks)if(c.x<=cp){c.reached=true;c.on=c.x===cp;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
  const n=LV.gates.filter(g=>g.open).length;sat=0.15+0.14*n;if(LP().boss)sat=1;
  SF=newSF(cp>100?cp-70:24);DB={cur:null,q:[]};ST={best:cp,idle:0,fails:0,cd:1200,n:0};HN=null;RQ=null;if(!DG().intro&&!LP().cp)dogIntro();else if(curLv()===2&&!LP().intro){LP().intro=true;save();dogTalk(L2INTRO(),null,'play');}}
+function lavaBounce(){const p=P;if((p.bnc||0)>=2)return false;p.bnc=(p.bnc||0)+1;const px=p.x+10;let best=null;for(const q of LV.plats)if(q.y>=330&&q.y<=440&&q.w>=40){const tx=clamp(px,q.x+Math.min(30,q.w/2),q.x+q.w-Math.min(30,q.w/2)),d=Math.abs(tx-px);if(d<260&&(!best||d<best.d))best={d,tx};}
+ p.vy=-17;p.bTx=best?best.tx:null;p.vx=best?clamp((best.tx-px)/34,-5,5):p.face*3;p.y=Math.min(p.y,440-p.h-6);p.inv=Math.max(p.inv,40);sfx('spring');addParts(px,470,14,'#ff8a1f',{sp:1.5});if(p.bnc===1)toast('Ouch, hot! Boing! Grab a rock!',110);return true;}
 function respawn(msg){P.x=P.safe.x;P.y=P.safe.y-2;P.vx=0;P.vy=0;P.inv=120;if(msg)toast(msg,120);addParts(P.x+10,P.y+28,16,'#fff',{sp:1.5});}
 function hurt(dmg,dir,src,msg){if(P.inv>0||mode!=='play')return;
  if(P.shield>0){P.shield=0;P.inv=90;sfx('pop');addParts(P.x+10,P.y+28,14,'#bdf',{sp:1.4});floatText('Bubble pop!',P.x,P.y-10,'#7df');return;}dmg=easy()?Math.max(1,Math.ceil(dmg/2)):dmg;P.hp-=dmg;P.inv=easy()?140:95;P.hurtT=12;P.vx=-(dir||P.face)*5;P.vy=-6;P.atk=null;sfx('hurt');shake=8;addParts(P.x+10,P.y+20,8,'#ffd23f',{star:true});
@@ -1009,7 +1013,7 @@ function special(){if(P.ch<100){toast('Fight and collect stars to fill the bendi
   for(const q of LV.pools)if(!q.cooled&&Math.abs(q.x+q.w/2-cx)<q.w/2+330){q.cooled=true;q.ct=0;LV.plats.push({x:q.x-2,y:440,w:q.w+4,h:120,t:'g',cool:q});sfx('douse');shake=6;addParts(q.x+q.w/2,440,40,'#e8f6ff',{sp:2.2,g:-.08});addXP(10);toast('Tssss! The lava cooled into rock! 🪨',150);}
   for(const g of LV.geys)if(Math.abs(g.x-cx)<380&&g.cool<=0){g.cool=900;addParts(g.x,430,12,'#e8f6ff',{sp:1.2,g:-.08});}}
  else if(pr.elem===2){for(const m of LV.mounds)if(!m.dug&&Math.abs(m.x-cx)<220)digMound(m,'earth');mk(6,3,50,26,{y:P.y+56-26*big});mk(-6,3,50,26,{y:P.y+56-26*big});
-  let pil=false;for(const q of LV.pits)if(!q.pil&&Math.abs(q.x+q.w/2-cx)<q.w/2+330){pil=true;const pc=q.x+q.w/2;q.pil={x:pc-48,y:540,w:96,h:220,t:'g',pillar:true,ty:400};LV.plats.push(q.pil);sfx('earth');shake=10;addParts(pc,470,30,'#c9a46a',{sp:2.2});addXP(10);toast('RUMBLE! A rock pillar rose out of the lava! Hop across!',160);}
+  let pil=false;for(const q of LV.pits)if(!q.pil&&Math.abs(q.x+q.w/2-cx)<q.w/2+330){pil=true;const pc=q.x+q.w/2;const pw=easy()?170:120;q.pil={x:pc-pw/2,y:540,w:pw,h:220,t:'g',pillar:true,ty:400};LV.plats.push(q.pil);sfx('earth');shake=10;addParts(pc,470,30,'#c9a46a',{sp:2.2});addXP(10);toast('RUMBLE! A rock pillar rose out of the lava! Hop across!',160);}
   if(!pil){const px=cx+f*62-30;LV.plats.push({x:px,y:P.y+56-76,w:60,h:16,t:'p',tmp:480,rock:true});}hitOb('crate',o=>breakOb(o,'smash'),260,true);
   for(const e of LV.enemies)if(!e.dead&&Math.abs(e.x-cx)<170){e.stun=70;e.vx=0;}}
  else{mk(9*f,2,64,60,{push:true});P.vy=-18.5;P.jumps=1;P.onGround=false;P.spr=true;P.airT=480;addParts(cx,P.y+56,20,'#dff',{sp:1.6,g:-.05});}
@@ -1046,10 +1050,10 @@ function updLava(){const L=LV,p=P,E=easy(),px=p.x+10,safe=hasPet('salamander');
  for(const r of L.falling){if(r.warn>0){r.warn--;continue;}r.vy+=.45;r.y+=r.vy;if(!safe&&p.inv<=0&&Math.abs(r.x-px)<r.r+10&&r.y+r.r>p.y&&r.y-r.r<p.y+p.h){hurt(1,Math.sign(px-r.x)||1);r.dead=true;addParts(r.x,r.y,10,'#8a6a5a',{sp:1.4});}
   if(r.y>440-r.r){r.dead=true;sfx('smash');addParts(r.x,430,10,'#8a6a5a',{sp:1.4});shake=Math.max(shake,2);}}
  L.falling=L.falling.filter(r=>!r.dead);
- for(const q of L.pits)if(q.pil&&q.pil.y>q.pil.ty){q.pil.y=Math.max(q.pil.ty,q.pil.y-5);if(T%3===0)addParts(q.pil.x+48,470,2,'#c9a46a',{sp:1});}
+ for(const q of L.pits)if(q.pil&&q.pil.y>q.pil.ty){q.pil.y=Math.max(q.pil.ty,q.pil.y-5);if(T%3===0)addParts(q.pil.x+q.pil.w/2,470,2,'#c9a46a',{sp:1});}
  for(const q of L.pools)if(q.cooled&&q.ct<240)q.ct++;
- const R=L.rise;if(R){const inZ=px>R.x0-20&&px<R.x1;if(inZ)R.lv=Math.max(R.min,R.lv-R.sp);else R.lv=Math.min(R.base,R.lv+1.5);
-  if(inZ&&p.y+p.h>R.lv+8){R.lv=R.base;P.inv=0;hurt(1,0,'spike','Hot hot! The lava went back down. Try again, hop quickly!');}}}
+ const R=L.rise;if(R){const inZ=px>R.x0-20&&px<R.x1;if(R.hold>0)R.hold--;else if(inZ)R.lv=Math.max(R.min,R.lv-R.sp);else R.lv=Math.min(R.base,R.lv+1.5);
+  if(inZ&&p.y+p.h>R.lv+8){if(E&&lavaBounce())R.lv=Math.min(R.base,R.lv+60),R.hold=150;else{R.lv=R.base;R.hold=E?300:180;P.inv=0;hurt(1,0,'spike','Hot hot! The lava went back down. Try again, hop quickly!');}}}}
 /* ---- the final encounter: Air blows the Storm Cloud away (Lv 1) / Water cools the Magma Golem (Lv 2) ---- */
 function startFinale(){const L=LV,g=curLv()===2,p=P;mode='play';shush();p.x=L.bossX+30;p.y=440-58;p.vx=p.vy=0;p.face=1;p.atk=null;p.inv=30;p.ch=100;cam.x=clamp(p.x-260,0,L.W-VW);parts=[];
  L.fin={ph:'wait',t:0,el:g?1:3,x:L.bossX+330,y:g?300:250,golem:g,hint:0,wave:0};DB={cur:null,q:[]};
@@ -1110,11 +1114,11 @@ function updPlay(){T++;const p=P,L=LV,pr=PR(),E=easy();
  if(p.grab){const nx=p.gs>0?p.x+p.w:p.x-gc.w,bx={x:nx,y:gc.y,w:gc.w,h:gc.h};if(nx<gc.r.x0+6||nx+gc.w>gc.r.x1-6||L.plats.some(q=>q!==gc&&q.t!=='p'&&ov(bx,q))){p.x=gox;p.vx=0;}else{if(Math.abs(nx-gc.x)>.3&&T%12===0)sfx('tick');gc.x=nx;}}
  p.ride=p.gnd&&p.gnd.rx!==undefined?p.gnd:null;
  if(p.onGround&&p.gnd.t==='g'&&!activeRoom()&&p.x>p.gnd.x+50&&p.x+p.w<p.gnd.x+p.gnd.w-50&&T%10===0&&p.gnd.y<=440)p.safe={x:p.x,y:p.y};
- p.ph+=Math.abs(p.vx)*.07;for(const q of L.highs)if(!q.done&&p.onGround&&p.y+p.h<=q.y+2&&Math.abs(p.x+10-q.x)<200)q.done=true;
+ if(p.onGround)p.bnc=0;if(p.bTx!=null){if(p.onGround||p.inWater)p.bTx=null;else if(!keys.left&&!keys.right)p.vx=clamp((p.bTx-(p.x+10))/18,-4.5,4.5);}p.ph+=Math.abs(p.vx)*.07;for(const q of L.highs)if(!q.done&&p.onGround&&p.y+p.h<=q.y+2&&Math.abs(p.x+10-q.x)<200)q.done=true;
  {const tg=(!p.onGround&&!w)?-clamp(Math.abs(p.vy)/16,0,1)*.2:0;p.sq+=(tg-p.sq)*.22;const htx=-p.vx*1.9,hty=-p.vy*1.1;p.hv+=(htx-p.hx)*.2;p.hv*=.7;p.hx+=p.hv;p.hw+=(hty-p.hy)*.2;p.hw*=.7;p.hy+=p.hw;}
  if(p.x<0){p.x=0;}if(p.x>L.W-p.w)p.x=L.W-p.w;
  if(p.y>640&&!activeRoom()){if(P.inv>0)respawn('Whoops! Back to safe ground.');else hurt(1,0,'spike','Whoops! Back to safe ground.');}
- if(L.theme==='lava'&&p.y+p.h>484&&!w&&!(L.rise&&p.x+10>L.rise.x0&&p.x+10<L.rise.x1)){const r=activeRoom();if(r){roomReset(r,'Hot hot! No worries, back to the puzzle start.');return;}P.inv=0;hurt(1,0,'spike','Hot hot! Back to safe ground.');addParts(p.x+10,470,14,'#ff8a1f',{sp:1.5});}
+ if(L.theme==='lava'&&p.y+p.h>484&&!w&&!(L.rise&&p.x+10>L.rise.x0&&p.x+10<L.rise.x1)){const r=activeRoom();if(r){roomReset(r,'Hot hot! No worries, back to the puzzle start.');return;}if(easy()&&lavaBounce())return;P.inv=0;hurt(1,0,'spike','Hot hot! Back to safe ground.');addParts(p.x+10,470,14,'#ff8a1f',{sp:1.5});}
  updLava();if(mode!=='play')return;
  if(p.atk){const a=p.atk;a.t++;if(a.type!=='cast'){
   if(a.type==='fly'||a.type==='super'){const fl=a.type==='fly';if(a.t>=4&&a.t<(fl?25:27)){const bx=fl?{x:p.face>0?p.x+p.w-2:p.x-58,y:p.y+12,w:60,h:46}:{x:p.face>0?p.x+p.w-2:p.x-66,y:p.y+12,w:68,h:46};
@@ -1158,7 +1162,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  L.items=L.items.filter(i=>!i.got);
  for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';say(SCROLLS[c.id][0]+'! '+SCROLLS[c.id][1],{again:true});}}
  L.scrolls=L.scrolls.filter(c=>!c.got);
- for(const c of L.checks)if(!c.on&&p.x>c.x){L.checks.forEach(o=>o.on=false);c.on=true;const lp=LP();if(lp.cp!==c.x){lp.cp=c.x;p.hp=Math.min(p.max,p.hp+2);if(c.x>100){floatText(easy()?'⚑ ✔':'⚑ Checkpoint',c.x+20,440-150,'#bfffbf');addParts(c.x+18,440-60,8,'#bfffbf',{star:true});sfx('star');}save();}}
+ for(const c of L.checks)if(!c.reached&&p.x>c.x){c.reached=true;const lp=LP();if(c.x>(lp.cp||0)){lp.cp=c.x;L.checks.forEach(o=>o.on=o===c);p.hp=Math.min(p.max,p.hp+2);if(c.x>100){floatText(easy()?'⚑ ✔':'⚑ Checkpoint',c.x+20,440-150,'#bfffbf');addParts(c.x+18,440-60,8,'#bfffbf',{star:true});sfx('star');}save();}} // one-way: each flag fires once; only the furthest counts
  if(!pr.tipMoves&&p.onGround&&!activeRoom()&&++tipT>300){pr.tipMoves=true;const tc=tcEl.classList.contains('on');toast(tc?'🦶💨 Flying Kick: tap 🦶 while running or jumping!':'🦶💨 Flying Kick: press X while running or jumping!',330);toast(tc?'🦸 Superman Punch: tap 👊 in the air, or tap 🦸!':'🦸 Superman Punch: press Z in the air (or B)!',330);toast(tc?'▼ Hold to duck, tap to drop through ledges, tap in the air to ground-pound!':'S / ↓: hold to duck, tap to drop through ledges or ground-pound in the air!',330);save();}
  updRooms();if(mode!=='play')return;
  // gates
@@ -1190,7 +1194,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  if(ap&&ap.def.id==='unicorn'){p.heal++;if(p.heal>(1900-250*ap.lv)&&p.hp<p.max){p.heal=0;p.hp++;floatText('+♥',p.x,p.y-10,'#f9c');sfx('pet');addParts(PF.x,PF.y-20,10,'#f9c',{star:true});}}
  if(pr.lvl>=6){p.aura++;if(p.aura>1200&&p.hp<p.max){p.aura=0;p.hp++;floatText('+♥',p.x,p.y-10,'#fc6');}}
  stepParts();
- const tgt=p.x-420+p.face*50;cam.x+=(tgt-cam.x)*.1;cam.x=clamp(cam.x,0,L.W-VW);
+ const fr=tcFrame(),tgt=fr?p.x-(fr.l+(fr.r-fr.l)*(p.face>0?.3:.7)):p.x-420+p.face*50;cam.x+=(tgt-cam.x)*.1;cam.x=clamp(cam.x,0,L.W-VW);
  const n=L.gates.filter(g=>g.open).length;const st=LP().boss||(L.fin&&L.fin.wave>0)?Math.max(.15+.14*n,(L.fin?L.fin.wave:1)):.15+.14*n;sat+=(st-sat)*(L.fin?.06:.02);
  updDog();if(eT&&!p.near)petDog();
   if(T%300===0)save();}
@@ -1554,6 +1558,7 @@ function drawWorld(){drawBGscene(cam.x);const L=LV,p=P;ctx.save();if(shake>0){ct
   else{const mv=s.rx!==undefined;ctx.fillStyle=mv?Hc(350,60,60):Hc(30,55,52);rr(s.x,s.y,s.w,s.h,6);ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=Hc(25,50,28);ctx.stroke();ctx.fillStyle=mv?Hc(48,90,70):Hc(100,60,50);ctx.fillRect(s.x+4,s.y+2,s.w-8,4);}}
 for(const q of L.plats)if(q.rock&&vis(q)){ctx.globalAlpha=q.tmp<60&&q.tmp%8<4?.5:1;ctx.fillStyle='#8d8d99';ctx.strokeStyle='#4a4a5a';ctx.lineWidth=3;rr(q.x+6,q.y+12,q.w-12,440-q.y-12,6);ctx.fill();ctx.stroke();ctx.fillStyle='#b4b4c2';ctx.fillRect(q.x+12,q.y+20,8,440-q.y-30);ctx.globalAlpha=1;}
  for(const o of L.obst)if(!o.gone&&vis(o))drawObst(o);
+ for(const q of L.pits)if(!q.pil&&vis({x:q.x-120,w:q.w+120})){const a=.55+.35*Math.sin(T/9),mx=q.x-34;ctx.save();ctx.globalAlpha=a;ctx.fillStyle='#ffe066';ctx.beginPath();ctx.ellipse(mx,438,30,7,0,0,Math.PI*2);ctx.fill();ctx.restore();txt('🪨',mx-16,392,26);txt('✨',mx+16,392,24);txt('⬇',mx,416,20,'#ffe066','center','#2b2b55');}
  for(const q of L.pools)if(!q.cooled&&vis(q)){ctx.save();ctx.globalAlpha=.35+.15*Math.sin(T/10);ctx.fillStyle=Hc(30,100,60);ctx.fillRect(q.x,440,q.w,30);ctx.restore();}
  for(const g of L.geys)if(vis({x:g.x-40,w:80})){const ph=geyPh(g);ctx.fillStyle=ph==='cool'?'#5a6a7a':'#4a2a22';ctx.beginPath();ctx.ellipse(g.x,440,30,12,0,Math.PI,0);ctx.fill();ctx.fillStyle=ph==='cool'?'#8ab':'#ff7a1f';ctx.beginPath();ctx.ellipse(g.x,434,12,4,0,0,7);ctx.fill();
   if(ph==='warn'){const k=Math.sin(T/3);txt('!',g.x,400+k*3,22,'#ffd23f','center','#a22');}
@@ -1565,7 +1570,7 @@ for(const q of L.plats)if(q.rock&&vis(q)){ctx.globalAlpha=q.tmp<60&&q.tmp%8<4?.5
  for(const s of L.springs)if(vis(s)){const h=s.h-(s.sq>0?5:0);ctx.fillStyle='#e22';rr(s.x,s.y+s.h-h,s.w,h,5);ctx.fill();ctx.fillStyle='#fc3';ctx.fillRect(s.x+4,s.y+s.h-h,s.w-8,4);ctx.strokeStyle='#722';ctx.lineWidth=2;ctx.stroke();}
  for(const c of L.checks){ctx.fillStyle='#fff';ctx.fillRect(c.x-2,440-70,4,70);ctx.fillStyle=c.on?Hc(130,80,50):'#999';ctx.beginPath();ctx.moveTo(c.x+2,440-70);ctx.lineTo(c.x+34,440-58+Math.sin(T/8)*2);ctx.lineTo(c.x+2,440-46);ctx.fill();}
  for(const s of L.signs)if(vis({x:s.x,w:20})){ctx.fillStyle=Hc(30,50,50);ctx.fillRect(s.x-3,440-34,6,34);rr(s.x-18,440-62,36,28,4);ctx.fill();ctx.fillStyle='#fff';txt('i',s.x,440-48,20,'#fff');
-  if(Math.abs(p.x-s.x)<170){ctx.font=F(17);const tw=ctx.measureText(s.s).width+24;rr(s.x-tw/2,440-118,tw,34,10);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();ctx.strokeStyle='#2b2b55';ctx.lineWidth=3;ctx.stroke();txt(s.s,s.x,440-101,17,'#2b2b55');}}
+  if(Math.abs(p.x-s.x)<170){ctx.font=F(17);const tw=Math.min(VW-16,ctx.measureText(s.s).width+24),bx=clamp(s.x-tw/2,cam.x+8,cam.x+VW-8-tw);rr(bx,440-118,tw,34,10);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();ctx.strokeStyle='#2b2b55';ctx.lineWidth=3;ctx.stroke();txt(s.s,bx+tw/2,440-101,tw+24>VW-16?15:17,'#2b2b55');}}
  for(const m of L.mounds)if(vis({x:m.x})){const dd=Math.abs(m.x-(p.x+10)),pp=m.pop>0?Math.sin(m.pop/40*Math.PI)*26:0;ctx.fillStyle=m.dug?Hc(28,35,32):Hc(28,50,42);ctx.beginPath();ctx.ellipse(m.x,440,34,(m.dug?6:20)+pp,0,Math.PI,0);ctx.fill();
   if(!m.dug){ctx.fillStyle=Hc(28,45,36);ctx.beginPath();ctx.ellipse(m.x-8,436,9,4,0,Math.PI,0);ctx.fill();
    if((dd<230&&T%90<8)||T%400<6)starShape(m.x+((T/90|0)%2?16:-14),(dd<230?408:412),dd<230?5:3,'#fff',T/10);}}
@@ -1819,7 +1824,7 @@ function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.
  else if(D.ph==='meter'||(D.ph==='anim'&&false)){const m=D.m;txt('POWER METER: stop on  '+m.q.replace(' = ?','')+(easy()?'':' !'),480,392,30,'#2b2b55');if(easy())txt('Find the answer number and stop on it!',480,420,18,'#7a4a00');
   const cw=860/m.N;for(let i=0;i<m.N;i++){const dd=Math.abs(i+1-m.target);ctx.fillStyle=dd===0?'#7be34a':dd===1?'#ffe066':'#f9a';rr(50+i*cw+2,440,cw-4,46,8);ctx.fill();ctx.strokeStyle='#2b2b55';ctx.lineWidth=3;ctx.stroke();txt(String(i+1),50+i*cw+cw/2,463,26,'#2b2b55');}
   const cx=50+m.x*cw;ctx.fillStyle='#ff3b30';ctx.beginPath();ctx.moveTo(cx,490);ctx.lineTo(cx-12,512);ctx.lineTo(cx+12,512);ctx.fill();ctx.fillRect(cx-3,436,6,56);
-  if(m.res)txt(m.res.d===0?'PERFECT!':m.res.d===1?'So close!':'Nice try!',480,420,30,'#e0409a');else btn('STOP!',800,396,130,38,duelStop,{size:22,col:'#ff9aa8'});}
+  if(m.res)txt(m.res.d===0?'PERFECT!':m.res.d===1?'So close!':'Nice try!',480,420,30,'#e0409a');else btn('STOP!',800,Math.min(396,436-MH()-2),130,Math.max(38,MH()),duelStop,{size:22,col:'#ff9aa8'});}
  else if(D.ph==='ko'){txt('Stick Girl gets back up with a rainbow hug! 🌈',480,430,28,'#e0409a');}
  else if(D.ph==='win'){txt(curLv()===2?'K.O.!  The Golem is tired!':'K.O.!  The Storm Cloud gives up!',480,410,36,'#e0409a');btn('Yay!',400,460,160,50,()=>{D.t=999;},{size:26,col:'#ffe066'});}
  else if(D.ph==='anim'){txt(D.anim.who==='p'?'Attack!':'Watch out!',480,440,34,'#2b2b55');}}
@@ -1887,19 +1892,20 @@ function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b
  ctx.fillStyle=Hc(110,60,45);ctx.fillRect(0,440,VW,100);stick(200,440,{col:SV.players[0].color,s:2.4,pose:'cheer'});stick(760,440,{col:SV.players[1].color,s:1.9,pose:'cheer',face:-1});
  const pr=PR();dogSprite(885,470,-1,1.15,T,{fast:T%200<60,mouth:T%200<60});const lv=curLv(),un=(pr.unl||1)>=2;
  const go=()=>{if(!pr.intro){pr.intro=true;save();startStory('intro',['Once upon a time the world was bursting with colour: red apples, blue seas, green hills and golden sunshine.','Then a GRUMPY STORM CLOUD rumbled in. "GRUMBLE! I hate colours!" It stole them all and the world turned grey.',PL().name+' is a brave kung fu kid. With quick kicks, clever answers and new animal friends, she will bring the colours home!','Answer the glowing gates to free the colours. Befriend animals and explore secret places. You can\'t lose - you can always try again!'],()=>startPlay());}else startPlay();};
- btn('▶  Play as '+PL().name,300,192,360,56,go,{size:27,col:'#ffe066'});
- btn('🌈 1 Meadow',300,254,176,44,()=>{pr.lv=1;save();sfx('tick');say('Level 1, Colour Meadow');},{size:18,col:lv===1?'#bff5c4':'#fff'});
- btn(un?'🌋 2 Ember':'🔒 2 Ember',484,254,176,44,()=>{if(!un){sfx('bad');say(easy()?'Finish level 1 first!':'Beat Level 1 to unlock Ember Mountain!',{again:true});return;}pr.lv=2;save();sfx('tick');say('Level 2, Ember Mountain');},{size:18,col:!un?'#ccc':lv===2?'#ffc39b':'#fff'});
- btn('Choose Heroes',300,304,176,42,()=>{mode='select';},{size:18});btn('🐾 Pets & Scrolls',484,304,176,42,()=>openPets('title'),{size:18});
- btn('New run',300,352,176,40,()=>{const l=LP();if(l.cp||l.gates.length)resetRun();else startPlay();},{size:18});btn(SV.mute?'🔇 Sound off':'🔊 Sound on',484,352,176,40,toggleMute,{size:18});
- btn('✨ Idol: '+(SV.idol?'ON':'off'),300,398,116,34,toggleIdol,{size:14,col:SV.idol?'#ff9bf0':'#fff'});btn('🎵 '+Math.round(SV.mv*100)+'%',422,398,116,34,()=>cycVol('mv'),{size:14});btn('🔔 '+Math.round(SV.sv*100)+'%',544,398,116,34,()=>cycVol('sv'),{size:14});
- btn(HINTLBL(),300,438,176,34,cycHints,{size:13});btn('🗣 Read aloud: '+(ttsOn()?'ON':'off'),484,438,176,34,toggleTTS,{size:13,col:ttsOn()?'#d8f6ff':'#fff'});
- txt('Lv '+pr.lvl+'  ⭐ '+pr.stars+'  🐾 '+Object.keys(pr.pets).length+'/'+PETS.length+'  🌟 '+((pr.bigs||[]).length+((pr.l2&&pr.l2.bigs)||[]).length)+'/6'+(pr.l2&&pr.l2.boss?'  🏆 All done!':pr.boss?'  🏆 Level 1 done!':''),480,490,19,'#fff','center','#2b2b55');
+ const mh=MH(),g=6,y1=176,cw=196,cx_=i=>80+i*204,ry=i=>y1+i*(mh+g),ty=Math.min(512,ry(4)+14);
+ btn('▶  Play as '+PL().name,180,ry(0),600,mh,go,{size:27,col:'#ffe066'});
+ btn('🌈 1 Meadow',cx_(0),ry(1),cw,mh,()=>{pr.lv=1;save();sfx('tick');say('Level 1, Colour Meadow');},{size:18,col:lv===1?'#bff5c4':'#fff'});
+ btn(un?'🌋 2 Ember':'🔒 2 Ember',cx_(1),ry(1),cw,mh,()=>{if(!un){sfx('bad');say(easy()?'Finish level 1 first!':'Beat Level 1 to unlock Ember Mountain!',{again:true});return;}pr.lv=2;save();sfx('tick');say('Level 2, Ember Mountain');},{size:18,col:!un?'#ccc':lv===2?'#ffc39b':'#fff'});
+ btn('Choose Heroes',cx_(2),ry(1),cw,mh,()=>{mode='select';},{size:18});btn('🐾 Pets & Scrolls',cx_(3),ry(1),cw,mh,()=>openPets('title'),{size:18});
+ btn('New run',cx_(0),ry(2),cw,mh,()=>{const l=LP();if(l.cp||l.gates.length)resetRun();else startPlay();},{size:18});btn(SV.mute?'🔇 Sound off':'🔊 Sound on',cx_(1),ry(2),cw,mh,toggleMute,{size:18});
+ btn('✨ Idol: '+(SV.idol?'ON':'off'),cx_(2),ry(2),cw,mh,toggleIdol,{size:16,col:SV.idol?'#ff9bf0':'#fff'});btn('🗣 Read aloud: '+(ttsOn()?'ON':'off'),cx_(3),ry(2),cw,mh,toggleTTS,{size:15,col:ttsOn()?'#d8f6ff':'#fff'});
+ btn(HINTLBL(),cx_(0),ry(3),cw*2+8,mh,cycHints,{size:16});btn('🎵 '+Math.round(SV.mv*100)+'%',cx_(2),ry(3),cw,mh,()=>cycVol('mv'),{size:16});btn('🔔 '+Math.round(SV.sv*100)+'%',cx_(3),ry(3),cw,mh,()=>cycVol('sv'),{size:16});
+ txt('Lv '+pr.lvl+'  ⭐ '+pr.stars+'  🐾 '+Object.keys(pr.pets).length+'/'+PETS.length+'  🌟 '+((pr.bigs||[]).length+((pr.l2&&pr.l2.bigs)||[]).length)+'/6'+(pr.l2&&pr.l2.boss?'  🏆 All done!':pr.boss?'  🏆 Level 1 done!':''),480,ty,19,'#fff','center','#2b2b55');
  if(!tcEl.classList.contains('on'))txt('Keys: ←→ move · ↑/Space jump · Z punch · X kick · C star · V special · Q element · E talk · P pets · M mute',480,522,14,'#fff','center','#2b2b55');}
 function doResetHero(i){SV.prog[i]=newProg();save();}
 function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(0,0,VW,VH);txt('Choose Your Hero',480,34,40,'#e0409a','center','#fff');
  SV.players.forEach((pl,i)=>{const x=40+i*450,y=70,pr=SV.prog[i],sel=SV.sel===i;rr(x,y,430,420,22);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=sel?8:3;ctx.strokeStyle=sel?'#ff5a8a':'#2b2b55';ctx.stroke();
-  btn('🗑 Reset',x+322,y+10,98,32,()=>{if(confirm('Start '+pl.name+' over from scratch? Pets, stars and levels will be erased.'))doResetHero(i);},{size:15,col:'#ffd0d8'});
+  btn('🗑 Reset',x+430-Math.max(98,MH())-10,y+10,Math.max(98,MH()),Math.max(32,MH()),()=>{if(confirm('Start '+pl.name+' over from scratch? Pets, stars and levels will be erased.'))doResetHero(i);},{size:15,col:'#ffd0d8'});
   stick(x+215,y+160,{col:pl.color,s:2.6,pose:sel?'cheer':'idle',seed:i});
   btn('✏ '+pl.name,x+40,y+185,350,50,()=>{const n=prompt('Hero name?',pl.name);if(n&&n.trim()){pl.name=n.trim().slice(0,18);save();}},{size:24});
   txt('Colour',x+60,y+262,18,'#2b2b55','left');SWATCH.forEach((c,k)=>{const sx=x+40+k*43,sy=y+280;ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx+18,sy+18,17,0,7);ctx.fill();ctx.lineWidth=pl.color===c?5:2;ctx.strokeStyle=pl.color===c?'#222':'#fff';ctx.stroke();NUI.push({x:sx,y:sy,w:36,h:36,fn:()=>{pl.color=c;save();}});});
@@ -1932,6 +1938,7 @@ function update(){switch(mode){case 'play':updPlay();break;case 'quiz':updQuiz()
  case 'pause':if(tap('pause')){if(pmoves)pmoves=false;else mode='play';}break;case 'scroll':if(tap('interact'))mode='play';break;case 'title':T++;if(tap('interact')){const b=UI.find(u=>u.w===360);b&&b.fn();}if(tap('mute'))toggleMute();break;case 'select':T++;if(tap('pause'))mode='title';break;case 'end':T++;break;}
  if(tap('mute')&&mode!=='play')toggleMute();}
 const bEl=document.getElementById('bE'),bDl=document.getElementById('bD'),bQl=document.getElementById('bQ'),bVl=document.getElementById('bV');
+function tcFrame(){if(!tcEl.classList.contains('on')||tcEl.classList.contains('menu'))return null;tcTop(0,1);let l=0,r=VW;for(const b of tcR){if(b.y>VH*.45){if((b.x0+b.x1)/2<VW/2)l=Math.max(l,b.x1);else r=Math.min(r,b.x0);}}l=clamp(l,0,VW*.3);r=clamp(r,VW*.6,VW);return{l,r};}
 function tcTop(x0,x1){if(!tcEl.classList.contains('on')||tcEl.classList.contains('menu'))return VH;if(!tcR||T-tcRT>60){tcRT=T;const cr=cv.getBoundingClientRect(),k=VW/(cr.width||VW);tcR=[];tcEl.querySelectorAll('button').forEach(b=>{const r=b.getBoundingClientRect();if(r.width)tcR.push({x0:(r.left-cr.left)*k,x1:(r.right-cr.left)*k,y:(r.top-cr.top)*k});});}let t=VH;for(const r of tcR)if(r.x1>x0&&r.x0<x1)t=Math.min(t,r.y);return t;}
 function rdy(){tcEl.classList.toggle('sea',mode==='sea');tcEl.classList.toggle('menu',!(mode==='play'||mode==='sea'));const on=mode==='play'&&P&&P.near,dn=mode==='play'&&P&&LV&&P.near&&P.near.k==='mound';bEl.classList.toggle('rdy',!!on);bDl.classList.toggle('rdy',!!dn);
  const ne=mode==='play'&&LV?elemNeed():null,right=ne&&PR().elem===ne.el;bQl.classList.toggle('rdy',!!(ne&&!right));bVl.classList.toggle('rdy',!!(right&&P.ch>=100));}
@@ -1997,6 +2004,18 @@ function selfTest(){const log=[];try{
   stP();LV.portals.push({r:{id:'t',done:true,q:{q:'x',o:['a','b'],c:0}},x:P.x+30,wait:0,msg:0});P.y=380;frames(5);ok_(()=>P.near&&P.near.k==='portal','portal near prompt');
   const p0=LV.portals[LV.portals.length-1];press('interact');frames(3);rel('interact');ok_(()=>p0.go||mode==='rq','portal E accepted');
  }
+ // B1: checkpoints fire once each, only the furthest counts, no save spam, particles stay bounded, no free healing
+ {const sv0=save,ft0=floatText;let nS=0,nF=0;save=()=>{nS++;};floatText=(...a)=>{nF++;return ft0(...a);};try{
+  for(const lv of[1,2]){SV.sel=0;SV.players[0].tier='age7';SV.prog[0]=newProg();SV.prog[0].intro=true;SV.prog[0].dog.intro=true;PR().unl=2;PR().lv=lv;if(lv===2){LP().intro=true;}startPlay(lv);mode='play';LV.enemies=[];LV.geys=[];LV.rockz=[];for(const g of LV.gates){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}
+   const cks=LV.checks.filter(c=>c.x>100).slice(0,5);ok_(()=>cks.length>=4,'L'+lv+' has flags');nS=0;nF=0;
+   for(const c of cks){P.x=c.x+30;P.y=440-P.h-1;P.vx=P.vy=0;P.inv=999;frames(4);}
+   ok_(()=>nF===cks.length,'L'+lv+' one checkpoint popup per flag ('+nF+'/'+cks.length+')');ok_(()=>nS<=cks.length+2,'L'+lv+' saves '+nS);
+   ok_(()=>LP().cp===cks[cks.length-1].x,'L'+lv+' furthest checkpoint kept '+LP().cp);ok_(()=>LV.checks.filter(c=>c.on).length===1&&cks[cks.length-1].on,'L'+lv+' only furthest flag lit');
+   P.hp=1;nS=0;nF=0;frames(600);const n0=parts.length;frames(600);
+   ok_(()=>nF===0&&nS<=10,'L'+lv+' no repeats/save spam over 20 s while standing ('+nF+' popups, '+nS+' saves)');ok_(()=>P.hp===1,'L'+lv+' no free healing hp='+P.hp);ok_(()=>parts.length<=Math.max(60,n0+20),'L'+lv+' particles stable '+n0+'->'+parts.length);
+   P.x=cks[1].x+30;frames(30);P.x=cks[cks.length-1].x+60;frames(30);ok_(()=>nF===0&&LP().cp===cks[cks.length-1].x,'L'+lv+' walking back/forward does not re-fire');
+   startPlay(lv);mode='play';LV.enemies=[];for(const g of LV.gates){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}frames(5);ok_(()=>Math.abs(P.x-cks[cks.length-1].x)<40,'L'+lv+' restart at furthest flag x'+Math.round(P.x));nF=0;P.x=cks[cks.length-1].x+40;frames(20);ok_(()=>nF===0,'L'+lv+' no re-fire after restart');}
+  log.push('B1 checkpoints ok');}finally{save=sv0;floatText=ft0;}}
  document.title='SELFTEST OK '+log.join('|');}catch(e){document.title='SELFTEST FAIL '+e.message+' '+(e.stack||'').split('\n')[1];console.error('GAMEERR',e.stack);}}
 function roomTest(){const log=[];const fails=[];const ok=(c,m)=>{if(!c)fails.push(m);};try{
  const frames=n=>{for(let i=0;i<n;i++)tick();};
