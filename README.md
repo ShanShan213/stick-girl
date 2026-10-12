@@ -4,6 +4,21 @@ Single-file HTML5 canvas game (`index.html`, no dependencies) for two sisters (a
 Open `index.html` in a browser (or serve the folder over http/https to enable "Add to Home Screen" via
 `manifest.webmanifest` + `sw.js` + `icon.svg`). Progress is saved in `localStorage` (key `stickgirl.v1`).
 
+## v7 (2026-10-12): read-aloud, ocean portals, finale, Level 2
+* **Read aloud** (Web Speech, en-AU voice if available): ON by default for `age4`, toggle (🗣) on the title/pause screens for `age7` (off by default).
+  Speaks story, Stormi, signs, prompts, toasts, questions + every answer option; 🔊 replay buttons on quizzes, rooms, scrolls.
+* **Age 4 picture questions**: counting (with dots), shapes, colours, picture→letter, picture-word; picture answers for rooms, duel and boards.
+  Icon prompts (E/🔄/✨ icons, glowing touch buttons) so nothing needs reading.
+* **Bonus portals** (3 per level) lead to an underwater (L1) / crystal ice (L2) swim world: hold ⤒ to swim up, ▼ down.
+  A chasing shark (slower in age4) gives a gentle chomp that bounces you back to the start/mid flag. Collect the Big Star 🌟,
+  then the return portal opens. HUD + end screen show **Big Stars n/3**. Real ocean/ice facts.
+* **Interactive ending**: after the duel, pick 🌪️ Air (Q/🔄) and press ✨ (V) to blow the Storm Cloud away; colours return, Stormi cheers.
+* **Level 2 Ember Mountain** (unlocks after Level 1; level select on title): lava pits, rising lava, falling rocks, fire geysers,
+  fire imps, Cooling Sluice + lava puzzle rooms. 💧 Water cools lava pools/geysers, 🪨 Earth raises pillars. Volcano quiz gates
+  (Grade 2 / picture), new pets (red panda, salamander), 4 new scrolls, Magma Golem duel + Water finale.
+* Touch controls hide on menu screens; checkpoint uses a small float text (no stacked toasts); max 2 toasts.
+* Tests: `#selftest`, `#roomtest` (both levels/tiers); Playwright touch tests live outside the repo.
+
 ## Story
 A grumpy Storm Cloud stole all the colours. Stick Girl frees them by opening glowing gates (quizzes), smashing the
 Test Your Might dojo gate, befriending animals, and finally beating the Storm Cloud in a maths duel.
