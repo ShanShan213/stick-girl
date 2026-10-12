@@ -33,10 +33,10 @@ canvas{background:#000;display:block;touch-action:none}
 <button data-a="jump" style="right:14px;bottom:20px;width:76px;height:76px">⤒</button>
 <button data-a="punch" style="right:100px;bottom:20px">👊</button>
 <button data-a="kick" style="right:100px;bottom:90px">🦶</button>
-<button id="bS" class="cx" data-a="star" style="right:170px;bottom:20px">⭐</button>
-<button id="bV" class="cx" data-a="special" style="right:14px;bottom:104px">✨</button>
+<button id="bS" class="cx" data-a="star" style="right:14px;bottom:104px">⭐</button>
+<button id="bV" class="cx" data-a="special" style="right:170px;bottom:20px">✨</button>
 <button id="bE" class="cx" data-a="interact" style="right:240px;bottom:20px;width:56px;height:56px;font-size:20px">E</button>
-<button id="bQ" class="cx" data-a="elem" style="right:170px;bottom:90px;width:50px;height:50px;font-size:18px">🔄</button>
+<button id="bQ" data-a="elem" style="right:170px;bottom:90px;width:50px;height:50px;font-size:18px">🔄</button>
 </div>
 <script>
 (()=>{'use strict';
@@ -483,7 +483,28 @@ function schedStep(t){const T=TRK[trk],bar=Math.floor(trkStep/16)%T.bars.length,
   if(SV.idol){ // idol layer: chanting "oh" voices on the hook + sparkle arps
    if(nt&&bar>=4){const f=mf(nt.m);const v=AC.createOscillator(),bp=AC.createBiquadFilter(),g=AC.createGain();v.type='sawtooth';v.frequency.setValueAtTime(f,t);bp.type='bandpass';bp.Q.value=4;bp.frequency.value=s%4?900:700;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.09,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+Math.min(.34,nt.len*sl));v.connect(bp);bp.connect(g);g.connect(MB);v.start(t);v.stop(t+.4);}
    if(s%4===1)tn(t,mf(81+B.c[(s>>2)%3]),sl*.9,'triangle',.02,0,MB);if(s===2||s===6||s===10||s===14)clap(t,.05);}}}
-function wantTrack(){if(mode==='duel')return'boss';if(mode==='sea'||mode==='space')return'cave';if(mode==='play'&&P&&LV){for(const z of LV.dark)if(P.x>z.x&&P.x<z.x+z.w&&P.y>z.y-40&&P.y<z.y+z.h+60)return'cave';}return'over';}
+let CAVE=null;
+function enterCave(pi){if(CAVE||mode!=='play'||LV.cave)return;const main=LV,E=easy(),L=mkL(),got=LP().bigs.includes(pi.id),v=['o1','c3'].includes(pi.id)?0:1;
+ L.cave=true;L.theme=main.theme;L.lvl=main.lvl;L.bossX=1e9;L.W=1500;L.cpipe={x:1400};
+ L.plats.push({x:-300,y:440,w:2100,h:140,t:'g'},{x:-300,y:-40,w:340,h:480,t:'g'},{x:1440,y:-40,w:400,h:400,t:'g'});
+ const FLp=(x,y,w)=>L.plats.push({x,y,w,h:22,t:'p'}),ST=(x,y)=>L.items.push({x,y,k:'star'}),GM=(x,y,c)=>L.items.push({x,y,k:'gem',c});
+ const lo=E?20:0;
+ if(v){FLp(330,360+lo,130);FLp(540,290+lo,130);FLp(760,230+lo*2,150);FLp(1000,320+lo,130);for(let i=0;i<4;i++)ST(350+i*30,320+lo);for(let i=0;i<4;i++)ST(560+i*30,250+lo);GM(830,190+lo*2,'#ff6bd6');GM(1060,280+lo,'#5ff');for(let i=0;i<8;i++)ST(120+i*26,400);for(let i=0;i<6;i++)ST(1120+i*34,400);if(!got)L.bigItems.push({id:pi.id,x:835,y:150+lo*2});L.route=[[395,360+lo],[605,290+lo],[835,230+lo*2]];}
+ else{FLp(300,350+lo,120);FLp(500,280+lo,200);FLp(780,350+lo,120);FLp(960,270+lo,200);for(let i=0;i<6;i++)ST(520+i*30,240+lo);for(let i=0;i<6;i++)ST(980+i*30,230+lo);GM(330,310+lo,'#5ff');GM(810,310+lo,'#ffe14d');GM(600,400,'#ff6bd6');for(let i=0;i<10;i++)ST(140+i*26,400);if(!got)L.bigItems.push({id:pi.id,x:1060,y:180+lo});L.route=[[360,350+lo],[600,280+lo],[840,350+lo],[1060,270+lo]];}
+ CAVE={main,pi};LV=L;keys.down=false;const p=P;p.x=110;p.y=60;p.vx=0;p.vy=2;p.onGround=false;p.atk=null;p.grab=null;cam.x=0;parts=[];if(typeof SF==='object'){SF.x=80;SF.y=380;}
+ sfx('spring');toast(got?'🕳️ Back in the secret cave!':'🕳️ A secret cave! Find the Big Star 🌟',160);say(got?'The secret cave!':'Whee! A secret cave! Find the Big Star, then walk into the pipe.',{again:true});}
+function leaveCave(){const C=CAVE;if(!C)return;CAVE=null;keys.down=false;LV=C.main;const p=P;p.x=C.pi.out-10;p.y=440-58;p.vy=-11;p.vx=1.5;p.onGround=false;p.inv=60;p.face=1;cam.x=clamp(p.x-420,0,LV.W-VW);parts=[];if(typeof SF==='object'){SF.x=p.x-60;SF.y=380;}sfx('spring');addParts(p.x+10,440,16,'#9be8a9',{sp:1.4});}
+function drawCaveBG(){const lv=LV.theme==='lava';ctx.save();ctx.fillStyle=texPat(lv?'cave2':'cave1');ctx.translate(-((cam.x*.5)%160),0);ctx.fillRect(0,0,VW+160,VH);ctx.restore();ctx.fillStyle='rgba(0,0,12,.6)';ctx.fillRect(0,0,VW,VH);
+ ctx.save();ctx.translate(-Math.round(cam.x),0);ctx.fillStyle=lv?'#3a2622':'#2c2436';for(let x=40;x<1500;x+=70){const h=26+((x*37)%40);ctx.beginPath();ctx.moveTo(x-18,0);ctx.lineTo(x+18,0);ctx.lineTo(x,h);ctx.fill();}
+ const pipe=(x,y,w,h,col)=>{ctx.fillStyle=col;ctx.strokeStyle='#14502a';ctx.lineWidth=4;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(x+6,y+4,8,h-8);};
+ pipe(80,0,60,70,'#2fc46b');pipe(70,62,80,26,'#3ad67a');
+ const c=LV.cpipe.x;pipe(c-40,350,200,90,'#2fc46b');pipe(c-60,340,30,100,'#3ad67a');ctx.fillStyle='#062';ctx.fillRect(c-30,356,10,78);txt('➜',c-90,320+Math.sin(T/8)*5,30,'#ffe066','center','#2b2b55');
+ for(const b of LV.bigItems)if(!b.got){const k=.5+.5*Math.sin(T/10);ctx.save();ctx.shadowColor='#ffd23f';ctx.shadowBlur=24+k*16;starShape(b.x,b.y+Math.sin(T/14)*5,26,'#ffd23f',T/40);ctx.restore();}
+ ctx.restore();}
+function drawPipes(){for(const pi of LV.pipes){const vx=pi.x;if(vx<cam.x-100||vx>cam.x+VW+100)continue;ctx.fillStyle='#4a3a2a';ctx.beginPath();ctx.ellipse(vx,442,34,11,0,0,7);ctx.fill();ctx.fillStyle='#120c08';ctx.beginPath();ctx.ellipse(vx,443,27,7,0,0,7);ctx.fill();ctx.strokeStyle='#8a7a6a';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(vx,442,34,11,0,Math.PI,2*Math.PI);ctx.stroke();
+  if(T%40<20&&!LP().bigs.includes(pi.id))starShape(vx+18,424-(T%40)/2,4,'#ffe066',0);
+  const o=pi.out;if(o>cam.x-100&&o<cam.x+VW+100){ctx.fillStyle='#2fc46b';ctx.strokeStyle='#14502a';ctx.lineWidth=4;ctx.fillRect(o-24,404,48,36);ctx.strokeRect(o-24,404,48,36);ctx.fillStyle='#3ad67a';ctx.fillRect(o-30,396,60,14);ctx.strokeRect(o-30,396,60,14);}}}
+function wantTrack(){if(mode==='duel')return'boss';if(mode==='sea'||mode==='space')return'cave';if(mode==='play'&&P&&LV){if(LV.cave)return'cave';for(const z of LV.dark)if(P.x>z.x&&P.x<z.x+z.w&&P.y>z.y-40&&P.y<z.y+z.h+60)return'cave';}return'over';}
 function pump(){if(!AC||!musicOn||AC.state!=='running')return;const want=wantTrack();if(want!==trk){trk=want;trkStep=0;nextT=AC.currentTime+.05;}
  if(nextT<AC.currentTime-.3)nextT=AC.currentTime+.05;
  while(nextT<AC.currentTime+.16){if(!SV.mute)schedStep(nextT);trkStep++;nextT+=60/TRK[trk].bpm/4;}}
@@ -517,7 +538,7 @@ function btn(label,x,y,w,h,fn,o){o=o||{};const hov=mouse.x>=x&&mouse.x<=x+w&&mou
  const sp=btnSprite(Math.round(w),Math.round(h),col,o.line||'#2b2b55',!!pr),oy=pr?3:0;
  ctx.save();ctx.drawImage(sp,x-3,y-3,sp.width/2,sp.height/2);
  if(o.lw){rr(x,y+oy,w,h,Math.min(18,h/2.6));ctx.lineWidth=o.lw;ctx.strokeStyle=o.line||'#2b2b55';ctx.stroke();}if(o.draw){ctx.translate(0,oy);o.draw(x,y,w,h);}else txt(label,x+w/2,y+h/2+1+oy,o.size||24,o.tc||'#2b2b55');ctx.restore();
- if(o.hit||BTNHIT){const M=Math.ceil(44/CSS_S)+1,hw=Math.max(w,M),hh=Math.max(h,M),hx=clamp(x-(hw-w)/2,0,VW-hw),hy=clamp(y-(hh-h)/2,0,VH-hh);NUI.push({x:hx,y:hy,w:hw,h:hh,fn,dis:o.dis,vis:{x,y,w,h},label});}else NUI.push({x,y,w,h,fn,dis:o.dis});}
+ if(o.hit||BTNHIT){const M=Math.ceil(44/CSS_S)+1,hw=Math.max(w,M),hh=Math.max(h,M),hx=clamp(x-(hw-w)/2,0,VW-hw),hy=clamp(y-(hh-h)/2,0,VH-hh);NUI.push({x:hx,y:hy,w:hw,h:hh,fn,dis:o.dis,vis:{x,y,w,h},label});}else NUI.push({x,y,w,h,fn,dis:o.dis,label});}
 /* ---- pictures for non-reader questions (age 4): numbers with dots, shapes, colour splats, letters, emoji ---- */
 const COLHEX={red:'#e8262b',orange:'#ff8a1f',yellow:'#ffd417',green:'#2fb84b',blue:'#2a7fe8',purple:'#9a4ee0',pink:'#ff6fb5',brown:'#8a5a2b'};
 function shapeP(k,x,y,r,col){ctx.save();ctx.fillStyle=col;ctx.strokeStyle='#2b2b55';ctx.lineWidth=4;ctx.lineJoin='round';ctx.beginPath();
@@ -827,10 +848,16 @@ function renameDog(){const n=prompt('Dog name?',DN());if(n&&n.trim()){SV.dogName
 function mkEnemy(t,x,y){const e={t,x,y:0,w:22,h:56,vx:0,vy:0,hp:2,dir:-1,cd:ri(30,90),home:x,flash:0,stun:0,wind:0,t0:ri(0,99),onGround:false,y0:y};
  if(t==='hopper'){e.w=30;e.h=26;e.hp=1;}if(t==='imp'){e.w=26;e.h=30;e.hp=1;e.cd2=ri(90,200);}if(t==='cloud'){e.w=36;e.h=26;e.hp=1;}
  e.y=(y===undefined||t!=='cloud'&&y===undefined)?440-e.h:(t==='cloud'?y:y-e.h);if(easy()&&e.hp>1)e.hp=1;return e;}
+function mkL(){return {plats:[],spikes:[],movers:[],enemies:[],items:[],balls:[],gates:[],pets:[],mounds:[],bushes:[],scrolls:[],water:[],checks:[],dark:[],signs:[],obst:[],springs:[],npcs:[],eproj:[],proj:[],hints:[],W:0,bossX:0,
+  pools:[],pits:[],highs:[],bonus:[],geys:[],rockz:[],falling:[],rise:null,fin:null,seq:[],pipes:[],bigItems:[],bridges:[],crates:[],doors:[],imps:[],levers:[],nooks:[],plates:[],portals:[],rooms:[],sprites:[],stones:[],lvl:curLv(),theme:curLv()===2?'lava':'meadow'};}
 function buildLevel(){
- const L={plats:[],spikes:[],movers:[],enemies:[],items:[],balls:[],gates:[],pets:[],mounds:[],bushes:[],scrolls:[],water:[],checks:[],dark:[],signs:[],obst:[],springs:[],npcs:[],eproj:[],proj:[],hints:[],W:0,bossX:0,
-  pools:[],pits:[],highs:[],bonus:[],geys:[],rockz:[],falling:[],rise:null,fin:null,lvl:curLv(),theme:curLv()===2?'lava':'meadow'};
+ const L=mkL();
  let cx=0,gid=0;
+ let lsd=(L.lvl*104729+7)>>>0;const LR=()=>{lsd=(Math.imul(lsd,1664525)+1013904223)>>>0;return lsd/4294967296;};
+ // variety: deck of stretch blocks (no back-to-back repeats, avoids reusing the same pair), mixed enemy groups, varied stair heights
+ const deck={b:[],last:-1,pairs:new Set()},DRAW=n=>{if(!deck.b.length){deck.b=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(LR()*(i+1));[deck.b[i],deck.b[j]]=[deck.b[j],deck.b[i]];}}let k=deck.b.findIndex(v=>v!==deck.last&&!deck.pairs.has(deck.last+'>'+v));if(k<0)k=deck.b.findIndex(v=>v!==deck.last);if(k<0)k=0;const v=deck.b.splice(k,1)[0];deck.pairs.add(deck.last+'>'+v);deck.last=v;return v;};
+ let lastE='';const EN1=(x,def)=>{const pool=L.lvl===2?['imp','ninja','hopper']:['ninja','hopper','ninja','hopper','cloud'];let t=LR()<.4?def:pool[Math.floor(LR()*pool.length)];if(t===lastE)t=pool.find(q=>q!==lastE&&q!=='cloud')||def;lastE=t;EN(t,x,t==='cloud'?300:undefined);};
+ const STAIRS=[[350,270,200],[365,290,215],[340,275,205],[360,280,200]];let stairN=0;const STAIR=(x)=>{const h=STAIRS[stairN++%STAIRS.length];FL(x,h[0],95);FL(x+140,h[1],95);FL(x+280,h[2],300);return h[2];};
  const G=(len,y)=>{y=y||440;L.plats.push({x:cx,y,w:len,h:Math.max(100,580-y),t:'g'});const s=cx;cx+=len;return s;};
  const gap=n=>{cx+=n;};const GAPE=n=>easy()?Math.round(n*.75):n;
  const FL=(x,y,w)=>L.plats.push({x,y,w,h:16,t:'p'});
@@ -903,32 +930,40 @@ function buildLevel(){
   const Ez=easy(),end0=cx;let n=0;(L.stretches=L.stretches||[]).push([cx,cx+total]);
   const HEART=(x,y)=>L.items.push({x,y,k:'heart'});
   const mods=[
-   ()=>{const a=G(950);if(n%2===0)CK(a+70);SP(a+280,Ez?2:3);arc(a+250,378,Ez?5:6,78);EN('ninja',a+500);SP(a+640,2);arc(a+625,378,5,70);EN('hopper',a+800);row(a+380,400,3);},
-   ()=>{const g1=Ez?62:105,g2=Ez?70:112;const a=G(260);arc(a+250,372,4,55);gap(g1);const b=G(190);ST(b+95,380);arc(b+185,372,4,55);gap(g2);const c=G(200);if(Ez)ST(c+100,390);else EN('hopper',c+100);arc(c+190,372,4,55);gap(g1);G(300);EN('ninja',cx-150);},
-   ()=>{const a=G(280);const g=Ez?240:290;const gx=cx;gap(g);MV(gx+g/2,436,110,g/2-45,0,.025);row(gx+40,330,Math.floor(g/45));const b=G(260);EN('ninja',b+140);HEART(b+200,400);},
-   ()=>{const a=G(1150);EN('ninja',a+330);EN('ninja',a+470);EN('hopper',a+650);EN('cloud',a+560,300);BALL(a+740,a+1000);EN(Ez?'ninja':'ninja2',a+1000);row(a+300,400,5);ST(a+900,380);HEART(a+1080,400);},
-   ()=>{const a=G(1200);CK(a+60);FL(a+300,350,95);FL(a+440,270,95);FL(a+580,200,300);row(a+600,160,6);TR(a+830,160);HEART(a+720,160);EN('ninja',a+640);SP(a+960,2);arc(a+930,380,5,70);EN('hopper',a+1080);HS(a+240,'A secret path up there! Hop up the ledges for stars and a treat.',1);},
-   ()=>{const a=G(900);SPR(a+280,440);FL(a+420,185,320);row(a+450,148,6);ST(a+360,300);TR(a+700,148);EN('ninja',a+580);SP(a+520,3);EN('hopper',a+820);arc(a+90,385,4,50);},
-   ()=>{const g=Ez?240:280,x1=cx+300;const a=G(300);const g1=cx;gap(g);MV(g1+g/2,436,110,g/2-45,0,.028);const b=G(150);ST(b+75,390);const g2=cx;gap(g);MV(g2+g/2,436,110,g/2-45,0,.03);const c=G(340);EN('ninja',c+200);arc(c+60,372,4,50);},
-   ()=>{const a=G(1250);EN('hopper',a+260);SP(a+400,3);arc(a+370,376,6,80);EN('ninja',a+660);BALL(a+560,a+860);EN(Ez?'ninja':'ninja2',a+900);EN('hopper',a+1000);SP(a+1060,2);row(a+740,400,4);HEART(a+1180,400);}
+   ()=>{const a=G(950);if(n%2===0)CK(a+70);SP(a+280,Ez?2:3);arc(a+250,378,Ez?5:6,78);EN1(a+500,'ninja');SP(a+640,2);arc(a+625,378,5,70);EN1(a+800,'hopper');row(a+380,400,3);},
+   ()=>{const g1=Ez?62:105,g2=Ez?70:112;const a=G(260);arc(a+250,372,4,55);gap(g1);const b=G(190);ST(b+95,380);arc(b+185,372,4,55);gap(g2);const c=G(200);if(Ez)ST(c+100,390);else EN1(c+100,'hopper');arc(c+190,372,4,55);gap(g1);G(300);EN1(cx-150,'ninja');},
+   ()=>{const a=G(280);const g=Ez?240:290;const gx=cx;gap(g);MV(gx+g/2,436,110,g/2-45,0,.025);row(gx+40,330,Math.floor(g/45));const b=G(260);EN1(b+140,'ninja');HEART(b+200,400);},
+   ()=>{const a=G(1150);EN1(a+330,'ninja');EN1(a+470,'ninja');EN1(a+650,'hopper');EN('cloud',a+560,300);BALL(a+740,a+1000);EN(Ez?'ninja':'ninja2',a+1000);row(a+300,400,5);ST(a+900,380);HEART(a+1080,400);},
+   ()=>{const a=G(1200);CK(a+60);STAIR(a+300);row(a+600,160,6);TR(a+830,160);HEART(a+720,160);EN1(a+640,'ninja');SP(a+960,2);arc(a+930,380,5,70);EN1(a+1080,'hopper');HS(a+240,'A secret path up there! Hop up the ledges for stars and a treat.',1);},
+   ()=>{const a=G(900);SPR(a+280,440);FL(a+420,185,320);row(a+450,148,6);ST(a+360,300);TR(a+700,148);EN1(a+580,'ninja');SP(a+520,3);EN1(a+820,'hopper');arc(a+90,385,4,50);},
+   ()=>{const g=Ez?240:280,x1=cx+300;const a=G(300);const g1=cx;gap(g);MV(g1+g/2,436,110,g/2-45,0,.028);const b=G(150);ST(b+75,390);const g2=cx;gap(g);MV(g2+g/2,436,110,g/2-45,0,.03);const c=G(340);EN1(c+200,'ninja');arc(c+60,372,4,50);},
+   ()=>{const a=G(1250);EN1(a+260,'hopper');SP(a+400,3);arc(a+370,376,6,80);EN1(a+660,'ninja');BALL(a+560,a+860);EN(Ez?'ninja':'ninja2',a+900);EN1(a+1000,'hopper');SP(a+1060,2);row(a+740,400,4);HEART(a+1180,400);},
+   ()=>{const a=G(1000);SPR(a+250,440);SP(a+330,Ez?2:3);FL(a+430,250,170);row(a+445,212,4);BU(a+150,440,.9);EN1(a+760,'hopper');arc(a+800,380,4,50);},
+   ()=>{const a=G(300);BU(a+120,440,.8);const g=Ez?200:230,gx=cx;gap(g);MV(gx+g/2,410,Ez?130:115,0,45,.03);ST(gx+g/2,330);const b=G(320);EN1(b+200,'ninja');HEART(b+120,400);row(b+40,400,3);}
   ];
-  let i=(seed*3)%mods.length;while(cx-end0<total){mods[i%mods.length]();i++;n++;}const z=G(480);row(z+120,400,4);
+  while(cx-end0<total){const k=DRAW(mods.length);L.seq.push({k:'#'+k,x:cx});mods[k]();n++;}const z=G(480);row(z+120,400,4);
  };
 
  const HEART=(x,y)=>L.items.push({x,y,k:'heart'});
  const BONUS=(id,th)=>{const a=G(760);CK(a+60);SG(a+170,th==='ice'?'❄️ A crystal portal! Walk in to find a Big Star 🌟':'🌊 An ocean portal! Walk in and swim for a Big Star 🌟');row(a+250,400,3);L.bonus.push({id,x:a+460,th,cool:false});arc(a+560,390,4,50);};
  const GEY=(x,off)=>L.geys.push({x,off:off||0,cool:0});
+ // secret pipe-hole: hidden hole -> underground bonus cave (Big Star) -> pops out further ahead
+ const SECRET=(id,v)=>{const Ez=easy(),a=G(1200);CK(a+60);BU(a+230,440,1.05);L.pipes.push({id,x:a+300,out:a+1000});HS(a+120,v?'Hmm... a cracked hole by that bush. Big Stars love hiding underground! Stand on it and tap ▼.':'Psst! That hole by the bush looks suspicious... Stand on it and tap ▼!',1);
+  if(v){if(!Ez)SP(a+560,2);EN(Ez?'hopper':'ninja',a+700);arc(a+520,380,5,60);}else{L.balls.push({x0:a+480,x1:a+820,x:a+480,y:420,vx:E_BALL(),vy:0,r:15});row(a+560,400,4);if(!Ez)EN1(a+760,'hopper');}
+  row(a+1050,400,3);};
  const LSTRETCH=(total,seed)=>{const Ez=easy(),end0=cx;let n=0;(L.stretches=L.stretches||[]).push([cx,cx+total]);
   const mods=[
-   ()=>{const a=G(1000);if(n%2===0)CK(a+70);GEY(a+300,0);arc(a+260,378,5,70);EN('imp',a+520);GEY(a+700,90);EN('imp',a+860);row(a+560,400,3);},
-   ()=>{const g1=Ez?85:115,g2=Ez?95:125;const a=G(260);arc(a+250,372,4,55);gap(g1);const b=G(190);ST(b+95,380);arc(b+185,372,4,55);gap(g2);const c=G(200);ST(c+100,390);arc(c+190,372,4,55);gap(g1);G(300);EN('ninja',cx-50);},
-   ()=>{const a=G(280);const g=Ez?240:290;const gx=cx;gap(g);MV(gx+g/2,436,110,g/2-45,0,.025);row(gx+40,330,Math.floor(g/45));const b=G(260);EN('imp',b+140);HEART(b+200,400);},
-   ()=>{const a=G(1200);if(n%2===0)CK(a+60);L.rockz.push({x0:a+200,x1:a+1000,cd:90});row(a+250,400,6);EN('ninja',a+600);ST(a+900,380);HEART(a+1100,400);},
-   ()=>{const a=G(1200);CK(a+60);FL(a+300,350,95);FL(a+440,270,95);FL(a+580,200,300);BU(a+345,350,.9);row(a+600,160,6);TR(a+830,160);HEART(a+720,160);EN('imp',a+640);SP(a+960,2);arc(a+930,380,5,70);EN('imp',a+1080);HS(a+240,'A secret path up there! Hop up the ledges for stars and a treat.',1);},
-   ()=>{const a=G(900);SPR(a+280,440);FL(a+420,185,320);row(a+450,148,6);ST(a+360,300);TR(a+700,148);EN('ninja',a+580);GEY(a+170,40);EN('imp',a+820);arc(a+90,385,4,50);},
-   ()=>{const g=Ez?240:280;const a=G(300);const g1=cx;gap(g);MV(g1+g/2,436,110,g/2-45,0,.028);const b=G(150);ST(b+75,390);const g2=cx;gap(g);MV(g2+g/2,436,110,g/2-45,0,.03);const c=G(340);EN('imp',c+200);arc(c+60,372,4,50);},
-   ()=>{const a=G(1250);EN('imp',a+260);GEY(a+420,0);arc(a+370,376,6,80);EN('ninja',a+660);BALL(a+560,a+860);EN(Ez?'imp':'ninja2',a+900);GEY(a+1060,100);row(a+740,400,4);HEART(a+1180,400);}];
-  let i=(seed*3)%mods.length;while(cx-end0<total){mods[i%mods.length]();i++;n++;}const z=G(480);row(z+120,400,4);};
+   ()=>{const a=G(1000);if(n%2===0)CK(a+70);GEY(a+300,0);arc(a+260,378,5,70);EN1(a+520,'imp');GEY(a+700,90);EN1(a+860,'imp');row(a+560,400,3);},
+   ()=>{const g1=Ez?85:115,g2=Ez?95:125;const a=G(260);arc(a+250,372,4,55);gap(g1);const b=G(190);ST(b+95,380);arc(b+185,372,4,55);gap(g2);const c=G(200);ST(c+100,390);arc(c+190,372,4,55);gap(g1);G(300);EN1(cx-50,'ninja');},
+   ()=>{const a=G(280);const g=Ez?240:290;const gx=cx;gap(g);MV(gx+g/2,436,110,g/2-45,0,.025);row(gx+40,330,Math.floor(g/45));const b=G(260);EN1(b+140,'imp');HEART(b+200,400);},
+   ()=>{const a=G(1200);if(n%2===0)CK(a+60);L.rockz.push({x0:a+200,x1:a+1000,cd:90});row(a+250,400,6);EN1(a+600,'ninja');ST(a+900,380);HEART(a+1100,400);},
+   ()=>{const a=G(1200);CK(a+60);STAIR(a+300);BU(a+345,350,.9);row(a+600,160,6);TR(a+830,160);HEART(a+720,160);EN1(a+640,'imp');SP(a+960,2);arc(a+930,380,5,70);EN1(a+1080,'imp');HS(a+240,'A secret path up there! Hop up the ledges for stars and a treat.',1);},
+   ()=>{const a=G(900);SPR(a+280,440);FL(a+420,185,320);row(a+450,148,6);ST(a+360,300);TR(a+700,148);EN1(a+580,'ninja');GEY(a+170,40);EN1(a+820,'imp');arc(a+90,385,4,50);},
+   ()=>{const g=Ez?240:280;const a=G(300);const g1=cx;gap(g);MV(g1+g/2,436,110,g/2-45,0,.028);const b=G(150);ST(b+75,390);const g2=cx;gap(g);MV(g2+g/2,436,110,g/2-45,0,.03);const c=G(340);EN1(c+200,'imp');arc(c+60,372,4,50);},
+   ()=>{const a=G(1250);EN1(a+260,'imp');GEY(a+420,0);arc(a+370,376,6,80);EN1(a+660,'ninja');BALL(a+560,a+860);EN(Ez?'imp':'ninja2',a+900);GEY(a+1060,100);row(a+740,400,4);HEART(a+1180,400);},
+   ()=>{const a=G(1000);FL(a+300,365,140);row(a+320,328,3);GEY(a+520,30);FL(a+620,335,140);row(a+640,298,3);BU(a+150,440,.9);EN1(a+820,'imp');},
+   ()=>{const a=G(950);L.rockz.push({x0:a+250,x1:a+650,cd:Ez?150:100});row(a+260,400,5);BU(a+780,440,1);EN1(a+860,'ninja');HEART(a+700,400);}];
+  while(cx-end0<total){const k=DRAW(mods.length);L.seq.push({k:'#'+k,x:cx});mods[k]();n++;}const z=G(480);row(z+120,400,4);};
  const roomL2A=()=>{const x0=cx;G(520);const r=RM('l2a','Cooling Sluice',x0,x0+1500,{intro:'A lava river! Something heavy on the orange plate turns on the water pipe, and the water cools a rock bridge. Push the crate onto it, or tap E near the plate to call Stormi!',
    fact:['Cooling Scroll','When lava touches cold water it cools fast and turns into hard black rock called basalt.'],q:{q:'What turned the lava into a rock bridge?',o:['Cold water','A pillow','Music'],ic:['💧','🛏️','🎵'],c:0}});
   const pl=PLT(r,x0+330),cr=CRT(r,x0+(E4?230:140)),br=BRG(r,x0+520,420);br.lava=true;r.tick=()=>setBridge(br,pl.on||r.done,L);gap(420);G(560);PTL(r,x0+1330);SG(x0+90,'Heavy plate = water pipe = rock bridge');
@@ -943,17 +978,17 @@ function buildLevel(){
   gap(GAPE(150));LSTRETCH(2200,21);
   s=G(700);CK(s+60);SG(s+300,'Lava lake! Tap 🔄 to pick 💧 Water, then tap ✨ to cool it into rock');row(s+200,400,4);POOL(Ez?360:400);s=G(900);arc(s+100,380,5,60);EN('imp',s+400);EN('ninja',s+650);GT(s+820,'maths');
   LSTRETCH(3000,22);roomL2A();
-  LSTRETCH(1500,23);BONUS('c1','ice');
+  LSTRETCH(1500,23);SECRET('c1',1);
   s=G(800);CK(s+60);SG(s+350,'Too wide to jump! Stand at the edge, tap 🔄 to pick 🪨 Earth, then tap ✨ for a rock pillar');row(s+300,400,3);PIT(Ez?340:420);s=G(1100);arc(s+60,380,5,60);EN('imp',s+400);EN('imp',s+600);SP(s+760,2);
   L.mounds.push({id:'m2',x:s+980,scroll:'pumice'});BU(s+1010,440,1);HS(s+800,'Something is buried in that lumpy mound! Dig with ▼, Earth power, or a panda friend.',2);
   gap(GAPE(140));LSTRETCH(2600,24);s=G(800);CK(s+40);GT(s+650,'volcano');
-  LSTRETCH(1800,25);RISE();LSTRETCH(1500,26);BONUS('c2','ice');
+  LSTRETCH(600,25);RISE();LSTRETCH(700,26);BONUS('c2','ice');
   s=G(2000);CK(s+60);SG(s+120,'Falling rocks! Watch the shadows and dodge');L.rockz.push({x0:s+300,x1:s+1300,cd:90});row(s+400,400,6);arc(s+900,380,6,70);EN('ninja',s+1100);HEART(s+1350,400);
   FL(s+1600,150,240);L.highs.push({x:s+1720,y:150});PT('salamander',s+1770,150);SC('lava',s+1815,110);TR(s+1650,110);HS(s+1400,'See that high ledge? Air power gives a giant jump! A friend lives up there.',1,'salamander');SG(s+1450,'🌪️ Air special = giant jump to the high ledge!');
   GT(s+1950,'reading');LSTRETCH(3000,27);
   roomR6({id:'l2b',name:'Basalt Echo Steps',o:{intro:'Hop the glowing basalt stones over the lava. See-through stones are fake! Then the light fades: follow your crumb trail back the same way!',
    fact:['Basalt Scroll','Basalt is a dark rock made when lava cools. Some basalt cools into amazing six-sided columns, like the Giant\'s Causeway!'],q:{q:'The stones went high, low, high. The echo goes...',o:['high, low, high','low, low, low','jump, spin, sleep'],ic:['⬆⬇⬆','⬇⬇⬇','🌀'],c:0}}});
-  LSTRETCH(1800,28);BONUS('c3','ice');
+  LSTRETCH(3800,28);SECRET('c3',0);
   s=G(1800);CK(s+40);for(let i=0;i<4;i++)GEY(s+300+i*260,i*65);FL(s+1300,330,90);FL(s+1420,250,200);BU(s+1345,330,.9);BU(s+1500,250,.8);SC('geyser',s+1560,210);row(s+1430,210,3);HS(s+1200,'Psst! Hop up the ledges behind the bushes for a secret.',2);EN('imp',s+700);EN(Ez?'imp':'ninja2',s+1000);GT(s+1750,'vmixed');
   LSTRETCH(2600,29);
   s=G(1800);CK(s+40);row(s+300,400,5);EN('imp',s+500);arc(s+900,380,6,70);SG(s+1000,'The grumpy Magma Golem is ahead!');HS(s+900,'The Magma Golem is just ahead! You can do it!',1);L.bossX=s+1250;};
@@ -962,7 +997,7 @@ function buildLevel(){
  s=G(2000);CK(s+60);SG(s+120,'Tap ◀ ▶ to move and ⤒ to jump');SG(s+520,'Tap 👊 to punch and 🦶 to kick. Tap ⭐ to throw a star when it pops up!');SG(s+1000,'Stomp enemies or punch them! Tap ✨ for your bending special when your meter is full');SG(s+1450,'New! Run and tap 🦶 for a Flying Kick. Tap 👊 in the air for a Superman Punch!');
  arc(s+300,390,5,60);row(s+800,400,5);HS(s+260,'Collect the colour stars ⭐ as you go. Each one brings a little colour back!',1);arc(s+1250,390,6,70);
  PT('fox',s+1250,440);SG(s+1130,'A friend! Tap E near animals');EN('ninja',s+1550);EN('ninja',s+1800);fill(s+250,s+1000,1,['hopper']);TR(s+700,330);
- STRETCH(1900,1);roomR1();gap(120);BONUS('o1','sea');
+ STRETCH(1900,1);roomR1();gap(120);SECRET('o1',0);
  // ---- 2: Spiky hills + secret sky chain
  STRETCH(1500,10);s=G(2300);CK(s+40);SP(s+360,3);arc(s+330,380,6,70);SP(s+820,2);EN('ninja',s+560);TH(s+1800);
  FL(s+1000,350,90);FL(s+1130,270,90);FL(s+1260,190,90);FL(s+1400,190,220);BU(s+1045,350,.9);BU(s+1300,190,.8);row(s+1410,150,4);HS(s+900,'Psst! Jump up the floating ledges. There is a secret sky path up there!',1);SC('cloud',s+1580,150);TR(s+1470,150);
@@ -973,7 +1008,7 @@ function buildLevel(){
  HS(pit-160,'I smell a friend down in that pit! Hop in, then bounce back out on the spring.',2,'panda');MV(pit+150,436,100,100,0,.02);PT('panda',pit+90,520);SPR(pit+235,520);row(pit+40,480,3);ST(pit+130,470);
  s=G(1100);L.mounds.push({id:'m1',x:s+300,scroll:'plant'});HS(s+180,'Dig dig dig! Something is buried by that lumpy mound. Dig with ▼, use Earth power, or ask a panda friend!',2);BU(s+330,440,1);CR(s+900);EN('ninja',s+500);BALL(s+700,s+1000);EN('hopper',s+800);arc(s+150,390,5,60);CK(s+60);
  gap(GAPE(140));
- s=G(1900);CK(s+40);FL(s+300,350,100);FL(s+450,270,100);FL(s+600,190,100);FL(s+720,190,520);BU(s+345,350,.9);BU(s+640,190,.8);
+ s=G(1900);CK(s+40);FL(s+300,365,100);FL(s+450,280,100);FL(s+600,190,100);FL(s+720,190,520);BU(s+345,365,.9);BU(s+640,190,.8);
  HS(s+250,'Climb the ledges to a dark cave. Fire lights it up, and an owl friend lives inside!',2,'owl');L.dark.push({x:s+700,y:40,w:560,h:150});row(s+760,150,5);ST(s+1000,120);ST(s+1040,150);PT('owl',s+1180,190);SC('sun',s+1260,150);
  EN('ninja',s+500);EN('ninja',s+950);EN('ninja2',s+1400);SP(s+1500,2);arc(s+1380,380,5,60);GT(s+1800,'reading');STRETCH(3000,3);roomR3();BONUS('o2','sea');
  // ---- 4: Splash pond
@@ -986,10 +1021,10 @@ function buildLevel(){
  s=G(1500);CK(s+40);EN('cloud',s+400,300);EN('cloud',s+700,280);EN('cloud',s+1100,300);SPR(s+280,440);HS(s+180,'Bounce on the red spring to reach the sky ledge. A unicorn friend lives up there!',2,'unicorn');FL(s+430,170,330);
  PT('unicorn',s+640,170);row(s+450,130,3);SC('bee',s+720,130);TR(s+520,130);SP(s+900,3);arc(s+870,370,6,70);BALL(s+1050,s+1400);
  const pit2=cx;gap(280);MV(pit2+140,436,110,95,0,.025);
- s=G(900);CK(s+40);EN('hopper',s+300);EN('ninja2',s+500);GT(s+800,'science');STRETCH(3000,6);roomR5();BONUS('o3','sea');
+ s=G(900);CK(s+40);EN('hopper',s+300);EN('ninja2',s+500);GT(s+800,'science');STRETCH(3000,6);roomR5();SECRET('o3',1);
  // ---- 6: Ember cave and storm approach
- s=G(1600);CK(s+40);TH(s+1400);BALL(s+120,s+420);FL(s+300,350,90);FL(s+430,270,90);FL(s+560,190,90);FL(s+680,190,400);BU(s+345,350,.9);BU(s+600,190,.8);
- HS(s+250,'More ledges lead up to an ember cave. Sparky the dragon lives there!',2,'dragon');L.dark.push({x:s+660,y:40,w:440,h:150});row(s+720,150,4);ST(s+900,130);PT('dragon',s+950,190);SC('bolt',s+1040,150);
+ s=G(1600);CK(s+40);TH(s+1400);BALL(s+120,s+420);SPR(s+470,440);FL(s+560,190,90);FL(s+680,190,400);BU(s+345,440,.9);BU(s+600,190,.8);
+ HS(s+250,'Bounce on the spring up to an ember cave. Sparky the dragon lives there!',2,'dragon');L.dark.push({x:s+660,y:40,w:440,h:150});row(s+720,150,4);ST(s+900,130);PT('dragon',s+950,190);SC('bolt',s+1040,150);
  EN('ninja2',s+620);EN('hopper',s+1200);EN('ninja',s+1350);BALL(s+1150,s+1500);SP(s+1000,2);
  const pit3=cx;gap(GAPE(150));
  s=G(1700);CK(s+40);FL(s+1300,150,150);L.highs.push({x:s+1375,y:150});row(s+1320,112,4);HS(s+800,'See that high ledge? Tap 🔄 to pick 🌪️ Air, then tap ✨ for a giant jump!',1);SG(s+1000,'🌪️ Air special = giant jump to the sky ledge, then hold jump to glide!');EN('cloud',s+300,300);EN('ninja',s+500);SP(s+700,3);arc(s+680,370,6,80);EN('ninja2',s+900);BALL(s+1000,s+1300);EN('hopper',s+1350);GT(s+1600,'mixed');STRETCH(3000,7);roomR6();
@@ -997,7 +1032,14 @@ function buildLevel(){
  STRETCH(1900,8);s=G(1800);CK(s+40);row(s+300,400,5);EN('ninja',s+500);EN('cloud',s+700,300);arc(s+900,380,6,70);SG(s+1000,'The grumpy Storm Cloud is ahead!');HS(s+900,'The Storm Cloud is just ahead! I will be right behind you. You can do it!',1);L.bossX=s+1250;
 }
  L.W=cx;
+ {const busy=x=>L.rooms.some(r=>x>r.x0-150&&x<r.x1+150)||L.gates.some(g=>Math.abs(g.x-x)<260)||L.water.some(w=>x>w.x-100&&x<w.x+w.w+100)||x>L.bossX-700||L.pipes.some(p=>Math.abs(p.x-x)<160||Math.abs(p.out-x)<160)||L.bonus.some(b=>Math.abs(b.x-x)<220)||L.portals.some(p=>Math.abs(p.x-x)<200)||L.checks.some(c=>Math.abs(c.x-x)<90)||L.signs.some(q=>Math.abs(q.x-x)<120)||L.npcs.some(q=>Math.abs(q.x-x)<120)||L.pets.some(q=>Math.abs(q.x-x)<120);
+  const gr=L.plats.filter(p=>p.t==='g'&&p.y===440).sort((a,b)=>a.x-b.x),onG=x=>gr.some(p=>x>p.x+20&&x<p.x+p.w-20);
+  const evs=[];for(let i=1;i<gr.length;i++)if(gr[i].x-(gr[i-1].x+gr[i-1].w)>30)evs.push(gr[i].x);
+  L.plats.forEach(p=>{if(p.t==='p')evs.push(p.x);});L.springs.forEach(q=>evs.push(q.x));L.spikes.forEach(q=>evs.push(q.x));(L.geys||[]).forEach(q=>evs.push(q.x));evs.sort((a,b)=>a-b);
+  let last=0,k=0;for(const x of evs.concat([L.W])){if(x-last>2300){for(let px=last+900;px<x-700;px+=1300){let q=px;for(let t=0;t<8&&(busy(q)||!onG(q)||!onG(q+120));t++)q+=110;if(!busy(q)&&onG(q)&&onG(q+120)){const h=[372,360,380][k++%3];FL(q,h,120);ST(q+30,h-38);ST(q+90,h-38);BU(q-60,440,.85);}}}last=x;}
+  const bs=L.bushes.map(b=>b.x).sort((a,b)=>a-b);let lb=0;for(const x of bs.concat([L.W])){for(let px=lb+1700;px<x-900;px+=1900){let q=px;for(let t=0;t<6&&busy(q);t++)q+=150;if(!busy(q)&&onG(q))BU(q,440,[.8,1,.9][Math.floor(q/7)%3]);}lb=x;}}
  L.rooms.forEach(r=>{if(r.done)roomApplyDone(L,r);});
+ {const sp=L.portals[L.lvl===1?2:0];L.portals.forEach(po=>{po.space=po===sp;});L.portals=L.portals.filter(po=>po.space||!po.r.done);}
  // apply save
  const pr=LP();L.gates.forEach(g=>{if(pr.gates.includes(g.id)){g.open=true;L.plats.splice(L.plats.indexOf(g.barrier),1);}});
  L.mounds.forEach(m=>{m.dug=pr.dug.includes(m.id);});L.scrolls=L.scrolls.filter(c=>!PR().scrolls.includes(c.id));
@@ -1025,7 +1067,7 @@ function moveBody(b,solids){b.x+=b.vx;
 const bossAtk=()=>curLv()===2?'Lava Splash':'Lightning Zap',bossName=()=>curLv()===2?'Grumbly the Magma Golem':'Grumbler the Storm Cloud';
 const L2INTRO=()=>{const n=fullName();return[{s:'Woof! We made it to Ember Mountain, '+n+'!',b:1},{s:'A grumpy Magma Golem woke up and made the whole mountain hot and grumbly. The colours are hiding again!'},
  {s:'Watch out for lava, fire geysers and falling rocks. Water 💧 cools lava into rock, and Earth 🪨 raises rock pillars!'},{s:'Find three Big Stars 🌟 in the crystal portals, answer the Volcano Gates, and we will calm the Golem down. Let\'s go!',b:1}];};
-function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;SPC=null;PH={cd:300,blk:0,idle:0,hop:0};LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}for(const c of LV.checks)if(c.x<=cp){c.reached=true;c.on=c.x===cp;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
+function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;SPC=null;CAVE=null;PH={cd:300,blk:0,idle:0,hop:0};LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}for(const c of LV.checks)if(c.x<=cp){c.reached=true;c.on=c.x===cp;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
  const n=LV.gates.filter(g=>g.open).length;sat=0.15+0.14*n;if(LP().boss)sat=1;
  SF=newSF(cp>100?cp-70:24);DB={cur:null,q:[]};ST={best:cp,idle:0,fails:0,cd:1200,n:0};HN=null;RQ=null;if(!DG().intro&&!LP().cp)dogIntro();else if(curLv()===2&&!LP().intro){LP().intro=true;save();dogTalk(L2INTRO(),null,'play');}}
 function lavaBounce(){const p=P;if((p.bnc||0)>=2)return false;p.bnc=(p.bnc||0)+1;const px=p.x+10;let best=null;for(const q of LV.plats)if(q.y>=330&&q.y<=440&&q.w>=40){const tx=clamp(px,q.x+Math.min(30,q.w/2),q.x+q.w-Math.min(30,q.w/2)),d=Math.abs(tx-px);if(d<260&&(!best||d<best.d))best={d,tx};}
@@ -1150,7 +1192,7 @@ function updPlay(){T++;const p=P,L=LV,pr=PR(),E=easy();
   if(tap('punch')&&!p.atk){if(air&&p.xcd<=0)goSuper();else{p.atk={type:'punch',t:0,dur:20,hs:new Set()};sfx('hit');}}
   if(tap('super')&&!p.atk&&!w&&p.xcd<=0)goSuper();}
  if(p.atk&&(p.atk.type==='fly'||p.atk.type==='super')){const a=p.atk,fl=a.type==='fly';if(a.t<(fl?25:27)){p.vx=p.face*(fl?(E?9:10.5):(E?8.4:9.4));p.vy=clamp(p.vy-(fl?.38:.22),-3,fl?1.8:3);if(p.onGround&&a.t>5)a.t=fl?26:28;}else p.vx*=.86;}
- if(tap('down')&&!w&&p.hurtT<=0&&!p.atk&&!p.grab){const mm=nearMound(p,75);
+ if(tap('down')&&!w&&p.hurtT<=0&&!p.atk&&!p.grab){const pq=p.onGround&&L.pipes.find(pi=>Math.abs(pi.x-(p.x+10))<42);if(pq){enterCave(pq);return;}if(L.cave&&p.x+10>L.cpipe.x-110){leaveCave();return;}const mm=nearMound(p,75);
   if(mm&&p.onGround)digMound(mm,'down');
   else if(p.onGround&&p.gnd&&p.gnd.t==='p'){p.dropT=16;p.y+=2;p.vy=1;p.onGround=false;p.coy=0;p.gnd=null;sfx('tick');addParts(p.x+10,p.y+56,4,'#fff',{sp:.8});}
   else if(!p.onGround&&!p.pound){p.pound=true;p.vx*=.3;p.atk=null;sfx('kick');}}
@@ -1206,6 +1248,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
   if(mag&&it.k==='star'&&d<mag&&d>1){it.x+=dx/d*6;it.y+=dy/d*6;}
   if(d<28){it.got=true;if(it.k==='star'){addStars(1);P.ch=Math.min(100,P.ch+3);addXP(1);sfx('star');addParts(it.x,it.y,4,'#ffd23f',{star:true});}
    else if(it.k==='treat'){pr.treats++;toast('Pet treat found! Feed your friends in the 🐾 screen.',120);sfx('pet');}
+   else if(it.k==='gem'){addStars(3);P.ch=Math.min(100,P.ch+8);sfx('star');floatText('+3',it.x,it.y,it.c||'#6ff');addParts(it.x,it.y,6,it.c||'#6ff',{star:true});}
    else if(it.k==='heart'){if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);}floatText('+♥',it.x,it.y,'#f66');sfx('pet');}}}
  L.items=L.items.filter(i=>!i.got);
  for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';say(SCROLLS[c.id][0]+'! '+SCROLLS[c.id][1],{again:true});}}
@@ -1222,13 +1265,16 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  p.near=null;
  for(const q of L.pets)if(Math.abs(q.x-(p.x+10))<60&&Math.abs(q.y-(p.y+56))<40)p.near={k:'pet',o:q,x:q.x,y:q.y-60,l:'Tap E to say hello'};
  for(const n of L.npcs)if(Math.abs(n.x-p.x)<70)p.near={k:'npc',o:n,x:n.x,y:440-90,l:'Tap E to chat with Pip'};
- for(const po of L.portals)if(Math.abs(po.x-(p.x+10))<80&&p.y+p.h>=400){const lk=portalLock(po);p.near={k:'portal',o:po,x:po.x,y:262,l:lk?'🔒 '+lk:po.r.done?'Tap E for a space trip':'Tap E to step into the portal',ic:lk?'🔒':po.r.done?'🚀':'🌈'};}
+ for(const po of L.portals)if(Math.abs(po.x-(p.x+10))<80&&p.y+p.h>=400){const lk=portalLock(po);p.near={k:'portal',o:po,x:po.x,y:262,l:lk?'🔒 '+lk:po.r.done?'Tap E for a space trip':po.space?'Tap E to step into the rainbow portal':'Tap E to go through the exit door',ic:lk?'🔒':po.r.done?'🚀':po.space?'🌈':'🚪'};}
  {const mm=nearMound(p,75);if(mm)p.near={k:'mound',o:mm,x:mm.x,y:440-64,l:'Tap E or ▼ to dig!',ic:'⛏️'};}
  for(const po of L.bonus)if(Math.abs(po.x-(p.x+10))<80&&p.y+p.h>=380)p.near={k:'bonus',o:po,x:po.x,y:262,l:po.th==='ice'?'Tap E to enter the crystal portal':'Tap E to dive into the ocean portal',ic:po.th==='ice'?'❄️':'🌊'};
+ for(const pi of L.pipes)if(Math.abs(pi.x-(p.x+10))<42&&p.onGround)p.near={k:'pipe',x:pi.x,y:440-80,l:'Tap ▼ or E to go down the hole!',ic:'🕳️',fn:()=>enterCave(pi)};
  const rn=roomNear();if(rn)p.near=rn;
+ if(L.cave){if(p.x+10>L.cpipe.x-6){leaveCave();return;}if(p.x+10>L.cpipe.x-110)p.near={k:'pipe',x:L.cpipe.x-30,y:440-130,l:'Walk into the pipe to pop out ➜',ic:'➜',fn:leaveCave};
+  for(const b of L.bigItems)if(!b.got&&Math.hypot(p.x+10-b.x,p.y+28-b.y)<52){b.got=true;const B=LP().bigs;if(!B.includes(b.id))B.push(b.id);addStars(20);addXP(30);sfx('lvl');sfx('harmony');shake=6;addParts(b.x,b.y,30,'#ffd23f',{star:true,sp:1.8});banner={t:240,title:'🌟 BIG STAR!',sub:'Big Stars '+B.length+'/3'};say('You found a Big Star! Now walk into the pipe to pop out.',{again:true});save();}}
  const eT=tap('interact');
  if(eT&&p.near){const n=p.near;
-  if(n.k==='room')n.fn();
+  if(n.k==='room'||n.k==='pipe')n.fn();
   else if(n.k==='pet')startFeed(petOf(n.o.id),true);
   else if(n.k==='npc'){startCatch();}
   else if(n.k==='portal'){n.o.go=true;sfx('tick');}
@@ -1328,7 +1374,7 @@ function updRooms(){const p=P,L=LV,E=easy();
  for(const s of L.stones)if(s.plat&&s.half===1&&!s.crumb&&s.r.phase==='in'&&p.onGround&&p.gnd===s.plat){s.crumb=true;sfx('star');}
  if(HN&&HN.t>0)HN.t--;}
 function dogSayRoom(r){HN={x:-999,y:0,txt:r.intro,t:560};say(r.intro,{queue:true});}
-function rqDone(){const po=RQ&&RQ.po;mode='play';RQ=null;P.gcool=20;if(po){po.cool=true;toast('🚀 The rainbow portal now leads to SPACE! Tap E to fly.',200);say(easy()?'The portal goes to space now! Tap E!':'The rainbow portal now leads to space! Tap E or walk back in for a space trip.',{queue:true});}}
+function rqDone(){const po=RQ&&RQ.po;mode='play';RQ=null;P.gcool=20;if(po&&!po.space){LV.portals=LV.portals.filter(q=>q!==po);addParts(po.x,390,24,'#ffe066',{star:true,sp:1.4});toast('🚪 Room cleared! Keep going ➜',150);say(easy()?'Room done! Keep going!':'Room cleared! Keep going!',{queue:true});return;}if(po){po.cool=true;toast('🚀 The rainbow portal now leads to SPACE! Tap E to fly.',200);say(easy()?'The portal goes to space now! Tap E!':'The rainbow portal now leads to space! Tap E or walk back in for a space trip.',{queue:true});}}
 function portalLock(po){const r=po.r;if(r.done)return '';if(LV.doors.some(d=>d.r===r&&!d.open&&d.x<po.x&&P.x+10<d.x))return easy()?'Solve the room first!':'Solve the puzzle room first to open the way!';return '';}
 function rescueBonus(){const n=RSC().length,pr=PR(),lp=LP();lp.rbon=lp.rbon||[];for(const b of RBON)if(n>=b.n&&!lp.rbon.includes(b.n)){lp.rbon.push(b.n);pr.treats+=b.t;addStars(b.s);addXP(b.n*5);banner={t:260,title:'Rescue bonus!',sub:b.m};sfx('harmony');}}
 function rqSay(force){const q=RQ.r.q;say(q.q,{again:true,force});RQ.opts.forEach((o,i)=>say(o.t,{queue:true,again:true,force,onstart:()=>{QHL=i;},onend:i===RQ.opts.length-1?()=>{QHL=-1;}:null}));}
@@ -1368,7 +1414,8 @@ function drawRooms(){const L=LV,p=P,x0=cam.x-160,x1=cam.x+VW+160,vis=(x,w)=>x+(w
   rr(s.x,s.y,s.w,s.h,8);ctx.fill();ctx.stroke();ctx.restore();
   if(s.crumb){ctx.fillStyle='#ffd23f';ctx.shadowColor='#ffd23f';ctx.shadowBlur=ph==='back'?14:6;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.arc(s.x+45+i*16,s.y-5+Math.sin(T/10+i)*1.5,4,0,7);ctx.fill();}ctx.shadowBlur=0;}}
  for(const c of L.crates)if(vis(c.x,c.w)){ctx.fillStyle='#c9894a';ctx.strokeStyle=p.grab===c?'#ffd23f':'#5a3414';ctx.lineWidth=p.grab===c?5:3;rr(c.x,c.y,c.w,c.h,5);ctx.fill();ctx.stroke();ctx.strokeStyle='#8a5a2b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(c.x+6,c.y+6);ctx.lineTo(c.x+c.w-6,c.y+c.h-6);ctx.moveTo(c.x+c.w-6,c.y+6);ctx.lineTo(c.x+6,c.y+c.h-6);ctx.stroke();}
- for(const po of L.portals)if(vis(po.x,60)){const y=440-56;ctx.save();ctx.translate(po.x,y);const on=po.r.done,lk=!on&&LV.doors.some(d=>d.r===po.r&&!d.open&&d.x<po.x);for(let i=0;i<3;i++){ctx.strokeStyle=lk?'rgba(170,170,190,.8)':`hsla(${(T*4+i*70)%360},90%,65%,.85)`;ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,24+i*5,46+i*4,0,T/20+i,T/20+i+4.6);ctx.stroke();}if(on)txt('🚀',0,-74,28);else if(lk)txt('🔒',0,-74,28);ctx.fillStyle=on?'rgba(150,255,200,.3)':'rgba(180,200,255,.25)';ctx.beginPath();ctx.ellipse(0,0,24,46,0,0,7);ctx.fill();ctx.restore();txt(on?'Space trip':lk?'Locked':'Portal',po.x,y-62,15,'#fff','center','#2b2b55');}
+ for(const po of L.portals)if(!po.space&&vis(po.x,60)){const lk=LV.doors.some(d=>d.r===po.r&&!d.open&&d.x<po.x),gl=.5+.5*Math.sin(T/12);ctx.save();ctx.fillStyle=lk?'#8a8aa0':'#b07a3a';rr(po.x-32,440-108,64,108,30);ctx.fill();ctx.fillStyle=lk?'#55556a':`rgba(255,${200+40*gl|0},120,.95)`;rr(po.x-22,440-96,44,96,22);ctx.fill();ctx.strokeStyle='#5a3a14';ctx.lineWidth=4;rr(po.x-32,440-108,64,108,30);ctx.stroke();ctx.restore();txt(lk?'🔒':'🚪',po.x,440-128,26);txt(lk?'Locked':'Exit',po.x,440-150,15,'#fff','center','#2b2b55');}
+ for(const po of L.portals)if(po.space&&vis(po.x,60)){const y=440-56;ctx.save();ctx.translate(po.x,y);const on=po.r.done,lk=!on&&LV.doors.some(d=>d.r===po.r&&!d.open&&d.x<po.x);for(let i=0;i<3;i++){ctx.strokeStyle=lk?'rgba(170,170,190,.8)':`hsla(${(T*4+i*70)%360},90%,65%,.85)`;ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,24+i*5,46+i*4,0,T/20+i,T/20+i+4.6);ctx.stroke();}if(on)txt('🚀',0,-74,28);else if(lk)txt('🔒',0,-74,28);ctx.fillStyle=on?'rgba(150,255,200,.3)':'rgba(180,200,255,.25)';ctx.beginPath();ctx.ellipse(0,0,24,46,0,0,7);ctx.fill();ctx.restore();txt(on?'Space trip':lk?'Locked':'Portal',po.x,y-62,15,'#fff','center','#2b2b55');}
  for(const s of L.sprites)if(vis(s.x,20)){const bob=s.follow&&Math.abs(s.vx)>0?Math.abs(Math.sin(s.ph*2))*3:Math.sin(s.ph)*1.5,cx=s.x+8,cy=s.y+16-bob;ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(cx,s.y+s.h,10,3,0,0,7);ctx.fill();
   ctx.fillStyle=s.col;ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,12,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx-4,cy-3,3.5,0,7);ctx.arc(cx+4,cy-3,3.5,0,7);ctx.fill();ctx.fillStyle='#222';ctx.beginPath();ctx.arc(cx-3.5+s.face,cy-3,1.6,0,7);ctx.arc(cx+4.5+s.face,cy-3,1.6,0,7);ctx.fill();ctx.strokeStyle='#333';ctx.beginPath();ctx.arc(cx,cy+3,4,.2,Math.PI-.2);ctx.stroke();
   starShape(cx,cy-18,4,'#ffd23f',s.ph);if(s.follow)txt('♥',cx,cy-30,13,'#ff5a8a');}
@@ -1641,7 +1688,7 @@ function stormCloud(x,y,s,mood){ctx.save();ctx.translate(x,y);ctx.scale(s,s);clo
  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-30,0,14,16,0,0,7);ctx.ellipse(30,0,14,16,0,0,7);ctx.fill();ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-28,2,6,0,7);ctx.arc(32,2,6,0,7);ctx.fill();
  ctx.strokeStyle='#111';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();if(mood==='sad'){ctx.moveTo(-50,-20);ctx.lineTo(-14,-12);ctx.moveTo(50,-20);ctx.lineTo(14,-12);ctx.moveTo(-14,34);ctx.quadraticCurveTo(0,20,14,34);}
  else{ctx.moveTo(-52,-16);ctx.lineTo(-14,-26);ctx.moveTo(52,-16);ctx.lineTo(14,-26);ctx.moveTo(-18,34);ctx.quadraticCurveTo(0,20,18,34);}ctx.stroke();ctx.restore();}
-function drawWorld(){let signNear=null;drawBGscene(cam.x);const L=LV,p=P;ctx.save();if(shake>0){ctx.translate(rnd(-shake,shake)/2,rnd(-shake,shake)/2);shake--;}ctx.translate(-Math.round(cam.x),0);
+function drawWorld(){let signNear=null;drawBGscene(cam.x);if(LV.cave)drawCaveBG();const L=LV,p=P;ctx.save();if(shake>0){ctx.translate(rnd(-shake,shake)/2,rnd(-shake,shake)/2);shake--;}ctx.translate(-Math.round(cam.x),0);
  const x0=cam.x-120,x1=cam.x+VW+120,vis=o=>o.x+(o.w||60)>x0&&o.x<x1;
  for(const w of L.water)if(vis(w)){ctx.fillStyle='rgba(50,150,255,.42)';ctx.fillRect(w.x,w.y,w.w,w.h+10);ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=3;ctx.beginPath();for(let x=Math.max(w.x,x0);x<Math.min(w.x+w.w,x1);x+=10)ctx.lineTo(x,w.y+Math.sin(x/18+T/12)*3);ctx.stroke();}
  const LAVA=L.theme==='lava';
@@ -1651,6 +1698,7 @@ function drawWorld(){let signNear=null;drawBGscene(cam.x);const L=LV,p=P;ctx.sav
  if(L.rise){const R=L.rise;if(R.x1>x0&&R.x0<x1){const lg=ctx.createLinearGradient(0,R.lv,0,VH);lg.addColorStop(0,Hc(40,100,58));lg.addColorStop(1,Hc(0,90,32));ctx.fillStyle=lg;ctx.fillRect(R.x0,R.lv,R.x1-R.x0,VH-R.lv);ctx.strokeStyle=Hc(50,100,75);ctx.lineWidth=4;ctx.beginPath();for(let x=R.x0;x<=R.x1;x+=10)ctx.lineTo(x,R.lv+Math.sin(x/25+T/10)*4);ctx.stroke();
   if(P.x+10>R.x0-20&&P.x<R.x1&&R.lv<R.base-4)txt('⬆🔥',clamp(P.x+10,R.x0+40,R.x1-40),R.lv-24,22);}}
  for(const s of L.plats){if(!vis(s)||s.t==='b'||s.stone)continue;
+  if(L.cave){const lv=L.theme==='lava';ctx.fillStyle=texPat(lv?'cave2':'cave1');ctx.fillRect(s.x,s.y,s.w,s.h);ctx.fillStyle=lv?'#5a3a30':'#6a5a7a';ctx.fillRect(s.x,s.y,s.w,s.t==='g'?10:6);ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=3;ctx.strokeRect(s.x,s.y,s.w,s.h);continue;}
   if(s.pillar){ctx.fillStyle='#6a5a52';ctx.strokeStyle='#3a2a24';ctx.lineWidth=3;rr(s.x,s.y,s.w,560-s.y,8);ctx.fill();ctx.stroke();ctx.fillStyle='#8a7a6e';ctx.fillRect(s.x+8,s.y+4,s.w-16,8);ctx.strokeStyle='#4a3a32';ctx.beginPath();for(let y=s.y+40;y<540;y+=40){ctx.moveTo(s.x+6,y);ctx.lineTo(s.x+s.w-6,y);}ctx.stroke();continue;}
   if(s.cool){const k=1-clamp(s.cool.ct/240,0,1);ctx.fillStyle='#3a3238';ctx.fillRect(s.x,s.y,s.w,60);ctx.fillStyle='#544a52';ctx.fillRect(s.x,s.y,s.w,8);ctx.strokeStyle=`rgba(255,${120+60*k|0},40,${.25+.7*k})`;ctx.lineWidth=3;ctx.beginPath();for(let x=s.x+20;x<s.x+s.w-20;x+=46){ctx.moveTo(x,s.y+10);ctx.lineTo(x+14,s.y+30);ctx.lineTo(x+6,s.y+52);}ctx.stroke();if(k>.2&&T%6===0)addParts(s.x+rnd(0,s.w),s.y,1,'rgba(240,240,255,.8)',{sp:.4,g:-.06});continue;}
   if(s.t==='g'&&LAVA){ctx.fillStyle=Hc(10,20,22);ctx.fillRect(s.x,s.y,s.w,s.h);ctx.fillStyle=Hc(15,25,34);ctx.fillRect(s.x,s.y,s.w,12);ctx.strokeStyle=Hc(25,100,55,.75);ctx.lineWidth=2;ctx.beginPath();for(let x=Math.max(s.x,Math.floor(x0/70)*70)+18;x<Math.min(s.x+s.w,x1)-10;x+=70){ctx.moveTo(x,s.y+16);ctx.lineTo(x+10,s.y+34);ctx.lineTo(x+2,s.y+56);}ctx.stroke();ctx.globalAlpha=.55;ctx.fillStyle=texPat('cave2');ctx.fillRect(Math.max(s.x,x0),s.y+60,Math.min(s.x+s.w,x1)-Math.max(s.x,x0),s.h-60);ctx.globalAlpha=1;ctx.fillStyle=texPat('soil');ctx.fillRect(Math.max(s.x,x0),s.y+14,Math.min(s.x+s.w,x1)-Math.max(s.x,x0),s.h-14);continue;}
@@ -1686,7 +1734,8 @@ for(const q of L.plats)if(q.rock&&vis(q)){ctx.globalAlpha=q.tmp<60&&q.tmp%8<4?.5
  for(const c of L.scrolls)if(vis({x:c.x})){const y=c.y+Math.sin(T/15)*4,dd=Math.abs(c.x-p.x),hid=!c.pop&&c.y<300,gl=c.pop?.35:Math.max(0,1-dd/140)*.3;if(gl>0){ctx.fillStyle='rgba(255,230,120,'+gl+')';ctx.beginPath();ctx.arc(c.x,y,24,0,7);ctx.fill();}ctx.fillStyle='#fff3c4';rr(c.x-12,y-14,24,28,4);ctx.fill();ctx.strokeStyle='#a36b1d';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#a36b1d';ctx.fillRect(c.x-8,y-6,16,2);ctx.fillRect(c.x-8,y,16,2);ctx.fillRect(c.x-8,y+6,10,2);
   if(hid){drawBush(c.x+3,c.y+40,.95,Math.sin(T/4)*(dd<130?(T%90<30?.06:.012):0));}
   if((dd<160&&T%60<6)||(!hid&&T%90<6)||T%500<5)starShape(c.x+(T%120<60?-9:10),y-18,4,'#fff',T/8);}
- for(const it of L.items)if(vis({x:it.x})){const y=it.y+Math.sin(T/10+it.x)*3;if(it.k==='star')starShape(it.x,y,11,'#ffd23f',Math.sin(T/20+it.x)*.3);else if(it.k==='treat')txt('🍎',it.x,y,24);else heart(it.x,y,1.3,1);}
+ if(!L.cave)drawPipes();
+ for(const it of L.items)if(vis({x:it.x})){const y=it.y+Math.sin(T/10+it.x)*3;if(it.k==='star')starShape(it.x,y,11,'#ffd23f',Math.sin(T/20+it.x)*.3);else if(it.k==='treat')txt('🍎',it.x,y,24);else if(it.k==='gem'){ctx.save();ctx.translate(it.x,y);ctx.fillStyle=it.c||'#5ff';ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(11,-3);ctx.lineTo(0,13);ctx.lineTo(-11,-3);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(4,-3);ctx.lineTo(-4,-3);ctx.fill();ctx.restore();}else heart(it.x,y,1.3,1);}
  for(const b of L.balls)if(vis({x:b.x})){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(T/8);ctx.fillStyle='#e2492e';ctx.strokeStyle='#611';ctx.lineWidth=3;for(let i=0;i<8;i++){ctx.rotate(Math.PI/4);ctx.beginPath();ctx.moveTo(-5,-b.r+2);ctx.lineTo(0,-b.r-8);ctx.lineTo(5,-b.r+2);ctx.fill();ctx.stroke();}ctx.beginPath();ctx.arc(0,0,b.r,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(-6,-4,4,5);ctx.fillRect(3,-4,4,5);ctx.restore();}
  drawRooms();
  for(const e of L.enemies)if(vis(e))drawEnemy(e);
@@ -2002,21 +2051,33 @@ function drawEnd(){drawStory(true);dogSprite(865,440,-1,1.7,T,{fast:true,mouth:t
  const scr=LVSCROLLS[lv].filter(id=>pr.scrolls.includes(id)).length;
  starShape(330,196,16,'#ffd23f',0);txt('Big Stars '+lp.bigs.length+' / 3',350,196,24,'#a36b1d','left');txt('📜 '+scr+'/'+LVSCROLLS[lv].length,610,196,24,'#a36b1d','left');
  txt('⭐ '+pr.stars+' stars    Hero level '+pr.lvl+'    🐾 '+Object.keys(pr.pets).length+' / '+PETS.length,480,236,21,'#2b7a2b');
- wrap(lp.bigs.length<3?'Some Big Stars are still hiding in the portals! Replay to find them all.':'All 3 Big Stars found! Amazing!',480,272,520,24,18,'#7a4a00');
+ wrap(lp.bigs.length<3?'Some Big Stars are still hiding: try the water portal and secret holes (tap ▼)! Replay to find them all.':'All 3 Big Stars found! Amazing!',480,272,520,24,18,'#7a4a00');
  if(lv===1){btn('🌋 Level 2: Ember Mountain ▶',250,306,460,62,()=>{shush();startPlay(2);},{col:'#ffb36b',size:26});btn('Play Level 1 again',220,382,240,50,()=>{resetRun();},{size:20});btn('Title screen',500,382,240,50,()=>{mode='title';},{size:20});}
  else{btn('Play Level 2 again',220,320,240,56,()=>{resetRun();},{col:'#ffe066',size:22});btn('Title screen',500,320,240,56,()=>{mode='title';},{size:22});wrap('More levels coming soon: Sky Temple, Coral Kingdom...',480,410,520,22,17,'#2b2b55');}}
 function resetRunState(){const p=LP();p.rooms={};p.rescued=[];p.rbon=[];p.cp=0;p.gates=[];p.dug=[];p.boss=false;}
 function resetRun(){resetRunState();save();startPlay();}
 
 /* ================= TITLE / SELECT / PAUSE ================= */
+let NG=null;const hasSave=pr=>!!(pr&&(pr.intro||(pr.unl||1)>=2||pr.stars>0||pr.lvl>1||Object.keys(pr.pets||{}).length));
+function askNew(i,from){NG={i,from,t:0};sfx('tick');const pl=SV.players[i];say('Start a new game for '+pl.name+'? All stars, pets and levels for '+pl.name+' go away. Tap the green tick for yes, or the red cross for no.',{again:true,force:pl.tier==='age4'});}
+function drawNG(){const i=NG.i,pl=SV.players[i],pr=SV.prog[i];NG.t++;ctx.fillStyle='rgba(20,20,60,.55)';ctx.fillRect(0,0,VW,VH);
+ rr(150,40,660,460,26);ctx.fillStyle='rgba(255,253,242,.98)';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='#ff5a8a';ctx.stroke();
+ txt('🆕 New game for '+pl.name+'?',480,84,34,'#e0409a');stick(300,250,{col:pl.color,s:1.9,pose:'idle'});
+ txt('⭐ '+pr.stars+'   🐾 '+Object.keys(pr.pets).length+'   Lv '+pr.lvl,560,170,28,'#2b2b55');txt('➜ 🗑 ➜ ⭐ 0   🐾 0',560,224,28,'#c0306a');
+ txt('Everything for '+pl.name+' starts again.',560,270,19,'#555');const o=SV.players[1-i];txt(o.name+"'s game is kept safe 👍",560,298,17,'#2b7a2b');
+ btn('✔ Yes, new game',190,380,280,96,()=>{const k=NG.i,f=NG.from;NG=null;doResetHero(k);sfx('star');if(f==='title'){SV.sel=k;titleGo();}else say('Fresh start for '+SV.players[k].name+'!',{again:true});},{size:24,col:'#9be8a9'});
+ btn('✖ No, keep it',490,380,280,96,()=>{NG=null;sfx('tick');},{size:24,col:'#ffd0d8'});}
+function titleGo(){const pr=PR();if(!pr.intro){pr.intro=true;save();startStory('intro',['Once upon a time the world was bursting with colour: red apples, blue seas, green hills and golden sunshine.','Then a GRUMPY STORM CLOUD rumbled in. "GRUMBLE! I hate colours!" It stole them all and the world turned grey.',fullName()+' is a brave kung fu kid. With quick kicks, clever answers and new animal friends, she will bring the colours home!','Answer the glowing gates to free the colours. Befriend animals and explore secret places. You can\'t lose - you can always try again!'],()=>startPlay());}else startPlay();}
 function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b5c','#ff9a1f','#ffd23f','#2fc46b','#3aa8ff','#a35cff','#ff4fa3','#18c9c9','#ff3b5c'];
  ctx.font=`bold 92px ${FONT}`;let x=480-ctx.measureText(t).width/2;for(let i=0;i<t.length;i++){const ch=t[i],w=ctx.measureText(ch).width;txt(ch,x+w/2,90+Math.sin(T/15+i)*6,92,cols[i%cols.length],'center','#2b2b55');x+=w;}
  txt('Colour Quest',480,160,40,'#fff','center','#2b2b55');
  ctx.fillStyle=Hc(110,60,45);ctx.fillRect(0,440,VW,100);stick(200,440,{col:SV.players[0].color,s:2.4,pose:'cheer'});stick(760,440,{col:SV.players[1].color,s:1.9,pose:'cheer',face:-1});
  const pr=PR();dogSprite(885,470,-1,1.15,T,{fast:T%200<60,mouth:T%200<60});const lv=curLv(),un=(pr.unl||1)>=2;
- const go=()=>{if(!pr.intro){pr.intro=true;save();startStory('intro',['Once upon a time the world was bursting with colour: red apples, blue seas, green hills and golden sunshine.','Then a GRUMPY STORM CLOUD rumbled in. "GRUMBLE! I hate colours!" It stole them all and the world turned grey.',fullName()+' is a brave kung fu kid. With quick kicks, clever answers and new animal friends, she will bring the colours home!','Answer the glowing gates to free the colours. Befriend animals and explore secret places. You can\'t lose - you can always try again!'],()=>startPlay());}else startPlay();};
+ const go=titleGo;
  const mh=MH(),g=6,y1=176,cw=196,cx_=i=>80+i*204,ry=i=>y1+i*(mh+g),ty=Math.min(512,ry(4)+14);
- btn('▶  Play as '+fullName(),180,ry(0),600,mh,go,{size:27,col:'#ffe066'});
+ if(NG){drawNG();return;}
+ if(hasSave(pr)){btn('▶ Continue '+PL().name+' · Lv '+pr.lvl+' · '+(lv===2?'🌋 2':'🌈 1'),80,ry(0),600,mh,go,{size:24,col:'#ffe066'});btn('🆕 New Game',692,ry(0),188,mh,()=>askNew(SV.sel,'title'),{size:20,col:'#ffd0d8'});}
+ else btn('▶  New Game: '+fullName(),180,ry(0),600,mh,go,{size:27,col:'#ffe066'});
  btn('🌈 1 Meadow',cx_(0),ry(1),cw,mh,()=>{pr.lv=1;save();sfx('tick');say('Level 1, Colour Meadow');},{size:18,col:lv===1?'#bff5c4':'#fff'});
  btn(un?'🌋 2 Ember':'🔒 2 Ember',cx_(1),ry(1),cw,mh,()=>{if(!un){sfx('bad');say(easy()?'Finish level 1 first!':'Beat Level 1 to unlock Ember Mountain!',{again:true});return;}pr.lv=2;save();sfx('tick');say('Level 2, Ember Mountain');},{size:18,col:!un?'#ccc':lv===2?'#ffc39b':'#fff'});
  btn('Choose Heroes',cx_(2),ry(1),cw,mh,()=>{mode='select';},{size:18});btn('🐾 Pets & Scrolls',cx_(3),ry(1),cw,mh,()=>openPets('title'),{size:18});
@@ -2026,10 +2087,10 @@ function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b
  txt('Lv '+pr.lvl+'  ⭐ '+pr.stars+'  🐾 '+Object.keys(pr.pets).length+'/'+PETS.length+'  🌟 '+((pr.bigs||[]).length+((pr.l2&&pr.l2.bigs)||[]).length)+'/6'+(pr.l2&&pr.l2.boss?'  🏆 All done!':pr.boss?'  🏆 Level 1 done!':''),480,ty,19,'#fff','center','#2b2b55');
  if(!tcEl.classList.contains('on'))txt('Keys: ←→ move · ↑/Space jump · Z punch · X kick · C star · V special · Q element · E talk · P pets · M mute',480,522,14,'#fff','center','#2b2b55');}
 function doResetHero(i){SV.prog[i]=newProg();save();}
-function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(0,0,VW,VH);txt('Choose Your Hero',480,34,40,'#e0409a','center','#fff');
+function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(0,0,VW,VH);if(NG){drawNG();return;}txt('Choose Your Hero',480,34,40,'#e0409a','center','#fff');
  const mh=MH(),g=6,botY=VH-mh-6,y0=56,cardH=botY-g-y0;
  SV.players.forEach((pl,i)=>{const x=40+i*450,y=y0,pr=SV.prog[i],sel=SV.sel===i;rr(x,y,430,cardH,22);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=sel?8:3;ctx.strokeStyle=sel?'#ff5a8a':'#2b2b55';ctx.stroke();
-  btn('🗑 Reset',x+430-Math.max(98,mh)-10,y+8,Math.max(98,mh),mh,()=>{if(confirm('Start '+pl.name+' over from scratch? Pets, stars and levels will be erased.'))doResetHero(i);},{size:15,col:'#ffd0d8'});
+  btn('🗑 Reset',x+430-Math.max(98,mh)-10,y+8,Math.max(98,mh),mh,()=>askNew(i,'select'),{size:15,col:'#ffd0d8'});
   const playY=y+cardH-mh-10,ageY=playY-g-mh,nameY=Math.min(y+170,Math.max(y+96,ageY-mh-90));
   const stickY=nameY-Math.min(30,Math.max(18,(nameY-y)*.24|0)),stickS=Math.min(2.6,1.65+(nameY-y)/130);
   stick(x+215,stickY,{col:pl.color,s:stickS,pose:sel?'cheer':'idle',seed:i});
@@ -2074,11 +2135,11 @@ function rdy(){tcEl.classList.toggle('sea',mode==='sea');tcEl.classList.toggle('
  const enN=pl&&LV.enemies.some(e=>!e.dead&&e.hp>0&&Math.abs(e.x+(e.w||30)/2-px)<560);
  const thin=pl&&((P.onGround&&P.gnd&&P.gnd.t==='p')||LV.plats.some(s=>s.t==='p'&&px>s.x-20&&px<s.x+s.w+20&&s.y>P.y+40&&s.y<P.y+260&&P.onGround&&P.gnd&&P.gnd.t==='p'));
  const shoot=pl&&LV.eproj.some(q=>Math.abs(q.x-px)<420);
- bDl.classList.toggle('sh',!!(pl&&(nearMound(P,140)||thin||shoot)));
+ bDl.classList.toggle('sh',!!(pl&&(nearMound(P,140)||thin||shoot||LV.pipes.some(pi=>Math.abs(pi.x-px)<160))));
  bEl.classList.toggle('sh',!!(pl&&P.near));
  bSl.classList.toggle('sh',!!(pl&&(enN||fin)));
  bVl.classList.toggle('sh',!!(pl&&(P.ch>=100||fin)));
- bQl.classList.toggle('sh',!!(pl&&(fin||(ne&&(!ez||!right)))));}
+}
 function draw(){rdy();NUI=[];BTNHIT=false;ctx.clearRect(0,0,VW,VH);
  switch(mode){case 'play':drawWorld();drawHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'rq':drawRQ();break;case 'sea':drawSea();break;case 'space':drawSpace();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'end':drawEnd();break;}
  UI=NUI;}
@@ -2121,6 +2182,7 @@ function selfTest(){const log=[];try{
    else if(mode==='boards'){for(let k=0;k<6&&!BD.done;k++){boardAnswer(BD.q.c);frames(30);}BD.t=999;frames(2);}}
   mode='play';for(const g of LV.gates)if(!g.open){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}
   for(const po of LV.bonus){mode='play';enterBonus(po);frames(5);SEA.star.got=false;P.x=SEA.star.x;P.y=SEA.star.y-28;frames(3);P.x=SEA.exit.x-10;P.y=SEA.exit.y-28;frames(3);ok_(()=>mode==='play','bonus return '+po.id);}
+  for(const pi of LV.pipes){mode='play';enterCave(pi);const b=LV.bigItems[0];if(b){P.x=b.x-10;P.y=b.y-28;P.vy=0;}frames(3);leaveCave();ok_(()=>mode==='play'&&!LV.cave,'cave return '+pi.id);}
   ok_(()=>LP().bigs.length===3,'L2 bigs');
   LV.enemies=[];P.x=LV.bossX+30;P.y=380;frames(3);ok_(()=>mode==='duel','L2 duel');
   for(let i=0;i<4000&&mode==='duel';i++){if(D.ph==='ask')duelAnswer(D.q.c);if(D.ph==='meter'&&D.m&&!D.m.res&&Math.random()<.05)duelStop();tick();if(D.ph==='win'&&D.t>20)D.t=999;}
