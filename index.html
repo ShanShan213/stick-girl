@@ -310,7 +310,12 @@ const SKEY='stickgirl.v1';
 const newProg=()=>({xp:0,lvl:1,stars:0,treats:3,pets:{},active:null,scrolls:[],cp:0,gates:[],dug:[],elem:0,quest:false,boss:false,intro:false,bestCatch:0,dog:{bond:0,intro:false,facts:[],pat:0}});
 let SV;
 try{SV=JSON.parse(localStorage.getItem(SKEY));}catch(e){SV=null;}
-if(!SV||!SV.players){SV={sel:0,mute:false,players:[{name:'Stick Girl 7',color:'#ff4fa3',tier:'age7'},{name:'Stick Girl 4',color:'#3aa8ff',tier:'age4'}],prog:[newProg(),newProg()]};}
+if(!SV||!SV.players){SV={sel:0,mute:false,players:[{name:'Amari',color:'#ff4fa3',tier:'age7'},{name:'Malia',color:'#3aa8ff',tier:'age4'}],prog:[newProg(),newProg()]};}
+{const HD={age7:'Amari',age4:'Malia'};SV.players.forEach((p,i)=>{if(/^\s*Stick ?Girl( ?[47])?\s*$/i.test(p.name||''))p.name=HD[p.tier]||(i?'Malia':'Amari');p.name=shortName(p.name)||HD[p.tier]||'Amari';});}
+function shortName(n){return String(n||'').replace(/^\s*stick\s*girl\s+/i,'').trim();}
+function fullName(pl){pl=pl||PL();return 'Stickgirl '+pl.name;}
+function hero(){try{return PL().name||'friend';}catch(e){return 'friend';}}
+const ttsSayName=s=>s.replace(/\bStickgirl\b/g,'Stick girl').replace(/\bAmari\b/g,'Ah-mar-ee').replace(/\bMalia\b/g,'Mah-lee-ah');
 if(SV.hints===undefined)SV.hints='few';if(SV.mv===undefined)SV.mv=.6;if(SV.sv===undefined)SV.sv=.8;if(SV.idol===undefined)SV.idol=false;
 const NOSAVE=/^#(selftest|roomtest|shot-)/.test(location.hash);
 function save(){if(NOSAVE)return;try{localStorage.setItem(SKEY,JSON.stringify(SV));}catch(e){}}
@@ -334,7 +339,7 @@ const ttsBtns=s=>String(s).replace(/(\b(?:tap|Tap|then|or|and|with|hold|Hold|\+)
 const ttsClean=s=>ttsBtns(s).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{2300}-\u{23FF}\u{25A0}-\u{25FF}\u{FE0F}\u{200D}\u{20E3}]/gu,' ').replace(/[⤒⏭⏸✔✖♥♡★☆⚑·]/g,' ').replace(/\(\s*(?:or\s*)?\)/g,' ').replace(/\s+/g,' ').replace(/\s+([!?.,:;])/g,'$1').replace(/^[\s:;,.!-]+/,'').trim();
 function say(text,o){o=o||{};if(!o.force&&!ttsOn())return;const t=ttsClean(text);if(!t)return;const now=Date.now();if(!o.again&&t===TTS.last&&now-TTS.lastT<6000)return;TTS.last=t;TTS.lastT=now;TTS.log.push(t);if(TTS.log.length>300)TTS.log.shift();
  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;
- try{if(!o.queue)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-AU';const v=TTS.voice||ttsVoice();if(v)u.voice=v;u.rate=easy()?.88:.98;u.pitch=1.1;u.volume=1;if(o.onstart)u.onstart=o.onstart;if(o.onend)u.onend=o.onend;speechSynthesis.speak(u);}catch(e){}}
+ try{if(!o.queue)speechSynthesis.cancel();const ts=ttsSayName(t);(TTS.slog=TTS.slog||[]).push(ts);if(TTS.slog.length>100)TTS.slog.shift();const u=new SpeechSynthesisUtterance(ts);u.lang='en-AU';const v=TTS.voice||ttsVoice();if(v)u.voice=v;u.rate=easy()?.88:.98;u.pitch=1.1;u.volume=1;if(o.onstart)u.onstart=o.onstart;if(o.onend)u.onend=o.onend;speechSynthesis.speak(u);}catch(e){}}
 function shush(){TTS.last='';try{window.speechSynthesis&&speechSynthesis.cancel();}catch(e){}}
 function toggleTTS(){const p=PL();p.tts=!ttsOn();save();sfx('tick');if(p.tts)say('Read aloud is on!',{again:true});else shush();}
 
@@ -731,7 +736,7 @@ function dogSay(text,o){o=o||{};say(text,{queue:true});if(SF.st==='away'&&P&&mod
 function dogNext(){DB.cur=DB.q.shift()||null;if(DB.cur&&DB.cur.bark)dogBark();}
 function dogFact(){const d=DG(),left=DOGFACTS.map((f,i)=>i).filter(i=>!d.facts.includes(i));if(!left.length)return;const i=left[0];d.facts.push(i);addXP(5);dogSay('📜 Fact Scroll: '+DOGFACTS[i],{fact:true});save();}
 function petDog(){if(mode!=='play'||!P||SF.st!=='in'||Math.abs(SF.x-P.x)>190)return;SF.wag=90;SF.mouth=60;sfx('yip');floatText('♥',SF.x,SF.y-62,'#ff5a8a');
- if(SF.pc<=0){SF.pc=2400;dogBond(1);dogSay(pick(['Woof! Thanks for the pat, '+PL().name+'!','Wag wag wag! I love you!','Best pat ever! Let\'s go find colours!']),{bark:false});}}
+ if(SF.pc<=0){SF.pc=2400;dogBond(1);dogSay(pick(['Woof! Thanks for the pat, '+PL().name+'!','Wag wag wag! I love you, '+PL().name+'!','Best pat ever! Let\'s go find colours!']),{bark:false});}}
 function dogQuizHelp(start){if(!QZ||QZ.done||SV.hints==='off')return;const q=QZ.qs[QZ.i],lv=dogLv();const left=q.opts.map((o,i)=>i).filter(i=>i!==q.c&&!QZ.rem.includes(i));
  if(start){QZ.dm=QZ.i===0?DN()+': Take your time. I believe in you!':'';if(lv>=4&&left.length>=2){QZ.rem.push(left[ri(0,left.length-1)]);QZ.dm=DN()+' crossed one out for you!';}return;}
  if(lv>=3&&left.length>=2){QZ.rem.push(left[ri(0,left.length-1)]);QZ.dm=DN()+' crossed out a wrong answer!';}
@@ -740,7 +745,7 @@ function dogQuizHelp(start){if(!QZ||QZ.done||SV.hints==='off')return;const q=QZ.
 function dogTalk(lines,onEnd,ret){if(SF.st==='away'){SF.st='in';SF.corner=-1;SF.hold=0;SF.x=P?P.x-60:24;}DT={lines,i:0,t:0,onEnd,ret:ret||'play'};mode='dogtalk';SF.wag=60;if(lines[0].b)sfx('bark');}
 function dogTalkEnd(){shush();const f=DT.onEnd,r=DT.ret;DT=null;mode=r;if(f)f();}
 function dogTalkAdv(){const full=DT.lines[DT.i].s.length*1.2;if(DT.t<full){DT.t=1e4;return;}DT.i++;DT.t=0;if(DT.i>=DT.lines.length){dogTalkEnd();return;}SF.wag=60;if(DT.lines[DT.i].b)sfx('bark');else sfx('yip');}
-function dogIntro(ret){const n=PL().name;dogTalk([
+function dogIntro(ret){const n=fullName();dogTalk([
  {s:'Woof woof! Hi '+n+'! I am '+DN()+', and I am your helper!',b:1},
  {s:'Oh no! The grumpy Storm Cloud stole all the colours of the world. Everything has gone grey!'},
  {s:'Your quest: collect the colour stars ⭐ and rescue the colours, one glowing gate at a time.'},
@@ -981,7 +986,7 @@ function petName(){const a=activePet();return a?a.def.name.split(' the ')[0]:'';
 function petHelp(){const ap=activePet();if(PH.blk>0)PH.blk--;if(PH.hop>0)PH.hop--;if(!ap||mode!=='play')return;if(PH.cd>0){PH.cd--;return;}
  const p=P,L=LV,px=p.x+10,nm=petName();
  const st=L.items.filter(i=>i.k==='star'&&!i.got&&Math.abs(i.x-px)>50&&Math.abs(i.x-px)<300&&i.y>250).sort((a,b)=>Math.abs(a.x-px)-Math.abs(b.x-px))[0];
- if(st){addParts(st.x,st.y,4,'#ffd23f',{star:true,g:0});st.x=px;st.y=p.y+28;floatText(nm+' fetched a ⭐',PF.x,PF.y-60,'#ffe066');PH.cd=720;return;}
+ if(st){addParts(st.x,st.y,4,'#ffd23f',{star:true,g:0});st.x=px;st.y=p.y+28;floatText(nm+' fetched a ⭐ for '+hero(),PF.x,PF.y-60,'#ffe066');PH.cd=720;return;}
  if(p.onGround&&Math.abs(p.vx)<.2){if(++PH.idle>240){PH.idle=0;PH.hop=40;addParts(PF.x,PF.y-20,5,'#fff6c0',{star:true,g:0});sfx('pet');PH.cd=900;return;}}else PH.idle=0;}
 
 function newPlayer(x,y){return{x,y,w:20,h:56,vx:0,vy:0,face:1,hp:6,max:6,inv:0,ch:0,atk:null,starCd:0,jumps:0,coy:0,jbuf:0,safe:{x,y},ph:0,onGround:false,gnd:null,ride:null,glide:false,heal:0,gcool:0,hurtT:0,spr:false,near:null,swim:false,aura:0,shield:0,speedT:0,lightT:0,airT:0,stageT:0,idolT:0,sq:0,hx:0,hv:0,hy:0,hw:0,xcd:0,lvy:0,wasG:true,dropT:0,duck:false,pound:false};}
@@ -993,7 +998,7 @@ function moveBody(b,solids){b.x+=b.vx;
   else if(b.vy>0||(b.vy===0&&py+b.h<=s.y+1)){b.y=s.y-b.h;b.vy=0;b.onGround=true;b.gnd=s;}
   else if(b.vy<0){b.y=s.y+s.h;b.vy=0;}}}
 const bossAtk=()=>curLv()===2?'Lava Splash':'Lightning Zap',bossName=()=>curLv()===2?'Grumbly the Magma Golem':'Grumbler the Storm Cloud';
-const L2INTRO=()=>{const n=PL().name;return[{s:'Woof! We made it to Ember Mountain, '+n+'!',b:1},{s:'A grumpy Magma Golem woke up and made the whole mountain hot and grumbly. The colours are hiding again!'},
+const L2INTRO=()=>{const n=fullName();return[{s:'Woof! We made it to Ember Mountain, '+n+'!',b:1},{s:'A grumpy Magma Golem woke up and made the whole mountain hot and grumbly. The colours are hiding again!'},
  {s:'Watch out for lava, fire geysers and falling rocks. Water 💧 cools lava into rock, and Earth 🪨 raises rock pillars!'},{s:'Find three Big Stars 🌟 in the crystal portals, answer the Volcano Gates, and we will calm the Golem down. Let\'s go!',b:1}];};
 function startPlay(lv){if(lv)PR().lv=lv;if(LP().boss)resetRunState();THEME=curLv()===2?'lava':'meadow';SEA=null;SPC=null;PH={cd:300,blk:0,idle:0,hop:0};LV=buildLevel();let cp=LP().cp||60;{const ok=LV.checks.map(c=>c.x).filter(x=>x<=cp+1);cp=ok.length?Math.max(...ok):60;}for(const c of LV.checks)if(c.x<=cp){c.reached=true;c.on=c.x===cp;}P=newPlayer(cp,440-56-2);P.safe={x:cp,y:P.y};PF={x:cp-30,y:440,face:1};cam.x=clamp(cp-400,0,LV.W-VW);parts=[];toasts=[];hstop=0;tipT=0;mode='play';
  const n=LV.gates.filter(g=>g.open).length;sat=0.15+0.14*n;if(LP().boss)sat=1;
@@ -1301,7 +1306,7 @@ function rqDone(){const po=RQ&&RQ.po;mode='play';RQ=null;P.gcool=20;if(po){po.co
 function portalLock(po){const r=po.r;if(r.done)return '';if(LV.doors.some(d=>d.r===r&&!d.open&&d.x<po.x&&P.x+10<d.x))return easy()?'Solve the room first!':'Solve the puzzle room first to open the way!';return '';}
 function rescueBonus(){const n=RSC().length,pr=PR(),lp=LP();lp.rbon=lp.rbon||[];for(const b of RBON)if(n>=b.n&&!lp.rbon.includes(b.n)){lp.rbon.push(b.n);pr.treats+=b.t;addStars(b.s);addXP(b.n*5);banner={t:260,title:'Rescue bonus!',sub:b.m};sfx('harmony');}}
 function rqSay(force){const q=RQ.r.q;say(q.q,{again:true,force});RQ.opts.forEach((o,i)=>say(o.t,{queue:true,again:true,force,onstart:()=>{QHL=i;},onend:i===RQ.opts.length-1?()=>{QHL=-1;}:null}));}
-function rqPick(i){if(RQ.ok)return;const o=RQ.opts[i];if(!o||RQ.rem.includes(i))return;if(o.ok){RQ.ok=true;sfx('lvl');addXP(15);addStars(5);save();say('Yes! Great thinking!',{again:true});}else{RQ.rem.push(i);RQ.msg='Almost! Think again, you can try another one.';say(RQ.msg,{again:true});sfx('bad');const n=RQ.opts.map((x,k)=>k).filter(k=>!RQ.rem.includes(k));RQ.sel=n[0]===undefined?0:n[0];}}
+function rqPick(i){if(RQ.ok)return;const o=RQ.opts[i];if(!o||RQ.rem.includes(i))return;if(o.ok){RQ.ok=true;sfx('lvl');addXP(15);addStars(5);save();say('Yes! Great thinking, '+hero()+'!',{again:true});}else{RQ.rem.push(i);RQ.msg='Almost! Think again, you can try another one.';say(RQ.msg,{again:true});sfx('bad');const n=RQ.opts.map((x,k)=>k).filter(k=>!RQ.rem.includes(k));RQ.sel=n[0]===undefined?0:n[0];}}
 function updRQ(){T++;RQ.t++;const n=RQ.opts.length;
  if(RQ.step===0){if(tap('interact')||tap('jump')){RQ.step=1;rqSay();}return;}
  if(RQ.ok){if(tap('interact')||tap('jump')){rqDone();}return;}
@@ -1318,7 +1323,7 @@ function drawRQ(){drawWorld();drawHUD();const r=RQ.r;panel(110,52,740,456,'#a36b
   if(RQ.ok){txt('✔ ⭐',480,400,30,'#2b7a2b');btn('▶ ▶',380,416,200,52,()=>{shush();rqDone();},{size:26,col:'#ffe066'});}else if(RQ.msg)txt('💡 🔁',480,420,26,'#a36b1d');return;}
  wrap(q.q,480,160,640,34,26,'#2b2b55');
  RQ.opts.forEach((o,i)=>{const rem=RQ.rem.includes(i),y=250+i*66;btn((RQ.ok&&o.ok?'✔ ':'')+o.t,230,y,500,56,()=>rqPick(i),{size:24,col:rem?'#ddd':RQ.ok&&o.ok?'#b8f5b8':RQ.sel===i?'#ffe066':'#fff',dis:rem});});
- if(RQ.ok){txt('Yes! Great thinking! +5 ⭐',390,471,22,'#2b7a2b');btn('Keep going ▶',600,446,220,50,()=>{shush();rqDone();},{size:16,col:'#ffe066'});}else if(RQ.msg)txt(RQ.msg,480,468,20,'#a36b1d');}
+ if(RQ.ok){txt('Yes! Great thinking, '+hero()+'! +5 ⭐',390,471,22,'#2b7a2b');btn('Keep going ▶',600,446,220,50,()=>{shush();rqDone();},{size:16,col:'#ffe066'});}else if(RQ.msg)txt(RQ.msg,480,468,20,'#a36b1d');}
 /* ---- drawing ---- */
 function drawRooms(){const L=LV,p=P,x0=cam.x-160,x1=cam.x+VW+160,vis=(x,w)=>x+(w||60)>x0&&x<x1;
  for(const n of L.nooks)if(vis(n.x,n.w)){ctx.fillStyle='rgba(50,25,95,.5)';ctx.beginPath();ctx.ellipse(n.x+n.w/2,440,n.w/2+10,50,0,Math.PI,0);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.stroke();ctx.setLineDash([]);txt('🌙',n.x+n.w/2,398,16);}
@@ -1403,7 +1408,7 @@ function enterBonus(po){if(SEA||mode!=='play')return;const ice=po.th==='ice',E=e
  for(let i=0;i<5;i++){const x0=260+i*520,yb=150+Math.floor(sr()*240);for(let k=0;k<5;k++)S.items.push({x:x0+k*36,y:yb+Math.sin(k/4*Math.PI)*-40,k:'star'});}
  S.items.push({x:1440,y:150,k:'treat'});
  SEA=S;P.x=S.sx;P.y=S.sy;P.vx=0;P.vy=0;P.atk=null;P.grab=null;P.inv=0;mode='sea';parts=[];toasts=[];sfx('water');sfx('spring');
- say((ice?'Welcome to the Crystal Cove! ':'Welcome to the ocean! ')+'Hold jump to swim up, down to swim down. Find the Big Star! '+S.fact.s,{again:true});}
+ say((ice?'Welcome to the Crystal Cove, ':'Welcome to the ocean, ')+hero()+'! '+'Hold jump to swim up, down to swim down. Find the Big Star! '+S.fact.s,{again:true});}
 function leaveBonus(){const S=SEA,p=P;SEA=null;mode='play';p.x=S.po.x+70;p.y=440-58;p.vx=2;p.vy=0;p.inv=60;p.onGround=false;S.po.cool=true;cam.x=clamp(p.x-420,0,LV.W-VW);parts=[];sfx('spring');
  addParts(S.po.x,380,24,S.th==='ice'?'#dff6ff':'#8fdcff',{sp:1.6});toast(S.star.got?'🌟 Big Stars '+bigsGot().length+'/3':'Back from the '+(S.th==='ice'?'Crystal Cove':'ocean')+'!',160);save();}
 /* ===== SPACE bonus world (behind solved rainbow puzzle-room portals): a gentle Asteroids-style mini game ===== */
@@ -1416,10 +1421,10 @@ function enterSpace(po){if(SPC||SEA||mode!=='play')return;const E=easy();shush()
  for(let i=0;i<(E?3:4);i++){const left=i%2===0;S.rocks.push(spRock(left?90:VW-90,110+((i*167)%320),3));}
  for(let i=0;i<50;i++)S.bg.push([Math.random()*VW,Math.random()*VH,Math.random()<.2?2:1]);
  SPC=S;mode='space';parts=[];toasts=[];sfx('spring');
- say('Space trip! '+(E?'Move with the arrows. Your star blaster shoots by itself!':'Turn with the arrows, tap jump to fly and punch to shoot the meteorites!')+' '+S.fact,{again:true});}
+ say('Space trip, '+hero()+'! '+(E?'Move with the arrows. Your star blaster shoots by itself!':'Turn with the arrows, tap jump to fly and punch to shoot the meteorites!')+' '+S.fact,{again:true});}
 function leaveSpace(){const S=SPC;if(!S)return;SPC=null;const p=P,po=S.po;mode='play';p.x=po.x+70;p.y=440-58;p.vx=2;p.vy=0;p.inv=60;p.onGround=false;po.cool=true;po.go=false;cam.x=clamp(p.x-420,0,LV.W-VW);parts=[];sfx('spring');addParts(po.x,380,16,'#c9a8ff',{sp:1.4});toast(S.won?'🚀 Back from space!':'Back from space! Try again any time 🚀',150);save();}
 function spWin(S){S.won=true;const lp=LP();lp.space=lp.space||[];const first=!lp.space.includes(S.po.r.id);if(first){lp.space.push(S.po.r.id);addStars(15);addXP(20);}else addStars(5);
- for(const r of S.rocks)addParts(r.x,r.y,6,'#ccc',{sp:1.2,g:0});S.rocks=[];sfx('lvl');banner={t:200,title:first?'SPACE STAR!':'Great flying!',sub:(first?'+15 ⭐':'+5 ⭐')+' The portal home is open 🏠'};S.ft=0;S.fact=S.fact2;say(S.fact,{queue:true});save();}
+ for(const r of S.rocks)addParts(r.x,r.y,6,'#ccc',{sp:1.2,g:0});S.rocks=[];sfx('lvl');banner={t:200,title:first?'SPACE STAR!':'Great flying, '+hero()+'!',sub:(first?'Well done, '+hero()+'! ':'')+(first?'+15 ⭐':'+5 ⭐')+' The portal home is open 🏠'};S.ft=0;S.fact=S.fact2;say(S.fact,{queue:true});save();}
 function updSpace(){T++;const S=SPC,E=easy(),sh=S.ship;S.t++;S.ft++;if(S.cd>0)S.cd--;if(sh.inv>0)sh.inv--;if(S.lockT>0)S.lockT--;
  if(tap('mute'))toggleMute();if(tap('pause')){leaveSpace();return;}tap('kick');tap('star');tap('special');tap('elem');tap('hint');tap('down');
  const fire=tap('punch')|tap('interact')|(keys.punch&&S.cd<=0);
@@ -1737,7 +1742,7 @@ function startQuiz(kind,gate){const tier=PL().tier,cats=GATE[tier][kind]||GATE[t
  say((easy()?'':GATENAME[kind]+'! ')+(qs[0].pics?'':''),{again:true});sayQ(qs[0]);}
 function quizFox(){const f=hasPet('fox');QZ.rem=[];QZ.msg='';if(!f)return;const q=QZ.qs[QZ.i];const wr=q.opts.map((o,i)=>i).filter(i=>i!==q.c);shuffle(wr);const n=Math.min(f>=3?2:1,q.opts.length-2);QZ.rem=wr.slice(0,n);if(n>0)QZ.msg=petOf('fox').name+' whispers: "Not those!" 🦊';}
 function quizAnswer(i){if(!QZ||QZ.done)return;const q=QZ.qs[QZ.i];if(i<0||i>=q.opts.length||QZ.rem.includes(i))return;
- if(i===q.c){sfx('ok');QZ.yay=40;say(pick(['Yes!','Well done!','Great job!','You got it!']),{again:true});addXP(QZ.wrong?8:15);addStars(2);addStars(0);QZ.i++;QZ.hint='';QZ.wrong=0;if(QZ.i>=QZ.qs.length){QZ.done=true;QZ.t=0;
+ if(i===q.c){sfx('ok');QZ.yay=40;say(pick(['Yes, '+hero()+'!','Well done, '+hero()+'!','Great job, '+hero()+'!','You got it, '+hero()+'!']),{again:true});addXP(QZ.wrong?8:15);addStars(2);addStars(0);QZ.i++;QZ.hint='';QZ.wrong=0;if(QZ.i>=QZ.qs.length){QZ.done=true;QZ.t=0;
    const g=QZ.gate;g.open=true;LV.plats.splice(LV.plats.indexOf(g.barrier),1);LP().gates.push(g.id);addXP(20);addStars(5);bumpBond(1);dogBond(1);dogBark();save();addParts(g.x,300,50,'#fff',{star:true,sp:2});say('The gate opens! A colour flies back into the world!',{queue:true});}else{quizFox();dogQuizHelp(true);bumpBond(0);const nq=QZ.qs[QZ.i];setTimeout(()=>{if(QZ&&QZ.qs[QZ.i]===nq)sayQ(nq);},700);}}
  else{sfx('bad');QZ.wrong++;QZ.hint=q.h;QZ.rem.push(i);QZ.sh=18;dogQuizHelp(false);say('Not quite! '+q.h+(QZ.dm?' '+QZ.dm:''),{again:true});}}
 function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.sh>0)QZ.sh--;if(QZ.yay>0)QZ.yay--;if(QZ.done&&(tap('interact')||QZ.t>400)){mode='play';P.gcool=30;toast('A colour returns to the world! 🌈',150);}}
@@ -1942,12 +1947,12 @@ function drawStory(bgOnly){const e=!STY||STY.kind==='end';const old=sat;sat=e?1:
  txt(STY.t>full.length*1.6?'Tap ▶':'',820,440,18,'#e0409a');txt((STY.i+1)+'/'+STY.lines.length,100,440,16,'#777');
  NUI.push({x:0,y:0,w:VW,h:VH,fn:storyAdv});}
 function drawScroll(){drawWorld();drawHUD();panel(130,100,700,330,'#a36b1d');btn('🔊',760,112,56,40,()=>say(STO.sc[0]+'! '+STO.sc[1],{force:true,again:true}),{size:20});txt('📜 '+STO.sc[0],480,150,38,'#a36b1d');wrap(STO.sc[1],480,240,600,36,28,'#2b2b55');txt('+5 ⭐  +15 XP  (saved in your Pet & Scroll book)',480,340,20,'#2b7a2b');btn('Cool!',380,370,200,52,()=>{mode='play';},{col:'#ffe066',size:26});}
-function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;lp.cp=0;pr.unl=Math.max(pr.unl||1,lv+1);addXP(80);addStars(20);pr.treats+=2;save();shush();const n=PL().name;
+function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;lp.cp=0;pr.unl=Math.max(pr.unl||1,lv+1);addXP(80);addStars(20);pr.treats+=2;save();shush();const n=fullName();
  const lines=lv===1?['WHOOSH! The Whirlwind blows the grumpy Storm Cloud far away. It shrinks into a tiny sniffly raincloud: "Okay... maybe colours are pretty," it mumbles.','The stolen colours burst back into the sky: red, orange, yellow, green, blue and purple. A giant rainbow stretches across the world!','🐶 WOOF WOOF! We did it, '+n+'! The colours are back! I am the proudest puppy in the whole world!','🐶 But look, smoke is puffing from Ember Mountain far away. A grumpy Magma Golem lives there! Will you come with me?',n+' waves to the meadow friends. "Next stop: Ember Mountain!"']
   :['TSSSS! The cool water calms the grumpy Magma Golem. His glowing cracks fade and little flowers sprout on his rocky shoulders.','"Thank you," he rumbles softly. "I was just too hot and cranky." The lava cools into new rock and the mountain glows with colour again.','🐶 WOOF WOOF! You were so brave, '+n+'! Lava, geysers AND a golem! Best adventure ever!','🐶 The Golem says we can visit his crystal caves any time. Wag wag wag!',n+' and '+DN()+' wave goodbye to Ember Mountain. More adventures are coming soon!'];
  startStory('end',lines,()=>{mode='end';sfx('bark');say(lv===1?'Level 1 complete! Level 2 is unlocked!':'Level 2 complete! You did it!',{again:true});});}
 function drawEnd(){drawStory(true);dogSprite(865,440,-1,1.7,T,{fast:true,mouth:true,hop:-Math.abs(Math.sin(T/5))*6});rr(180,50,600,400,26);ctx.fillStyle='rgba(255,253,242,.97)';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle='#e0409a';ctx.stroke();const pr=PR(),lv=curLv(),lp=LP();
- txt('LEVEL '+lv+' COMPLETE!',480,96,44,'#e0409a','center','#fff');txt(lv===1?PL().name+' freed the colours! 🌈':PL().name+' calmed Ember Mountain! 🌋',480,146,24,'#2b2b55');
+ txt('LEVEL '+lv+' COMPLETE!',480,96,44,'#e0409a','center','#fff');txt(lv===1?fullName()+' freed the colours! 🌈':fullName()+' calmed Ember Mountain! 🌋',480,146,24,'#2b2b55');
  const scr=LVSCROLLS[lv].filter(id=>pr.scrolls.includes(id)).length;
  starShape(330,196,16,'#ffd23f',0);txt('Big Stars '+lp.bigs.length+' / 3',350,196,24,'#a36b1d','left');txt('📜 '+scr+'/'+LVSCROLLS[lv].length,610,196,24,'#a36b1d','left');
  txt('⭐ '+pr.stars+' stars    Hero level '+pr.lvl+'    🐾 '+Object.keys(pr.pets).length+' / '+PETS.length,480,236,21,'#2b7a2b');
@@ -1965,7 +1970,7 @@ function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b
  const pr=PR();dogSprite(885,470,-1,1.15,T,{fast:T%200<60,mouth:T%200<60});const lv=curLv(),un=(pr.unl||1)>=2;
  const go=()=>{if(!pr.intro){pr.intro=true;save();startStory('intro',['Once upon a time the world was bursting with colour: red apples, blue seas, green hills and golden sunshine.','Then a GRUMPY STORM CLOUD rumbled in. "GRUMBLE! I hate colours!" It stole them all and the world turned grey.',PL().name+' is a brave kung fu kid. With quick kicks, clever answers and new animal friends, she will bring the colours home!','Answer the glowing gates to free the colours. Befriend animals and explore secret places. You can\'t lose - you can always try again!'],()=>startPlay());}else startPlay();};
  const mh=MH(),g=6,y1=176,cw=196,cx_=i=>80+i*204,ry=i=>y1+i*(mh+g),ty=Math.min(512,ry(4)+14);
- btn('▶  Play as '+PL().name,180,ry(0),600,mh,go,{size:27,col:'#ffe066'});
+ btn('▶  Play as '+fullName(),180,ry(0),600,mh,go,{size:27,col:'#ffe066'});
  btn('🌈 1 Meadow',cx_(0),ry(1),cw,mh,()=>{pr.lv=1;save();sfx('tick');say('Level 1, Colour Meadow');},{size:18,col:lv===1?'#bff5c4':'#fff'});
  btn(un?'🌋 2 Ember':'🔒 2 Ember',cx_(1),ry(1),cw,mh,()=>{if(!un){sfx('bad');say(easy()?'Finish level 1 first!':'Beat Level 1 to unlock Ember Mountain!',{again:true});return;}pr.lv=2;save();sfx('tick');say('Level 2, Ember Mountain');},{size:18,col:!un?'#ccc':lv===2?'#ffc39b':'#fff'});
  btn('Choose Heroes',cx_(2),ry(1),cw,mh,()=>{mode='select';},{size:18});btn('🐾 Pets & Scrolls',cx_(3),ry(1),cw,mh,()=>openPets('title'),{size:18});
@@ -1979,7 +1984,7 @@ function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)'
  SV.players.forEach((pl,i)=>{const x=40+i*450,y=70,pr=SV.prog[i],sel=SV.sel===i;rr(x,y,430,420,22);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=sel?8:3;ctx.strokeStyle=sel?'#ff5a8a':'#2b2b55';ctx.stroke();
   btn('🗑 Reset',x+430-Math.max(98,MH())-10,y+10,Math.max(98,MH()),Math.max(32,MH()),()=>{if(confirm('Start '+pl.name+' over from scratch? Pets, stars and levels will be erased.'))doResetHero(i);},{size:15,col:'#ffd0d8'});
   stick(x+215,y+160,{col:pl.color,s:2.6,pose:sel?'cheer':'idle',seed:i});
-  btn('✏ '+pl.name,x+40,y+185,350,50,()=>{const n=prompt('Hero name?',pl.name);if(n&&n.trim()){pl.name=n.trim().slice(0,18);save();}},{size:24});
+  btn('✏ '+fullName(pl),x+40,y+185,350,50,()=>{const n=prompt('Hero name? (Stickgirl is added for you)',pl.name);const sn=shortName(n);if(sn){pl.name=sn.slice(0,14);save();}},{size:24});
   txt('Colour',x+60,y+262,18,'#2b2b55','left');SWATCH.forEach((c,k)=>{const sx=x+40+k*43,sy=y+280;ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx+18,sy+18,17,0,7);ctx.fill();ctx.lineWidth=pl.color===c?5:2;ctx.strokeStyle=pl.color===c?'#222':'#fff';ctx.stroke();NUI.push({x:sx,y:sy,w:36,h:36,fn:()=>{pl.color=c;save();}});});
   btn(pl.tier==='age4'?'Age 4: Easy mode 🌱':'Age 7: Standard ⚡',x+40,y+330,350,44,()=>{pl.tier=pl.tier==='age4'?'age7':'age4';save();},{size:20,col:pl.tier==='age4'?'#b8f5b8':'#cde6ff'});
   btn(sel?'★ Playing as '+pl.name.slice(0,10):'Play as this hero',x+40,y+380,350,36,()=>{SV.sel=i;save();},{size:18,col:sel?'#ffe066':'#fff'});
