@@ -2035,11 +2035,12 @@ function rnDrawBoulder(pr,q){const R=RN,C=R.ch,o={z:R.z-rnBG(),_q:q};const r=980
  const h=r*2*p.k;ctx.save();ctx.globalAlpha=.3;rEl(p.x,p.y+r*p.k,h*.48,h*.08,'#000');ctx.globalAlpha=1;ctx.translate(p.x,p.y+dy);ctx.rotate(-C.rot);ctx.drawImage(RART.boulder(),-h/2,-h/2,h,h);ctx.restore();
  if(!C.end&&T%30<20)txt('⚠️',p.x,p.y-h*.62,30,'#fff','center');}
 function rnDrawObj(o,pr,spr,rev){const R=RN,t=o.t;
- if(t==='hint'||t==='chase'||t==='chend'||t==='caveout'||t==='end')return;
+ if(t==='hint'||t==='chase'||t==='chend'||t==='caveout')return;
+ if(t==='end'){const p=pr(o,0,0);if(!p)return;const w=R.rw*3.4*p.k,h=w*420/640;ctx.drawImage(RART.temple(),p.x-w/2,p.y-h,w,h);return;}
  if(t==='fruit'){if(o.got)return;const p=pr(o,rnLX(o.lane),o.y);if(!p)return;o.sx=p.x;o.sy=p.y;const h=150*p.k*(1+Math.sin(T/8+o.id2)*.06);spr(RART.mango(),p.x,p.y+h/2,h);return;}
  if(t==='crate'){if(o.br&&!o.fly)return;const p=pr(o,rnLX(o.lane),0);if(!p)return;o.sx=p.x;o.sy=p.y-150*p.k;const h=300*p.k;
   if(o.fly){const f=o.fly;ctx.save();ctx.translate(p.x+f*f*.9*(o.lane===0?-1:1),p.y-h/2-f*14);ctx.rotate(f*.4);ctx.drawImage(RART.crate('t'),-h/2,-h/2,h,h);ctx.restore();return;}
-  const sq=o.kind==='b'&&o.bn?1:0;spr(RART.crate(o.kind),p.x,p.y,h*(o.cd&&T%10<5?1.08:1));if(o.cd)txt(String(Math.ceil(o.cd/30)),p.x,p.y-h-18*p.k*10,Math.max(16,h*.45),'#ffe066','center','#c41e10');return;}
+  const sq=o.kind==='b'&&o.bn?1:0;spr(RART.crate(o.kind),p.x,p.y,h*(o.cd&&T%10<5?1.08:1));if(o.cd)txt(String(Math.ceil(o.cd/20)),p.x,p.y-h-18*p.k*10,Math.max(16,h*.45),'#ffe066','center','#c41e10');return;}
  if(t==='log'){for(let l=0;l<3;l++)if(o.m>>l&1){const p=pr(o,rnLX(l),0);if(!p)continue;const w=R.lw*1.0*p.k,h=w*90/320;ctx.drawImage(RART.log(),p.x-w/2,p.y-h,w,h);}return;}
  if(t==='branch'){const ls=[0,1,2].filter(l=>o.m>>l&1),a=ls[0],b=ls[ls.length-1],pa=pr(o,rnLX(a)-R.lw*.55,330),pb=pr(o,rnLX(b)+R.lw*.55,330);if(!pa||!pb)return;const h=(pb.x-pa.x)*150/512*1.1,x0=Math.min(pa.x,pb.x),w=Math.abs(pb.x-pa.x);
   const pp=pr(o,(rnLX(a)+rnLX(b))/2,0),post=pp?pp.y:pa.y;ctx.fillStyle='#6b4220';for(const pq of[pa,pb]){ctx.fillRect(pq.x-6*pq.k*20,pq.y-h*.2,12*pq.k*20,post-pq.y+h*.2);}ctx.drawImage(RART.branch(),x0,pa.y-h*.55,w,h);return;}
