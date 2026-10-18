@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="sg-build" content="v8-qa7-2026-10-13">
+<meta name="sg-build" content="v8-qa8-2026-10-18">
 <title>Stick Girl: Colour Quest</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#4cc3ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -87,7 +87,17 @@ const QB={
    Q('10c + 10c + 5c = ?','25c',['20c','30c','15c'],'10 + 10 = 20, then 5 more.'),
    Q('The short hand is on 3 and the long hand is on 12. What time is it?','3 o\'clock',['12 o\'clock','half past 3','half past 12'],'The long hand on 12 means o\'clock.'),
    Q('The long hand is on 6. It is ___ past 7.','half',['quarter','ten','o\'clock'],'The long hand on 6 means half past.'),
-   Q('Half of 10 is...','5',['2','4','20'],'Share 10 into 2 equal groups.')
+   Q('Half of 10 is...','5',['2','4','20'],'Share 10 into 2 equal groups.'),
+   Q('34 + 25 = ?','59',['58','69','49'],'Tens: 30 + 20 = 50. Ones: 4 + 5 = 9.'),
+   Q('42 + 36 = ?','78',['77','68','88'],'Add the tens, then the ones.'),
+   Q('67 − 23 = ?','44',['45','34','54'],'Tens: 60 − 20 = 40. Ones: 7 − 3 = 4.'),
+   Q('85 − 41 = ?','44',['46','34','54'],'Take away the tens, then the ones.'),
+   Q('Half of 30 is...','15',['10','20','13'],'Half of 20 is 10, half of 10 is 5.'),
+   Q('What is 100 − 10?','90',['80','91','99'],'Take away one ten.'),
+   Q('Sam has 23 cards and gets 14 more. How many cards?','37',['36','47','27'],'23 + 14: add the tens, then the ones.'),
+   Q('There are 48 birds and 25 fly away. How many are left?','23',['22','33','24'],'Tens: 40 − 20. Ones: 8 − 5.'),
+   Q('The long hand is on 3. It is ___ past 4.','quarter',['half','ten','three'],'The long hand on 3 means 15 minutes past.'),
+   Q('How many days are in one week?','7',['5','10','12'],'Monday to Sunday.')
   ],
   reading:[
    Q('Which word is spelled correctly?','friend',['freind','frend','frind'],'Your friend is there until the END.'),
@@ -104,20 +114,86 @@ const QB={
    Q('Which word is a naming word (noun)?','castle',['quickly','jump','bright'],'You can draw a picture of it.')
   ],
   science:[
-   Q('Which animal is a mammal?','Dolphin',['Shark','Frog','Eagle'],'Mammals breathe air and feed milk to their babies.'),
-   Q('What do plants need to make their food?','Sunlight',['Candy','Darkness','Plastic'],'Plants face the sky for a reason.'),
-   Q('Which one gives us light in the day?','The Sun',['The Moon','A star at night','A cloud'],'It is very hot and bright.'),
-   Q('What do you often see after rain and sun together?','Rainbow',['Volcano','Snowman','Meteor'],'It has seven colours.'),
-   Q('Thunder is the sound of...','Lightning',['Wind','Snow','Fog'],'You see the flash first!'),
-   Q('Which part of a plant drinks water from the soil?','Roots',['Petals','Leaves','Fruit'],'They grow underground.'),
-   Q('The Moon travels around the...','Earth',['Sun','Mars','Clouds'],'It is our home planet.'),
-   Q('What do we call the big star in our sky in the daytime?','The Sun',['The Moon','The Earth','A cloud'],'It gives us daylight.'),
-   Q('How many legs does an insect have?','6',['4','8','10'],'Ants, bees and beetles all have the same number.'),
-   Q('A baby frog is called a...','tadpole',['puppy','chick','cub'],'It has a tail and lives in water.'),
-   Q('Which animal is the tallest in the world?','Giraffe',['Elephant','Camel','Horse'],'Long neck!'),
-   Q('Which gas do we breathe in to stay alive?','Oxygen',['Helium','Smoke','Steam'],'Plants make it for us.'),
-   Q('Bees help flowers by carrying...','pollen',['sand','snow','honey'],'It is a yellow dust.'),
-   Q('Ice is frozen...','water',['milk','sand','air'],'It melts back into the same thing.')
+   Q('Which animal is a mammal?','Bat',['Penguin','Crocodile','Salmon'],'Mammals have fur or hair and feed their babies milk.'),
+   Q('Which one is NOT an insect?','Spider',['Ant','Beetle','Butterfly'],'Insects have 6 legs. Count this one\'s legs!'),
+   Q('A caterpillar makes a chrysalis and comes out as a...','butterfly',['ladybird','dragonfly','grasshopper'],'It has big colourful wings.'),
+   Q('Which part of a plant makes the seeds?','Flower',['Root','Stem','Leaf'],'Bees visit this part.'),
+   Q('Leaves take in which gas to make food?','carbon dioxide',['oxygen','helium','smoke'],'It is the gas we breathe OUT.'),
+   Q('When a puddle dries up in the sun, the water...','evaporates',['freezes','turns to sand','sinks into rock'],'It turns into water vapour and floats into the air.'),
+   Q('Clouds are made of tiny drops of...','water',['smoke','salt','sand'],'They can fall as rain.'),
+   Q('Which one will a magnet pick up?','an iron nail',['a wooden spoon','a plastic cup','a glass marble'],'Magnets pull on some metals.'),
+   Q('What is the closest star to the Earth?','the Sun',['the Moon','Mars','the North Star'],'It is a star we see in the daytime!'),
+   Q('What does a thermometer measure?','temperature',['rain','wind speed','weight'],'How hot or cold it is.'),
+   Q('Sounds are made when things...','vibrate',['freeze','glow','melt'],'Touch your throat while you hum.'),
+   Q('A shadow forms when something blocks...','light',['sound','wind','water'],'Stand in the sunshine and look behind you.'),
+   Q('Which one is a living thing?','a mushroom',['a rock','a cloud','a river'],'It grows and needs food and water.'),
+   Q('Dandelion seeds are mostly spread by...','the wind',['bees','worms','fish'],'Blow on a dandelion clock and see!'),
+   Q('Frogs are amphibians. Amphibians can live...','on land and in water',['only in trees','only in deserts','only in the sky'],'Tadpoles swim, grown-up frogs hop.'),
+   Q('Animals that eat only plants are called...','herbivores',['carnivores','omnivores','predators'],'Cows and koalas are like this.'),
+   Q('Which force pulls things down to the ground?','gravity',['magnetism','friction','electricity'],'Drop a ball and watch!'),
+   Q('Rubbing your hands together makes them warm because of...','friction',['gravity','magnetism','sunlight'],'Rubbing surfaces push against each other.'),
+   Q('Which animal is a reptile?','Turtle',['Frog','Salamander','Eel'],'Reptiles have dry, scaly skin.'),
+   Q('Which bird cannot fly?','Emu',['Eagle','Parrot','Swan'],'It is a very tall Australian bird that runs fast.'),
+   Q('A plant\'s stem carries ___ up to the leaves.','water',['sunlight','sand','seeds'],'The roots drink it from the soil.'),
+   Q('Which is the hardest natural material?','diamond',['gold','iron','glass'],'It is a sparkly gem.'),
+   Q('Which gas do we breathe in to stay alive?','Oxygen',['Helium','Carbon dioxide','Steam'],'Plants and trees give it to us.'),
+   Q('Bees help flowers make seeds by carrying...','pollen',['sand','water','honey'],'It is a yellow dust.'),
+   Q('A baby frog is called a...','tadpole',['cub','chick','fry'],'It has a tail and lives in water.'),
+   Q('How many legs does an insect have?','6',['4','8','10'],'Ants, bees and beetles all have the same number.')
+  ],
+  world:[
+   Q('What is the biggest animal that has ever lived?','blue whale',['African elephant','great white shark','T. rex'],'It lives in the ocean and is even bigger than any dinosaur.'),
+   Q('Which Australian animal is a mammal that lays eggs?','platypus',['koala','wombat','kangaroo'],'It has a bill like a duck.'),
+   Q('Which animal carries its baby in a pouch?','kangaroo',['emu','dingo','kookaburra'],'Its baby is called a joey.'),
+   Q('How many legs does a spider have?','8',['6','10','4'],'Spiders are not insects.'),
+   Q('How many arms does an octopus have?','8',['6','10','12'],'Octo means eight.'),
+   Q('What do bees make from flower nectar?','honey',['jam','syrup','butter'],'It is sweet and golden.'),
+   Q('What is the fastest animal on land?','cheetah',['lion','horse','kangaroo'],'It is a big spotty cat.'),
+   Q('A group of lions is called a...','pride',['pack','herd','flock'],'A pack is for wolves.'),
+   Q('Butterflies taste their food with their...','feet',['wings','eyes','antennae'],'They stand on a flower to taste it!'),
+   Q('Which planet is called the Red Planet?','Mars',['Venus','Jupiter','Saturn'],'Its rusty red dust makes it look red.'),
+   Q('Which is the biggest planet in our Solar System?','Jupiter',['Saturn','Earth','Neptune'],'It has a giant red storm spot.'),
+   Q('Which planet has big, bright rings you can see in a telescope?','Saturn',['Mars','Mercury','Venus'],'Its rings are made of ice and rock.'),
+   Q('How many planets travel around our Sun?','8',['7','9','10'],'Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.'),
+   Q('Which planet is closest to the Sun?','Mercury',['Venus','Earth','Mars'],'It is the smallest planet too.'),
+   Q('Who was the first person to walk on the Moon?','Neil Armstrong',['Buzz Aldrin','Yuri Gagarin','Captain Cook'],'He stepped out first in 1969. Buzz came next!'),
+   Q('The Earth spins around once every...','day',['week','month','year'],'That is why we have day and night.'),
+   Q('The Earth travels all the way around the Sun once every...','year',['day','week','month'],'That is why you have a birthday once each one.'),
+   Q('Which is the biggest ocean on Earth?','Pacific',['Atlantic','Indian','Arctic'],'It touches Australia\'s east coast.'),
+   Q('Coral reefs are built by tiny...','animals',['plants','shells','stones'],'Corals are alive and related to jellyfish.'),
+   Q('The Great Barrier Reef is off the coast of...','Queensland',['Victoria','Tasmania','South Australia'],'It is up in the warm north-east of Australia.'),
+   Q('Which sea creature has no bones at all?','jellyfish',['dolphin','turtle','seal'],'It is soft and wobbly.'),
+   Q('Whales breathe air through a...','blowhole',['gill','fin','tail'],'It is on top of their head.'),
+   Q('Most of the Earth\'s surface is covered by...','water',['land','ice','sand'],'Look at a globe: lots of blue!'),
+   Q('Which part of your body pumps blood?','heart',['lungs','stomach','brain'],'You can feel it beating in your chest.'),
+   Q('Your lungs help you to...','breathe',['see','hear','taste'],'Take a big deep breath in!'),
+   Q('How many baby teeth do children usually have?','20',['10','32','50'],'Grown-ups get up to 32 adult teeth.'),
+   Q('All the bones in your body together are your...','skeleton',['muscles','skin','veins'],'It holds you up.'),
+   Q('Which part of your body does your thinking?','brain',['heart','stomach','lungs'],'It is inside your head.'),
+   Q('What is the biggest organ of your body?','skin',['heart','liver','brain'],'It covers you all over!'),
+   Q('Your heart is a special kind of...','muscle',['bone','lung','tooth'],'It squeezes all day and night.'),
+   Q('What is the capital city of Australia?','Canberra',['Sydney','Melbourne','Brisbane'],'It is where Parliament House is.'),
+   Q('Which is the biggest continent?','Asia',['Africa','Australia','Europe'],'China and India are on it.'),
+   Q('How many continents are there?','7',['5','6','8'],'Africa, Antarctica, Asia, Australia, Europe, North and South America.'),
+   Q('What is the tallest mountain on Earth?','Mount Everest',['Mount Kosciuszko','Uluru','Mount Fuji'],'It is in the Himalayas.'),
+   Q('Uluru, the giant red rock, is in the...','Northern Territory',['Queensland','Western Australia','New South Wales'],'It is right in the middle of Australia.'),
+   Q('Where do most wild penguins live?','the far south',['the North Pole','the Sahara Desert','Greenland'],'Lots live near Antarctica.'),
+   Q('The Sahara is a huge...','desert',['forest','ocean','mountain'],'It is hot, dry and sandy.'),
+   Q('Balls of ice that fall from storm clouds are called...','hail',['fog','dew','mist'],'They can bounce on the ground!'),
+   Q('Which tool shows which way the wind is blowing?','weather vane',['thermometer','rain gauge','telescope'],'It often has an arrow or a rooster on top.'),
+   Q('A huge spinning storm from the ocean near northern Australia is called a...','cyclone',['blizzard','drought','heatwave'],'It brings very strong winds and heavy rain.'),
+   Q('When there is no rain for a very long time, it is called a...','drought',['flood','tide','frost'],'Farms get very dry.'),
+   Q('Which season comes after winter?','spring',['summer','autumn','monsoon'],'Flowers start to bloom.'),
+   Q('In Australia, which month is in summer?','January',['July','June','August'],'Think of Christmas and beach holidays.'),
+   Q('Fog is really a cloud that is...','close to the ground',['made of smoke','very hot','made of sand'],'You can walk right through it.'),
+   Q('Dinosaurs lived...','long before people',['with the knights','100 years ago','when Grandma was a kid'],'They lived millions of years ago.'),
+   Q('Before cars, many people travelled long distances by...','horse',['rocket','scooter','plane'],'Think of carriages and coaches.'),
+   Q('The first people to live in Australia were...','First Nations peoples',['the Vikings','the Romans','pirates'],'Aboriginal and Torres Strait Islander peoples have lived here for more than 60,000 years.'),
+   Q('Long ago, people wrote with a feather pen called a...','quill',['crayon','biro','marker'],'They dipped it in ink.'),
+   Q('Which was invented first?','the bicycle',['the aeroplane','the mobile phone','the computer'],'It has pedals and two wheels.'),
+   Q('The Pyramids of Giza are in which country?','Egypt',['Mexico','China','Greece'],'Near the River Nile.'),
+   Q('Before electric lights, people lit their homes with...','candles and oil lamps',['battery torches','glow sticks','TV screens'],'They had real flames.'),
+   Q('Knights in castles wore metal suits called...','armour',['wetsuits','space suits','ski suits'],'It clanked when they walked.')
   ],
   volcano:[
    Q('Hot melted rock deep inside the Earth is called...','magma',['sand','snow','smoke'],'When it comes OUT of a volcano we call it lava.'),
@@ -245,7 +321,7 @@ function drawPQ(q,rem,fn,y0,bh){bh=bh||168;drawPic(q.pic,480,y0-92,1.05);if(q.q)
  const n=q.opts.length,bw=n>=4?186:224,gap=18,x0=480-(n*bw+(n-1)*gap)/2;
  for(let i=0;i<n;i++){const x=x0+i*(bw+gap),rm=rem.includes(i),hl=QHL===i;btn('',x,y0,bw,bh,()=>fn(i),{dis:rm,col:rm?'#ddd':hl?'#fff4a8':'#fff',line:hl?'#ff9a1f':'#2b2b55',lw:hl?8:0,draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.25:1;drawPic(q.opts[i],X+W/2,Y+H/2-4,bh<140?.8:1.1);ctx.globalAlpha=1;}});}}
 /* which question categories each gate type draws from */
-const GATE={age7:{maths:['maths'],reading:['reading'],science:['science'],mixed:['maths','reading','science'],volcano:['volcano'],vmixed:['maths','volcano','reading']},
+const GATE={age7:{maths:['maths'],reading:['reading'],science:['science','world'],mixed:['maths','world','reading','science'],volcano:['volcano','world'],vmixed:['maths','volcano','world']},
  age4:{maths:['counting','sums'],reading:['letters','colours','words'],science:['animals','shapes'],mixed:['counting','letters','animals','colours'],volcano:['volcano','counting'],vmixed:['volcano','words','sums']}};
 const GATENAME={maths:'Number Gate',reading:'Word Gate',science:'Science Gate',mixed:'Mixed-Up Gate',volcano:'Volcano Gate',vmixed:'Lava Mix Gate'};
 const GATEIC={maths:'🔢',reading:'🔤',science:'🔬',mixed:'🌀',volcano:'🌋',vmixed:'🔥',might:'🥋'};
@@ -491,7 +567,7 @@ function enterCave(pi){if(CAVE||mode!=='play'||LV.cave)return;const main=LV,E=ea
  if(v){FLp(330,335,130);FLp(540,270,130);FLp(760,210,150);FLp(1000,300,130);for(let i=0;i<4;i++)ST(350+i*30,297);for(let i=0;i<4;i++)ST(560+i*30,232);GM(830,172,'#ff6bd6');GM(1060,262,'#5ff');for(let i=0;i<8;i++)ST(120+i*26,400);for(let i=0;i<6;i++)ST(1120+i*34,400);if(!got)L.bigItems.push({id:pi.id,x:835,y:135});L.route=[[395,335],[605,270],[835,210]];}
  else{FLp(300,335,120);FLp(500,270,200);FLp(780,325,120);FLp(960,260,200);for(let i=0;i<6;i++)ST(520+i*30,240+lo);for(let i=0;i<6;i++)ST(980+i*30,222);GM(330,297,'#5ff');GM(810,287,'#ffe14d');GM(600,400,'#ff6bd6');for(let i=0;i<10;i++)ST(140+i*26,400);if(!got)L.bigItems.push({id:pi.id,x:1060,y:170});L.route=[[360,335],[600,270],[840,325],[1060,260]];}
  CAVE={main,pi};LV=L;keys.down=false;const p=P;p.x=110;p.y=60;p.vx=0;p.vy=2;p.onGround=false;p.atk=null;p.grab=null;cam.x=0;parts=[];if(typeof SF==='object'){SF.x=80;SF.y=380;}
- sfx('spring');toast(got?'🕳️ Back in the secret cave!':'🕳️ A secret cave! Find the Big Star 🌟',160);say(got?'The secret cave!':'Whee! A secret cave! Find the Big Star, then walk into the pipe.',{again:true});}
+ sfx('spring');toasts=[];floatText(got?'🕳️ Secret cave!':'🕳️ Secret cave! Find the 🌟',170,250,'#ffe066');say(got?'The secret cave!':'Whee! A secret cave! Find the Big Star, then walk into the pipe.',{again:true});}
 function leaveCave(){const C=CAVE;if(!C)return;CAVE=null;keys.down=false;LV=C.main;const p=P;p.x=C.pi.out-10;p.y=440-58;p.vy=-11;p.vx=1.5;p.onGround=false;p.inv=60;p.face=1;cam.x=clamp(p.x-420,0,LV.W-VW);parts=[];if(typeof SF==='object'){SF.x=p.x-60;SF.y=380;}sfx('spring');addParts(p.x+10,440,16,'#9be8a9',{sp:1.4});}
 function drawCaveBG(){const lv=LV.theme==='lava';ctx.save();ctx.fillStyle=texPat(lv?'cave2':'cave1');ctx.translate(-((cam.x*.5)%160),0);ctx.fillRect(0,0,VW+160,VH);ctx.restore();ctx.fillStyle='rgba(0,0,12,.6)';ctx.fillRect(0,0,VW,VH);
  ctx.save();ctx.translate(-Math.round(cam.x),0);ctx.fillStyle=lv?'#3a2622':'#2c2436';for(let x=40;x<1500;x+=70){const h=26+((x*37)%40);ctx.beginPath();ctx.moveTo(x-18,0);ctx.lineTo(x+18,0);ctx.lineTo(x,h);ctx.fill();}
@@ -536,7 +612,7 @@ function btn(label,x,y,w,h,fn,o){o=o||{};const hov=mouse.x>=x&&mouse.x<=x+w&&mou
  let col=o.dis?'#b8b8c4':(o.col||(hov?'#ffe066':BPAL[(label&&label.length?(label.charCodeAt(0)+label.length):0)%BPAL.length]));if(pr)col=o.col?shade(col,.85):'#ffd23f';
  const sp=btnSprite(Math.round(w),Math.round(h),col,o.line||'#2b2b55',!!pr),oy=pr?3:0;
  ctx.save();ctx.drawImage(sp,x-3,y-3,sp.width/2,sp.height/2);
- if(o.lw){rr(x,y+oy,w,h,Math.min(18,h/2.6));ctx.lineWidth=o.lw;ctx.strokeStyle=o.line||'#2b2b55';ctx.stroke();}if(o.draw){ctx.translate(0,oy);o.draw(x,y,w,h);}else txt(label,x+w/2,y+h/2+1+oy,o.size||24,o.tc||'#2b2b55');ctx.restore();
+ if(o.lw){rr(x,y+oy,w,h,Math.min(18,h/2.6));ctx.lineWidth=o.lw;ctx.strokeStyle=o.line||'#2b2b55';ctx.stroke();}if(o.draw){ctx.translate(0,oy);o.draw(x,y,w,h);}else{let fs=o.size||24;if(label){ctx.font=F(fs);const tw=ctx.measureText(label).width,mw=w-18;if(tw>mw)fs=Math.max(11,Math.floor(fs*mw/tw));}txt(label,x+w/2,y+h/2+1+oy,fs,o.tc||'#2b2b55');}ctx.restore();
  if(o.hit||BTNHIT){const M=Math.ceil(44/CSS_S)+1,hw=Math.max(w,M),hh=Math.max(h,M),hx=clamp(x-(hw-w)/2,0,VW-hw),hy=clamp(y-(hh-h)/2,0,VH-hh);NUI.push({x:hx,y:hy,w:hw,h:hh,fn,dis:o.dis,vis:{x,y,w,h},label});}else NUI.push({x,y,w,h,fn,dis:o.dis,label});}
 /* ---- pictures for non-reader questions (age 4): numbers with dots, shapes, colour splats, letters, emoji ---- */
 const COLHEX={red:'#e8262b',orange:'#ff8a1f',yellow:'#ffd417',green:'#2fb84b',blue:'#2a7fe8',purple:'#9a4ee0',pink:'#ff6fb5',brown:'#8a5a2b'};
@@ -1625,7 +1701,7 @@ function drawLavaBG(parx){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorS
  ctx.fillStyle=Hc(15,35,24);ctx.beginPath();ctx.moveTo(0,VH);for(let x=0;x<=VW;x+=20)ctx.lineTo(x,410+Math.sin((x+parx*.55)/80+2)*24);ctx.lineTo(VW,VH);ctx.fill();
  for(let i=0;i<26;i++){const x=((i*97+T*.6-parx*.2)%VW+VW)%VW,y=VH-((i*53+T*(1+i%3))%VH);ctx.fillStyle=i%2?Hc(30,100,60,.8):Hc(48,100,65,.7);ctx.fillRect(x,y,3,3);}
  if(sat<.7){ctx.fillStyle=`rgba(60,40,50,${(.7-sat)*.4})`;ctx.fillRect(0,0,VW,VH);}}
-function drawBGscene(parx){if(THEME==='lava'&&mode!=='title'&&mode!=='select'){drawLavaBG(parx);return;}const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,Hc(205,85,62));g.addColorStop(1,Hc(190,75,90));ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
+function drawBGscene(parx){if(THEME==='lava'&&mode!=='title'&&mode!=='select'&&mode!=='levels'){drawLavaBG(parx);return;}const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,Hc(205,85,62));g.addColorStop(1,Hc(190,75,90));ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
  ctx.fillStyle=Hc(48,100,62);ctx.beginPath();ctx.arc(800,90,36,0,7);ctx.fill();
  for(let i=0;i<6;i++){const x=(((i*270-parx*.15)%1620)+1620)%1620-160;cloud(x,60+(i%3)*45,1.1,Hc(210,25,96-(1-sat)*38));}
  ctx.fillStyle=Hc(150,45,72);ctx.beginPath();ctx.moveTo(0,VH);for(let x=0;x<=VW;x+=20)ctx.lineTo(x,350+Math.sin((x+parx*.3)/130)*38);ctx.lineTo(VW,VH);ctx.fill();
@@ -2058,6 +2134,26 @@ function resetRunState(){const p=LP();p.rooms={};p.rescued=[];p.rbon=[];p.cp=0;p
 function resetRun(){resetRunState();save();startPlay();}
 
 /* ================= TITLE / SELECT / PAUSE ================= */
+/* ===== LEVEL SELECT: one card per entry in LEVELS. To add a level: add an entry here (soon:false), its builder in buildLevel, its LP() progress slot. ===== */
+const LEVELS=[{n:1,name:'Colour Meadow',ic:'🌈',sky:['#8fd3ff','#d8f5ff'],gr:'#5cc85c'},{n:2,name:'Ember Mountain',ic:'🌋',sky:['#5a2a2a','#ff9a5a'],gr:'#3a2a26'},{n:3,name:'Jungle Temple',ic:'🛕',sky:['#2f7a4a','#bff0b0'],gr:'#6a5a3a',soon:true}];
+const lvProg=(pr,n)=>n===1?pr:n===2?pr.l2:pr['l'+n],lvBigs=(pr,n)=>{const l=lvProg(pr,n);return l&&l.bigs?l.bigs.length:0;},lvDone=(pr,n)=>{const l=lvProg(pr,n);return !!(l&&l.boss);};
+const lvOpen=(pr,n)=>{const L=LEVELS.find(l=>l.n===n);return !!L&&!L.soon&&(n===1||(pr.unl||1)>=n);};
+let LSM=null;
+function lvTap(L){const pr=PR();if(!lvOpen(pr,L.n)){sfx('bad');const prev=LEVELS.find(l=>l.n===L.n-1);const m=L.soon?'Level '+L.n+', '+L.name+', is locked. It is coming soon!':'Level '+L.n+' is locked. Finish '+(prev?prev.name:'the level before')+' first!';LSM={t:180,s:'🔒 '+m};say(m,{again:true,force:easy()});return;}
+ pr.lv=L.n;save();sfx('tick');say('Level '+L.n+', '+L.name+'!',{again:true});titleGo();}
+function drawLevels(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,VW,VH);const pr=PR(),cur=curLv(),mh=MH();
+ txt('Choose a Level · '+PL().name,480,40,34,'#e0409a','center','#fff');btn('◀ Back',16,12,Math.max(120,mh*2),mh,()=>{mode='title';sfx('tick');},{size:18});
+ const n=LEVELS.length,cw=270,gap=30,x0=480-(n*cw+(n-1)*gap)/2,y=86,ch=Math.min(330,VH-y-(LSM&&LSM.t>0?70:20));
+ LEVELS.forEach((L,i)=>{const x=x0+i*(cw+gap),open=lvOpen(pr,L.n),done=lvDone(pr,L.n),here=open&&L.n===cur;
+  btn('',x,y,cw,ch,()=>lvTap(L),{col:open?(here?'#fff4a8':'#fff'):'#d8d8e0',line:here?'#ff9a1f':'#2b2b55',lw:here?8:0,draw:(X,Y,W,H)=>{
+   ctx.save();rr(X+12,Y+12,W-24,H*.5,14);ctx.clip();const g=ctx.createLinearGradient(0,Y,0,Y+H*.5);g.addColorStop(0,L.sky[0]);g.addColorStop(1,L.sky[1]);ctx.fillStyle=g;ctx.fillRect(X,Y,W,H);ctx.fillStyle=L.gr;ctx.fillRect(X,Y+12+H*.5-30,W,30);
+   if(L.n===3){ctx.fillStyle='#8a7a5a';for(let k=0;k<4;k++)ctx.fillRect(X+W/2-60+k*10,Y+H*.5-30-k*18,120-k*20,18);ctx.fillStyle='#2f7a4a';for(let k=0;k<5;k++){ctx.beginPath();ctx.arc(X+20+k*55,Y+30,22,0,7);ctx.fill();}}
+   txt(L.ic,X+W/2,Y+12+H*.25,64);ctx.restore();if(!open){ctx.fillStyle='rgba(40,40,60,.45)';rr(X+12,Y+12,W-24,H*.5,14);ctx.fill();txt('🔒',X+W/2,Y+12+H*.25,58);}
+   txt(L.n+'. '+L.name,X+W/2,Y+H*.5+40,22,'#2b2b55');
+   ctx.globalAlpha=open?1:.5;for(let k=0;k<3;k++)starShape(X+W/2-44+k*44,Y+H*.5+84,15,k<lvBigs(pr,L.n)?'#ffd23f':'#d8d8e0',0);ctx.globalAlpha=1;
+   txt('Big Stars '+lvBigs(pr,L.n)+'/3',X+W/2,Y+H*.5+116,16,'#7a4a00');
+   txt(!open?(L.soon?'🔒 Coming soon':'🔒 Locked'):done?'✔ Done · tap to replay':here?'▶ Play':'▶ Play',X+W/2,Y+H-28,18,!open?'#666':done?'#2b7a2b':'#c0306a');}});});
+ if(LSM&&LSM.t>0){LSM.t--;rr(120,VH-64,720,52,16);ctx.fillStyle='#fff3b0';ctx.fill();wrap(LSM.s,480,VH-38,690,20,18,'#7a4a00');}}
 let NG=null;const hasSave=pr=>!!(pr&&(pr.intro||(pr.unl||1)>=2||pr.stars>0||pr.lvl>1||Object.keys(pr.pets||{}).length));
 function askNew(i,from){NG={i,from,t:0};sfx('tick');const pl=SV.players[i];say('Start a new game for '+pl.name+'? All stars, pets and levels for '+pl.name+' go away. Tap the green tick for yes, or the red cross for no.',{again:true,force:pl.tier==='age4'});}
 function drawNG(){const i=NG.i,pl=SV.players[i],pr=SV.prog[i];NG.t++;ctx.fillStyle='rgba(20,20,60,.55)';ctx.fillRect(0,0,VW,VH);
@@ -2076,10 +2172,9 @@ function drawTitle(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3b
  const go=titleGo;
  const mh=MH(),g=6,y1=176,cw=196,cx_=i=>80+i*204,ry=i=>y1+i*(mh+g),ty=Math.min(512,ry(4)+14);
  if(NG){drawNG();return;}
- if(hasSave(pr)){btn('▶ Continue '+PL().name+' · Lv '+pr.lvl+' · '+(lv===2?'🌋 2':'🌈 1'),80,ry(0),600,mh,go,{size:24,col:'#ffe066'});btn('🆕 New Game',692,ry(0),188,mh,()=>askNew(SV.sel,'title'),{size:20,col:'#ffd0d8'});}
+ if(hasSave(pr)){btn('▶ Continue '+PL().name+' · Lv '+pr.lvl+' · '+(lv===2?'🌋 2':'🌈 1'),80,ry(0),600,mh,()=>{LSM=null;mode='levels';sfx('tick');},{size:24,col:'#ffe066'});btn('🆕 New Game',692,ry(0),188,mh,()=>askNew(SV.sel,'title'),{size:20,col:'#ffd0d8'});}
  else btn('▶  New Game: '+fullName(),180,ry(0),600,mh,go,{size:27,col:'#ffe066'});
- btn('🌈 1 Meadow',cx_(0),ry(1),cw,mh,()=>{pr.lv=1;save();sfx('tick');say('Level 1, Colour Meadow');},{size:18,col:lv===1?'#bff5c4':'#fff'});
- btn(un?'🌋 2 Ember':'🔒 2 Ember',cx_(1),ry(1),cw,mh,()=>{if(!un){sfx('bad');say(easy()?'Finish level 1 first!':'Beat Level 1 to unlock Ember Mountain!',{again:true});return;}pr.lv=2;save();sfx('tick');say('Level 2, Ember Mountain');},{size:18,col:!un?'#ccc':lv===2?'#ffc39b':'#fff'});
+ btn('🗺 Levels  '+LEVELS.map(L=>lvOpen(pr,L.n)?L.ic:'🔒').join(' '),cx_(0),ry(1),cw*2+8,mh,()=>{LSM=null;mode='levels';sfx('tick');say(easy()?'Pick a level!':'Choose a level',{again:true});},{size:19,col:'#bff5c4'});
  btn('Choose Heroes',cx_(2),ry(1),cw,mh,()=>{mode='select';},{size:18});btn('🐾 Pets & Scrolls',cx_(3),ry(1),cw,mh,()=>openPets('title'),{size:18});
  btn('New run',cx_(0),ry(2),cw,mh,()=>{const l=LP();if(l.cp||l.gates.length)resetRun();else startPlay();},{size:18});btn(SV.mute?'🔇 Sound off':'🔊 Sound on',cx_(1),ry(2),cw,mh,toggleMute,{size:18});
  btn('✨ Idol: '+(SV.idol?'ON':'off'),cx_(2),ry(2),cw,mh,toggleIdol,{size:16,col:SV.idol?'#ff9bf0':'#fff'});btn('🗣 Read aloud: '+(ttsOn()?'ON':'off'),cx_(3),ry(2),cw,mh,toggleTTS,{size:15,col:ttsOn()?'#d8f6ff':'#fff'});
@@ -2124,7 +2219,7 @@ function drawPause(){drawWorld();drawHUD();BTNHIT=true;panel(110,28,740,486,'#2b
 
 /* ================= MAIN LOOP ================= */
 function update(){switch(mode){case 'play':updPlay();break;case 'quiz':updQuiz();break;case 'feed':updFeed();break;case 'pets':updPets();break;case 'boards':updBoards();break;case 'duel':updDuel();break;case 'catch':updCatch();break;case 'story':updStory();break;case 'dogtalk':updDogTalk();break;case 'rq':updRQ();break;case 'sea':updSea();break;case 'space':updSpace();break;
- case 'pause':if(tap('pause')){if(pmoves)pmoves=false;else mode='play';}break;case 'scroll':if(tap('interact'))mode='play';break;case 'title':T++;if(tap('interact')){const b=UI.find(u=>u.w===360);b&&b.fn();}if(tap('mute'))toggleMute();break;case 'select':T++;if(tap('pause'))mode='title';break;case 'end':T++;break;}
+ case 'pause':if(tap('pause')){if(pmoves)pmoves=false;else mode='play';}break;case 'scroll':if(tap('interact'))mode='play';break;case 'title':T++;if(tap('interact')){const b=UI.find(u=>u.w===360);b&&b.fn();}if(tap('mute'))toggleMute();break;case 'select':T++;if(tap('pause'))mode='title';break;case 'levels':T++;if(tap('pause'))mode='title';break;case 'end':T++;break;}
  if(tap('mute')&&mode!=='play')toggleMute();}
 const bSl=document.getElementById('bS'),bEl=document.getElementById('bE'),bDl=document.getElementById('bD'),bQl=document.getElementById('bQ'),bVl=document.getElementById('bV');
 function tcFrame(){if(!tcEl.classList.contains('on')||tcEl.classList.contains('menu'))return null;tcTop(0,1);let l=0,r=VW;for(const b of tcR){if(b.y>VH*.45){if((b.x0+b.x1)/2<VW/2)l=Math.max(l,b.x1);else r=Math.min(r,b.x0);}}l=clamp(l,0,VW*.3);r=clamp(r,VW*.6,VW);return{l,r};}
@@ -2141,7 +2236,7 @@ function rdy(){tcEl.classList.toggle('sea',mode==='sea');tcEl.classList.toggle('
  bVl.classList.toggle('sh',!!(pl&&(P.ch>=100||fin)));
 }
 function draw(){rdy();NUI=[];BTNHIT=false;ctx.clearRect(0,0,VW,VH);
- switch(mode){case 'play':drawWorld();drawHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'rq':drawRQ();break;case 'sea':drawSea();break;case 'space':drawSpace();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'end':drawEnd();break;}
+ switch(mode){case 'play':drawWorld();drawHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'rq':drawRQ();break;case 'sea':drawSea();break;case 'space':drawSpace();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'levels':drawLevels();break;case 'end':drawEnd();break;}
  UI=NUI;}
 function tick(){update();hit={};digit=-1;draw();}
 let last=0,acc=0;
