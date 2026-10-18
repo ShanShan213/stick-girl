@@ -1856,7 +1856,7 @@ function rnBuild(E){
  s=sec(32,0,500,'stone','grass');hint(s+1,'Low branch! Tap ▼ or swipe down to slide under!');O(s+12,'branch',{m:7});fruit(s+10,5,1,50);if(!E)O(s+25,'branch',{m:7});
  s=sec(26,0,-500);DOOR(s+18,'maths','g1');hint(s+9,'A stone door! Answer the questions to open it.',{});
  mods(E?2:3);
- s=sec(34,0,0,'plank','water');hint(s+1,'Bounce crates ⬆ throw you high. POP crates explode into confetti: jump over them or spin them away!');O(s+8,'crate',{lane:1,kind:'b'});fruit(s+11,8,1,i=>520+Math.sin(i/7*Math.PI)*260);if(!E){O(s+24,'crate',{lane:0,kind:'t'});O(s+24,'crate',{lane:2,kind:'t'});fruit(s+21,6,1,100);}CHK(s+30);
+ s=sec(34,0,0,'plank','water');hint(s+1,'Bounce crates ⬆ throw you high. POP crates explode into confetti: jump over them or spin them away!');O(s+8,'crate',{lane:1,kind:'b'});fruit(s+11,8,1,i=>520+Math.sin(i/7*Math.PI)*260);if(!E){O(s+24,'crate',{lane:0,kind:'t'});O(s+24,'crate',{lane:2,kind:'t'});}else O(s+24,'crate',{lane:0,kind:'t'});fruit(s+21,6,1,100);CHK(s+30);
  CHASE(1);
  mods(E?1:2);
  // secret cave branch (Big Star j1): run into the mossy arch in the RIGHT lane
@@ -1957,7 +1957,7 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
   switch(o.t){
    case 'hint':if(!o.done&&dz<0){o.done=true;rnHint(o.s);}break;
    case 'fruit':if(!o.got&&Math.abs(dz)<120&&rnInL(o.lane)){const top=R.jy+(R.sl?260:620);if(o.y>R.jy-120&&o.y<top+60){o.got=true;rnFruit(1);rnFX(sx||480,sy||300,4,'#ffd23f',{sp:.6});}}break;
-   case 'crate':if(o.chk&&!o.on&&dz<0){o.on=true;const lp=LP();if(o.z-300>(lp.rz||0)){lp.rz=o.z-300;}P.hp=Math.min(P.max,P.hp+1);save();toast('⛳ Checkpoint!',90);sfx('chime');if(!o.br){o.br=true;rnFX(sx||480,sy||300,16);}}
+   case 'crate':if(o.chk&&!o.on&&dz<0){o.on=true;const lp=LP();if(o.z-300>(lp.rz||0)){lp.rz=o.z-300;}save();toast('⛳ Checkpoint!',90);sfx('chime');if(!o.br){o.br=true;rnFX(sx||480,sy||300,16);}}
     if(o.br){if(o.fly)o.fly++;if(o.fly===26){rnFX(sx||480,(sy||300)-80,30);sfx('pop');rnText('POP! 🎉',sx||480,(sy||300)-90,'#fff');}break;}
     if(o.cd)break;
     if(R.sp>6&&dz>0&&dz<720&&rnInL(o.lane)){rnBreak(o,'spin');break;}
@@ -2907,15 +2907,23 @@ function selfTest(){const log=[];try{
   fin();ok_(()=>LP().boss,'L2 boss saved');log.push(tier+' L2 end');
   // Level 3: Jungle Temple, unlocked by finishing Level 2
   ok_(()=>(PR().unl||1)>=3,'L3 unlocked after L2');startPlay(3);ok_(()=>curLv()===3&&LV.theme==='jungle','level 3 start');if(mode==='dogtalk'){for(let i=0;i<30&&mode==='dogtalk';i++){dogTalkAdv();dogTalkAdv();tick();}}
-  for(let i=0;i<2500;i++){if(i%20===0){keys={right:true};if(Math.random()<.4)keys.jump=true;}if(i%7===0)press(pick(ks));if(mode!=='play')break;tick();}
-  for(const g of LV.gates){mode='play';P.x=g.x-50;P.y=380;P.gcool=0;P.vy=0;if(P.vine){P.vine.held=false;P.vine=null;}frames(3);
-   if(mode==='quiz'){for(let k=0;k<8&&mode==='quiz'&&!QZ.done;k++){quizAnswer((QZ.qs[QZ.i].c+1)%QZ.qs[QZ.i].opts.length);quizAnswer(QZ.qs[QZ.i].c);}frames(5);if(mode==='quiz'){QZ.t=999;frames(2);}}
-   else if(mode==='boards'){for(let k=0;k<6&&!BD.done;k++){boardAnswer(BD.q.c);frames(30);}BD.t=999;frames(2);}}
-  mode='play';ok_(()=>LV.gates.every(g=>g.open),'L3 all gates opened');for(const g of LV.gates)if(!g.open){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}
-  for(const po of LV.bonus){mode='play';enterBonus(po);frames(5);SEA.star.got=false;P.x=SEA.star.x;P.y=SEA.star.y-28;frames(3);P.x=SEA.exit.x-10;P.y=SEA.exit.y-28;frames(3);ok_(()=>mode==='play','L3 bonus return '+po.id);}
-  for(const pi of LV.pipes){mode='play';enterCave(pi);const b=LV.bigItems[0];if(b){P.x=b.x-10;P.y=b.y-28;P.vy=0;}frames(3);leaveCave();ok_(()=>mode==='play'&&!LV.cave,'L3 cave return '+pi.id);}
-  {const po=LV.portals.find(q=>q.space);mode='play';roomApplyDone(LV,po.r);po.r.done=true;enterSpace(po);spWin(SPC);leaveSpace();mode='play';}
-  ok_(()=>LP().bigs.length===3&&['j1','j2','j3'].every(b=>LP().bigs.includes(b)),'L3 bigs '+JSON.stringify(LP().bigs));
+  ok_(()=>mode==='run'&&RN&&RN.on,'L3 runner mode');
+  {const HZ=['log','branch','dart','gap','crumb','snake','monkey','crate'],RK=['left','right','jump','down','punch'];
+   const svc=()=>{if(mode==='quiz'){for(let k=0;k<8&&!QZ.done;k++){quizAnswer((QZ.qs[QZ.i].c+1)%QZ.qs[QZ.i].opts.length);quizAnswer(QZ.qs[QZ.i].c);}QZ.t=999;}else if(mode==='feed'){feedAnswer(FD.foods.indexOf(FD.def.food));endFeed();}else if(mode==='scroll'){hit.interact=true;}else if(mode==='dogtalk'){dogTalkAdv();}
+    else if(mode==='sea'){const S=SEA;S.star.got=false;P.x=S.star.x;P.y=S.star.y-28;frames(3);leaveBonus();}else if(mode==='space'){spWin(SPC);leaveSpace();}else if(mode==='pause')mode=PM();};
+   // fuzz: random touches on the runner, hearts topped up
+   for(let i=0;i<2500&&RN&&RN.on;i++){if(i%9===0)press(pick(RK));if(i%9===2)for(const k of RK)rel(k);svc();P.hp=Math.max(P.hp,2);tick();}
+   ok_(()=>RN&&RN.on&&RN.z>1000,'L3 runner fuzz moved '+(RN&&Math.round(RN.z)));
+   const go=(o,lane,back)=>{svc();RN.z=o.z-(back||1500);rnIdx();RN.ch=null;RN.view=1;RN.trans=0;RN.fall=0;RN.lane=lane;RN.px=rnLX(lane);for(const q of RN.obj)if(Math.abs(q.z-o.z)<(back||1500)+800&&HZ.includes(q.t))q.t='_x';};
+   const run=(n,stop)=>{for(let i=0;i<n;i++){svc();tick();if(stop())return true;}return false;};
+   for(const d of RN.obj.filter(o=>o.t==='door')){go(d,1,2600);run(400,()=>mode==='quiz');svc();run(200,()=>RN.z>d.z+200);}
+   ok_(()=>RN.obj.filter(o=>o.t==='door').every(d=>LP().gates.includes(d.id)),'L3 all 4 stone doors opened '+JSON.stringify(LP().gates));
+   {const f=RN.obj.find(o=>o.t==='fork'),bg=RN.obj.find(o=>o.t==='big');go(f,2);run(200,()=>RN.cave);ok_(()=>RN.cave,'L3 cave fork');RN.lane=bg.lane;RN.px=rnLX(bg.lane);for(const q of RN.obj)if(q.z>f.z&&q.z<bg.z+300&&HZ.includes(q.t))q.t='_x';run(900,()=>LP().bigs.includes('j1'));}
+   for(const po of RN.obj.filter(o=>o.t==='portal')){go(po,po.lane);run(200,()=>mode==='sea'||mode==='space');svc();ok_(()=>mode==='run','L3 portal return '+po.kind);}
+   ok_(()=>LP().bigs.length===3&&['j1','j2','j3'].every(b=>LP().bigs.includes(b)),'L3 bigs '+JSON.stringify(LP().bigs));
+   {const c=RN.obj.find(o=>o.t==='chase');go(c,1,300);c.done=false;run(60,()=>!!RN.ch);ok_(()=>!!RN.ch,'L3 boulder chase starts');const h=P.hp;RN.stum=999;run(900,()=>!RN.ch);ok_(()=>RN.z<c.z,'L3 boulder catch -> back to chase start');}
+   {const e=RN.obj.find(o=>o.t==='end');go(e,1,600);run(200,()=>mode==='play');}
+   ok_(()=>mode==='play'&&LP().rdone&&!RN&&LV.lvl===3,'L3 runner finished -> courtyard');}
   LV.enemies=[];if(P.vine){P.vine.held=false;P.vine=null;}LV.boulder&&(LV.boulder.st='done');P.x=LV.bossX+30;P.y=380;frames(3);ok_(()=>mode==='duel','L3 duel');
   for(let i=0;i<4000&&mode==='duel';i++){if(D.ph==='ask')duelAnswer(D.q.c);if(D.ph==='meter'&&D.m&&!D.m.res&&Math.random()<.05)duelStop();tick();if(D.ph==='win'&&D.t>20)D.t=999;}
   fin();ok_(()=>LP().boss&&PR().l3&&PR().l3.boss,'L3 boss saved');log.push(tier+' L3 end');PR().lv=1;const stP=()=>{startPlay();mode='play';for(const g of LV.gates)if(!g.open){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}};
@@ -2937,7 +2945,7 @@ function selfTest(){const log=[];try{
  }
  // B1: checkpoints fire once each, only the furthest counts, no save spam, particles stay bounded, no free healing
  {const sv0=save,ft0=floatText;let nS=0,nF=0;save=()=>{nS++;};floatText=(...a)=>{nF++;return ft0(...a);};try{
-  for(const lv of[1,2,3]){SV.sel=0;SV.players[0].tier='age7';SV.prog[0]=newProg();SV.prog[0].intro=true;SV.prog[0].dog.intro=true;PR().unl=3;PR().lv=lv;if(lv>=2){LP().intro=true;}startPlay(lv);mode='play';LV.enemies=[];LV.geys=[];LV.rockz=[];LV.darts=[];LV.boulder=null;for(const g of LV.gates){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}
+  for(const lv of[1,2]){SV.sel=0;SV.players[0].tier='age7';SV.prog[0]=newProg();SV.prog[0].intro=true;SV.prog[0].dog.intro=true;PR().unl=3;PR().lv=lv;if(lv>=2){LP().intro=true;}startPlay(lv);mode='play';LV.enemies=[];LV.geys=[];LV.rockz=[];LV.darts=[];LV.boulder=null;for(const g of LV.gates){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}
    const cks=LV.checks.filter(c=>c.x>100).slice(0,5);ok_(()=>cks.length>=4,'L'+lv+' has flags');nS=0;nF=0;
    for(const c of cks){P.x=c.x+30;P.y=440-P.h-1;P.vx=P.vy=0;P.inv=999;frames(4);}
    ok_(()=>nF===cks.length,'L'+lv+' one checkpoint popup per flag ('+nF+'/'+cks.length+')');ok_(()=>nS<=cks.length+2,'L'+lv+' saves '+nS);
@@ -2946,6 +2954,13 @@ function selfTest(){const log=[];try{
    ok_(()=>nF===0&&nS<=10,'L'+lv+' no repeats/save spam over 20 s while standing ('+nF+' popups, '+nS+' saves)');ok_(()=>P.hp===1,'L'+lv+' no free healing hp='+P.hp);ok_(()=>parts.length<=Math.max(60,n0+20),'L'+lv+' particles stable '+n0+'->'+parts.length);
    P.x=cks[1].x+30;frames(30);P.x=cks[cks.length-1].x+60;frames(30);ok_(()=>nF===0&&LP().cp===cks[cks.length-1].x,'L'+lv+' walking back/forward does not re-fire');
    startPlay(lv);mode='play';LV.enemies=[];LV.darts=[];LV.boulder=null;for(const g of LV.gates){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}frames(5);ok_(()=>Math.abs(P.x-cks[cks.length-1].x)<40,'L'+lv+' restart at furthest flag x'+Math.round(P.x));nF=0;P.x=cks[cks.length-1].x+40;frames(20);ok_(()=>nF===0,'L'+lv+' no re-fire after restart');}
+  // L3 runner: checkpoint crates fire once, the furthest counts, restart resumes there, no free healing while waiting
+  {SV.sel=0;SV.players[0].tier='age7';SV.prog[0]=newProg();SV.prog[0].intro=true;SV.prog[0].dog.intro=true;PR().unl=3;PR().lv=3;LP().intro=true;startPlay(3);ok_(()=>mode==='run','L3 runner start');
+   const ck=RN.obj.filter(o=>o.t==='crate'&&o.chk).slice(0,4);ok_(()=>ck.length>=4,'L3 has checkpoint crates '+ck.length);let nT=0;const t0=toast;toast=(...a)=>{if(String(a[0]).includes('Checkpoint'))nT++;return t0(...a);};
+   try{for(const c of ck){RN.z=c.z-250;rnIdx();RN.go=0;RN.v=44;RN.ch=null;RN.view=1;RN.inv=999;P.hp=1;frames(12);}
+    ok_(()=>nT===ck.length,'L3 one checkpoint popup per crate ('+nT+'/'+ck.length+')');ok_(()=>LP().rz===ck[ck.length-1].z-300,'L3 furthest checkpoint kept '+LP().rz);
+    ok_(()=>P.hp===1,'L3 checkpoint crates give no free healing hp='+P.hp);const hp=P.hp;nT=0;RN.z=ck[1].z-250;rnIdx();RN.v=44;frames(12);ok_(()=>nT===0&&LP().rz===ck[ck.length-1].z-300,'L3 going back does not re-fire');
+    startPlay(3);ok_(()=>Math.abs(RN.z-LP().rz)<1,'L3 restart at furthest checkpoint z'+Math.round(RN.z));}finally{toast=t0;}}
   log.push('B1 checkpoints ok');}finally{save=sv0;floatText=ft0;}}
  document.title='SELFTEST OK '+log.join('|');}catch(e){document.title='SELFTEST FAIL '+e.message+' '+(e.stack||'').split('\n')[1];console.error('GAMEERR',e.stack);}}
 function roomTest(){const log=[];const fails=[];const ok=(c,m)=>{if(!c)fails.push(m);};try{
