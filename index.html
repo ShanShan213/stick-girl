@@ -1730,7 +1730,7 @@ function leaveBonus(){const S=SEA,p=P;SEA=null;mode='play';p.x=S.po.x+70;p.y=440
  addParts(S.po.x,380,24,S.th==='ice'?'#dff6ff':'#8fdcff',{sp:1.6});toast(S.star.got?'🌟 Big Stars '+bigsGot().length+'/3':'Back from the '+(S.th==='ice'?'Crystal Cove':S.th==='river'?'river':'ocean')+'!',160);save();rnReturn();}
 /* ================= LEVEL 3: JUNGLE RUNNER (pseudo-3D, camera behind Stick Girl, Crash-style) ================= */
 let RN=null;const PM=()=>(RN&&RN.on)?'run':'play';
-const RS=200,RCH=1000,RDEP=.84,RHZ=.40,RDD=74,RPD=1626,RVD=2000,RVH=520; // segment length, camera height/depth, horizon, draw distance, player depth; reverse (boulder) camera
+const RS=200,RCH=1000,RDEP=.84,RHZ=.40,RDD=74,RPD=1626,RVD=1500,RVH=470; // segment length, camera height/depth, horizon, draw distance, player depth; reverse (boulder) camera
 const RSPR={};
 function rSpr(k,w,h,fn){let c=RSPR[k];if(c)return c;c=document.createElement('canvas');c.width=w;c.height=h;const o=ctx;ctx=c.getContext('2d');ctx.lineCap='round';ctx.lineJoin='round';try{fn(w,h);}catch(e){console.error('rSpr',k,e);}ctx=o;RSPR[k]=c;return c;}
 const rEl=(x,y,rx,ry,col,a)=>{ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,rx,ry,a||0,0,7);ctx.fill();};
@@ -2018,16 +2018,18 @@ function drawRun(){const R=RN;R.df=(R.df||0)+1;const E=R.E,rev=R.view<0,cave=R.c
   // objects in this segment (far first)
   const ob=s.ob;for(let j=rev?0:ob.length-1;rev?j<ob.length:j>=0;rev?j++:j--){const o=ob[j];o._q=q;
    if(!drawnP&&(rev?o.z>pz:o.z<pz)){rnDrawPlayer(pr,rev);drawnP=true;}
-   if((o.cave&&!cave)||(o.main&&cave))continue;rnDrawObj(o,pr,spr,rev);}
+   if((o.cave&&!cave)||(o.main&&cave))continue;if(!rev&&o.z<pz-110&&o.t!=='gap'&&o.t!=='crumb'&&!(o.br&&o.fly))continue; // passed things vanish (no giant sprites in front of her)
+   rnDrawObj(o,pr,spr,rev);}
   if(!drawnP&&(rev?s.i*RS<=pz:(s.i*RS)<=pz)&&(rev?true:true)){const inS=pz>=s.i*RS&&pz<(s.i+1)*RS;if(inS){q._pl=1;rnDrawPlayer(pr,rev,q);drawnP=true;}}
-  if(rev&&R.ch&&q.s.i===Math.floor((pz-R.ch.gap)/RS))rnDrawBoulder(pr,q);}
+  if(rev&&R.ch&&q.s.i===Math.floor((pz-rnBG())/RS))rnDrawBoulder(pr,q);}
  if(!drawnP)rnDrawPlayer(pr,rev,null);
  if(!cave)ctx.drawImage(RART.top(),0,0);
  for(const f of R.fx){ctx.globalAlpha=clamp(f.l/20,0,1);if(f.s)txt(f.s,f.x,f.y,24,f.c,'center','rgba(0,0,0,.45)');else{ctx.fillStyle=f.c;ctx.fillRect(f.x-f.r/2,f.y-f.r/2,f.r,f.r);}}ctx.globalAlpha=1;
  ctx.restore();
  if(R.trans>0){const a=1-Math.abs(R.trans-13)/13;ctx.fillStyle='rgba(255,255,240,'+(a*.95).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
  if(R.fall>0){ctx.fillStyle='rgba(30,140,190,'+(.5*(1-R.fall/46)).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}}
-function rnDrawBoulder(pr,q){const R=RN,C=R.ch,o={z:R.z-C.gap,_q:q};const r=980,p=pr(o,0,r);if(!p)return;let dy=0;if(C.end){dy=C.et*C.et*.35;}
+const rnBG=()=>RN.ch?260+RN.ch.gap*.42:0; // drawn boulder distance (squeezed so it looms right behind her)
+function rnDrawBoulder(pr,q){const R=RN,C=R.ch,o={z:R.z-rnBG(),_q:q};const r=980,p=pr(o,0,r);if(!p)return;let dy=0;if(C.end){dy=C.et*C.et*.35;}
  const h=r*2*p.k;ctx.save();ctx.globalAlpha=.3;rEl(p.x,p.y+r*p.k,h*.48,h*.08,'#000');ctx.globalAlpha=1;ctx.translate(p.x,p.y+dy);ctx.rotate(-C.rot);ctx.drawImage(RART.boulder(),-h/2,-h/2,h,h);ctx.restore();
  if(!C.end&&T%30<20)txt('⚠️',p.x,p.y-h*.62,30,'#fff','center');}
 function rnDrawObj(o,pr,spr,rev){const R=RN,t=o.t;
@@ -2080,7 +2082,7 @@ function drawRunHUD(){const R=RN;if(!R)return;
  if(R.ch&&!R.ch.end){const g=clamp((R.ch.gap-240)/(R.ch.max-240),0,1);rr(VW/2-130,64,260,26,12);ctx.fillStyle='rgba(20,20,60,.45)';ctx.fill();ctx.fillStyle=g<.35?'#ff5a5a':'#ffd23f';rr(VW/2-124,70,248*g+4,14,7);ctx.fill();txt('🪨',VW/2-146,77,24);txt('🏃',VW/2+150,77,24);
   // warnings for what is coming (she runs toward the screen)
   let w=null;for(let i=R.oi;i<R.obj.length;i++){const o=R.obj[i],dz=o.z-R.z;if(dz>2600)break;if(dz<0)continue;if((o.t==='log'&&rnInM(o.m))||(o.t==='gap'&&rnInM(o.m))){w='⤒';break;}if((o.t==='branch'||o.t==='dart')&&rnInM(o.m)){w='▼';break;}if(o.t==='crate'&&!o.br&&rnInL(o.lane)){w='👊';break;}}
-  if(w&&R.psx){rr(R.psx-26,R.psy-200,52,44,12);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();txt(w,R.psx,R.psy-178,28,'#2b2b55','center');}}
+  if(w&&R.psx){const wx=R.psx+(R.psx>VW-200?-110:110),wy=R.psy-150,k=1+.08*Math.sin(T/4);rr(wx-30*k,wy-24*k,60*k,48*k,14);ctx.fillStyle='rgba(255,255,255,.92)';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff5a5a';ctx.stroke();txt(w,wx,wy,30*k,'#2b2b55','center');}}
  if(!R.hint)R.hb=0;if(R.hint){const a=clamp(Math.min(R.hint.t/10,(330-R.hint.t)/20),0,1);ctx.globalAlpha=a;ctx.font=F(17);const ls=wrapLines(R.hint.s,360),h=ls.length*21+18;R.hb=118+Math.max(62,h)+8;rr(12,118,430,Math.max(62,h),14);ctx.fillStyle='rgba(255,253,242,.95)';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#2b2b55';ctx.stroke();
   dogSprite(46,118+Math.max(62,h)-14,1,.55,T,{});ls.forEach((l,i)=>txt(l,80,138+i*21,17,'#2b2b55','left'));ctx.globalAlpha=1;}}
 /* ---- swipes ---- */
