@@ -446,6 +446,7 @@ const bondLv=b=>[0,2,5,9,14].filter(t=>b>=t).length;
 const petOf=id=>PETS.find(p=>p.id===id);
 function activePet(){const a=PR().active;return a&&PR().pets[a]?{def:petOf(a),lv:bondLv(PR().pets[a].bond)}:null;}
 function hasPet(id){const a=activePet();return a&&a.def.id===id?a.lv:0;}
+if(SV&&SV.prog)SV.prog.forEach(q=>{if(q&&q.unl>3)q.unl=3;}); // qa9b: old saves recorded unl 4
 const MAXLV=3,curLv=()=>{const p=PR();return Math.max(1,Math.min(p.lv||1,p.unl||1,MAXLV));};
 /* per-level run state: Level 1 keeps its fields on the hero (old saves still work), Level 2 lives in prog.l2 */
 const LP=()=>{const p=PR(),n=curLv();if(n===1){if(!p.bigs)p.bigs=[];return p;}const k='l'+n;if(!p[k])p[k]={cp:0,gates:[],dug:[],rooms:{},rescued:[],rbon:[],boss:false,bigs:[]};return p[k];};
@@ -1376,7 +1377,7 @@ function updJungle(){const L=LV,p=P,E=easy(),px=p.x+10;if(L.theme!=='jungle'||L.
   if(B.st==='wait'){if(px>B.x0+120&&px<B.x1-260){B.st='roll';B.bx=Math.max(B.x0-320,px-430);B.t=0;shake=8;sfx('earth');toast(E?'RUN! ➜':'A giant boulder! RUN! ➜',150);say(E?'Run! Run to the right!':'Uh oh! A rolling boulder! Run to the right and jump the logs!',{again:true});}}
   else{B.t++;B.bx+=B.sp*(B.t<40?B.t/40:1);B.rot+=B.sp/B.r;if(B.t%26===0)shake=Math.max(shake,3);if(B.t%8===0)addParts(B.bx-B.r*.5,436,2,'#c9a46a',{sp:.8});
    if(px<B.x0-300){B.st='wait';B.bx=B.x0-320;}
-   else if(B.bx+B.r*.72>p.x&&p.y+p.h>440-B.r*1.8){B.st='wait';B.bx=B.x0-320;B.caught++;P.inv=0;if(!E)hurt(1,0,'spike','Boing! The boulder bumped you. Run fast and jump the logs!');if(P.hp>0&&mode==='play'){P.safe={x:B.x0+40,y:440-P.h};respawn(E?'Boing! The boulder bumped you. Run, run, run!':'');}}
+   else if(B.bx+B.r*.72>p.x&&p.y+p.h>440-B.r*1.8){B.st='wait';B.bx=B.x0-320;B.caught++;P.inv=0;if(!E)hurt(2,0,'spike','Boing! The boulder bumped you. Run fast and jump the logs!');if(P.hp>0&&mode==='play'){P.safe={x:B.x0+40,y:440-P.h};respawn(E?'Boing! The boulder bumped you. Run, run, run!':'');}}
    else if(B.bx>B.x1-B.r-36){B.st='done';sfx('smash');sfx('earth');shake=14;addParts(B.x1-40,370,36,'#b8a888',{sp:2.4});for(let i=0;i<6;i++)L.items.push({x:B.x1+40+i*34,y:400,k:'star'});floatText('CRASH! ⭐',B.x1-60,300,'#ffe066');addXP(20);toast('Phew! The boulder smashed into the temple wall!',150);}}}
  for(const k of L.keys){if(k.got||k.used)continue;if(Math.abs(px-k.x)<30&&Math.abs(p.y+24-k.y)<44){k.got=true;p.key=k;sfx('chime');addParts(k.x,k.y,10,'#ffd23f',{star:true});floatText('🔑 Got the key!',k.x,k.y-30,'#ffe066');toast('You got the golden key! Take it to the locked door.',150);}}}
 /* ---- the final encounter: Air blows the Storm Cloud away (Lv 1) / Water cools the Magma Golem (Lv 2) ---- */
@@ -1538,7 +1539,7 @@ const RSC=()=>LP().rescued||(LP().rescued=[]),RDN2=()=>LP().rooms||(LP().rooms={
 function activeRoom(){if(!LV||!P)return null;const x=P.x+10;for(const r of LV.rooms)if(!r.done&&x>=r.x0&&x<=r.x1)return r;return null;}
 function setDoor(d,open,L){L=L||LV;if(d.open===open)return;d.open=open;if(open){const i=L.plats.indexOf(d.plat);if(i>=0)L.plats.splice(i,1);}else if(!L.plats.includes(d.plat))L.plats.push(d.plat);}
 function setBridge(b,on,L){L=L||LV;if(b.on===on)return;b.on=on;if(on){if(!L.plats.includes(b.plat))L.plats.push(b.plat);if(L===LV&&mode==='play')sfx('spring');}else{const i=L.plats.indexOf(b.plat);if(i>=0)L.plats.splice(i,1);}}
-function roomApplyDone(L,r){r.done=true;r.phase='done';for(const d of L.doors)if(d.r===r)setDoor(d,true,L);for(const b of L.bridges)if(b.r===r)setBridge(b,true,L);for(const v of L.levers)if(v.r===r&&!v.time)v.on=true;for(const k of L.keys)if(k.r===r){k.used=true;k.got=false;if(P&&P.key===k)P.key=null;}
+function roomApplyDone(L,r){r.done=true;r.phase='done';for(const d of L.doors)if(d.r===r)setDoor(d,true,L);for(const b of L.bridges)if(b.r===r)setBridge(b,true,L);for(const v of L.levers)if(v.r===r){if(!v.time)v.on=true;else v.tm=0;}for(const k of L.keys)if(k.r===r){k.used=true;k.got=false;if(P&&P.key===k)P.key=null;}
  for(const s of L.stones)if(s.r===r&&!s.real){s.real=true;s.plat={x:s.x,y:s.y,w:90,h:16,t:'p',stone:true};L.plats.push(s.plat);}}
 function roomReset(r,msg){const L=LV,p=P;if(ST)ST.fails++;p.grab=null;if(SF.st==='stay')stormiOut();
  for(const c of L.crates)if(c.r===r){c.x=c.hx;c.y=384;c.vy=0;}
@@ -1559,13 +1560,13 @@ function roomNear(){const p=P,L=LV,px=p.x+10;let best=null,bd=1e9;
  if(p.onGround)for(const k of L.crates){if(p.gnd===k)continue;const gap=k.x>px?k.x-(p.x+p.w):p.x-(k.x+k.w);if(gap<=22&&gap>=-4&&p.y+p.h>k.y+10&&p.y<k.y+k.h)c(gap+5,{k:'room',x:k.x+k.w/2,y:k.y-14,l:'E: grab the crate',fn:()=>{p.grab=k;p.gs=k.x+k.w/2>px?1:-1;sfx('tick');}});}
  for(const s of L.sprites)if(!s.follow&&Math.abs(s.x+8-px)<60&&Math.abs(s.y-p.y)<70)c(Math.abs(s.x+8-px)+8,{k:'room',x:s.x+8,y:s.y-34,l:'E: come with me!',fn:()=>{s.follow=true;sfx('pet');floatText('♥',s.x+8,s.y-10,'#ff5a8a');}});
  if(p.key&&!p.key.used)for(const d of L.doors){if(d.open||d.kind!=='key'||d.r!==p.key.r)continue;const dd=Math.abs(d.x+13-px);if(dd<80)c(dd,{k:'room',x:d.x+13,y:360,l:'E: unlock the door 🔑',fn:()=>{const k=p.key;k.used=true;k.got=false;p.key=null;setDoor(d,true,L);sfx('chime');addParts(d.x+13,380,14,'#ffd23f',{star:true});toast('Click! The golden key opened the temple door!',140);}});}
- for(const pl of L.plates){if(pl.r.done)continue;const d=Math.abs(pl.x+35-px);if(d<80){if(SF.st==='stay')c(d+20,{k:'room',x:pl.x+35,y:380,l:'E: Stormi, come back',fn:()=>{stormiOut();}});else c(d+20,{k:'room',x:pl.x+35,y:380,l:'E: call Stormi to sit here',fn:()=>{callStormi(pl);}});}}
+ for(const pl of L.plates){if(pl.r.done)continue;const d=Math.abs(pl.x+35-px);if(d<80){if(SF.st==='stay')c(d+20,{k:'room',x:pl.x+35,y:380,l:'E: Stormi, come back',fn:()=>{stormiOut();}});else if(!L.crates.some(k=>Math.abs(k.x+k.w/2-(pl.x+pl.w/2))<pl.w/2&&Math.abs(k.y+k.h-440)<8))c(d+20,{k:'room',x:pl.x+35,y:380,l:'E: call Stormi to sit here',fn:()=>{callStormi(pl);}});}}
  return best;}
 function callStormi(pl){stormiIn(-P.face);SF.st='stay';SF.stay={x:pl.x+35,pl};SF.wag=60;dogBark();floatText('Woof! On my way!',P.x,P.y-30,'#9cf');}
 function lanternHint(){if(mode!=='play')return;const r=activeRoom();if(!r){toast('💡 The lantern shows nothing to solve here. Keep going!',100);return;}const h=r.hint();HN={x:h.x,y:h.y,txt:h.t,t:420};sfx('tick');say(h.t,{again:true});}
 function ptFace(a,b){return a<b?1:-1;}
 function updRooms(){const p=P,L=LV,E=easy();
- for(const v of L.levers)if(v.tm>0&&--v.tm===0){v.on=false;v.fn(false);toast(v.msgOff||'The bridge folded away. Pull the lever again!',120);}
+ for(const v of L.levers){if(v.tm<=0)continue;const px=p.x+10,out=!!L.cave||px<v.r.x0-150||px>v.r.x1+150;if(v.r.done||out){v.tm=0;if(!v.r.done){v.on=false;v.fn(false);}continue;}if(--v.tm===0){v.on=false;v.fn(false);toast(v.msgOff||'The bridge folded away. Pull the lever again!',120);}} // qa9b: no stale timer once solved / after leaving
  // crates
  for(const c of L.crates){if(Math.abs(c.x-p.x)>1300)continue;c.vx=0;c.vy=Math.min(13,c.vy+.6);moveBody(c,L.plats.filter(q=>q!==c));if(c.y>700){c.x=c.hx;c.y=384;c.vy=0;if(p.grab===c)p.grab=null;toast('The crate hopped back to its spot!',100);}}
  // plates
@@ -2204,7 +2205,7 @@ function drawFeed(){if(FD.ret==='pets')drawPetsBG();else{drawWorld();drawHUD();}
  txt('⚡ Superpower: '+d.pw,570,222,22,'#2b7a2b');wrap(d.pwd,570,252,520,22,17,'#2b2b55');
  if(FD.ok){const b=PR().pets[d.id].bond;txt(FD.first?'Yum! '+d.name+' is your friend now!':'Yum! They love '+d.foodName+'!',480,370,30,'#e0409a');txt('Bond: '+'♥'.repeat(bondLv(b))+'♡'.repeat(5-bondLv(b)),480,414,30,'#ff3b5c');btn('Yay!',380,440,200,56,endFeed,{col:'#ffe066',size:26});}
  else{txt('What does '+d.name.split(' ')[0]+' like to eat?',480,330,26,'#2b2b55');FD.foods.forEach((f,i)=>btn((i+1)+' '+f,190+i*210,360,190,80,()=>feedAnswer(i),{size:40}));
-  if(FD.hint)wrap('💡 Not quite! '+FD.hint,480,468,740,22,19,'#7a4a00');if(FD.first)btn('Not now',770,44,90,34,endFeed,{size:16,hit:1});}}
+  if(FD.hint)wrap('💡 Not quite! '+FD.hint,480,468,740,22,19,'#7a4a00');if(FD.first)btn('Not now',104,44,96,36,endFeed,{size:16,hit:1});}}
 
 /* ================= PETS SCREEN ================= */
 function openPets(ret){petRet=ret;mode='pets';if(petSel>=PETS.length)petSel=0;}
@@ -2370,7 +2371,7 @@ function drawStory(bgOnly){const e=!STY||STY.kind==='end';const old=sat;sat=e?1:
  txt(STY.t>full.length*1.6?'Tap ▶':'',820,440,18,'#e0409a');txt((STY.i+1)+'/'+STY.lines.length,100,440,16,'#777');
  NUI.push({x:0,y:0,w:VW,h:VH,fn:storyAdv});}
 function drawScroll(){drawWorld();drawHUD();panel(130,100,700,330,'#a36b1d');btn('🔊',760,112,56,40,()=>say(STO.sc[0]+'! '+STO.sc[1],{force:true,again:true}),{size:20,hit:1});txt('📜 '+STO.sc[0],480,150,38,'#a36b1d');wrap(STO.sc[1],480,240,600,36,28,'#2b2b55');txt('+5 ⭐  +15 XP  (saved in your Pet & Scroll book)',480,340,20,'#2b7a2b');btn('Cool!',380,370,200,52,()=>{mode='play';},{col:'#ffe066',size:26});}
-function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;lp.cp=0;pr.unl=Math.max(pr.unl||1,lv+1);addXP(80);addStars(20);pr.treats+=2;save();shush();const n=fullName();
+function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;lp.cp=0;pr.unl=Math.min(MAXLV,Math.max(pr.unl||1,lv+1));addXP(80);addStars(20);pr.treats+=2;save();shush();const n=fullName();
  const lines=lv===1?['WHOOSH! The Whirlwind blows the grumpy Storm Cloud far away. It shrinks into a tiny sniffly raincloud: "Okay... maybe colours are pretty," it mumbles.','The stolen colours burst back into the sky: red, orange, yellow, green, blue and purple. A giant rainbow stretches across the world!','🐶 WOOF WOOF! We did it, '+n+'! The colours are back! I am the proudest puppy in the whole world!','🐶 But look, smoke is puffing from Ember Mountain far away. A grumpy Magma Golem lives there! Will you come with me?',n+' waves to the meadow friends. "Next stop: Ember Mountain!"']
   :lv===2?['TSSSS! The cool water calms the grumpy Magma Golem. His glowing cracks fade and little flowers sprout on his rocky shoulders.','"Thank you," he rumbles softly. "I was just too hot and cranky." The lava cools into new rock and the mountain glows with colour again.','🐶 WOOF WOOF! You were so brave, '+n+'! Lava, geysers AND a golem! Best adventure ever!','🐶 The Golem says we can visit his crystal caves any time. Wag wag wag!','🐶 Listen... drums in the distance! An old Jungle Temple is waking up. Shall we go?',n+' and '+DN()+' wave goodbye to Ember Mountain. Next stop: the Jungle Temple!']
   :['THUD! The Earth power lifts the broken stones back into place, and the temple steps are whole again.','The Jungle Guardian blinks. Moss and flowers bloom on his shoulders. "My temple is fixed! I was grumpy because it was falling down," he rumbles.','📜 Fact Scroll: Rainforests cover only a small part of the land, but more than half of all the kinds of plants and animals on Earth live in them!','📜 Fact Scroll: The Amazon River, in the biggest rainforest, carries more water than any other river in the world!','🐶 WOOF WOOF! Vines, boulders, darts AND a giant guardian! You are the bravest explorer, '+n+'!',n+' and '+DN()+' wave goodbye to their jungle friends. What will the next adventure be?']
