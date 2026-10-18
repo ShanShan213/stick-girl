@@ -1730,7 +1730,7 @@ function leaveBonus(){const S=SEA,p=P;SEA=null;mode='play';p.x=S.po.x+70;p.y=440
  addParts(S.po.x,380,24,S.th==='ice'?'#dff6ff':'#8fdcff',{sp:1.6});toast(S.star.got?'🌟 Big Stars '+bigsGot().length+'/3':'Back from the '+(S.th==='ice'?'Crystal Cove':S.th==='river'?'river':'ocean')+'!',160);save();rnReturn();}
 /* ================= LEVEL 3: JUNGLE RUNNER (pseudo-3D, camera behind Stick Girl, Crash-style) ================= */
 let RN=null;const PM=()=>(RN&&RN.on)?'run':'play';
-const RS=200,RCH=1000,RDEP=.84,RHZ=.40,RDD=74,RPD=1626,RVD=3000,RVH=640; // segment length, camera height/depth, horizon, draw distance, player depth; reverse (boulder) camera
+const RS=200,RCH=1000,RDEP=.84,RHZ=.40,RDD=74,RPD=1626,RVD=2000,RVH=520; // segment length, camera height/depth, horizon, draw distance, player depth; reverse (boulder) camera
 const RSPR={};
 function rSpr(k,w,h,fn){let c=RSPR[k];if(c)return c;c=document.createElement('canvas');c.width=w;c.height=h;const o=ctx;ctx=c.getContext('2d');ctx.lineCap='round';ctx.lineJoin='round';try{fn(w,h);}catch(e){console.error('rSpr',k,e);}ctx=o;RSPR[k]=c;return c;}
 const rEl=(x,y,rx,ry,col,a)=>{ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,rx,ry,a||0,0,7);ctx.fill();};
@@ -1903,7 +1903,7 @@ function rnFruit(n,o){const R=RN;R.fruit+=n;LP().fruit=R.fruit;sfx('star');if(o&
 function rnHurt(n,msg,kind){const R=RN,E=R.E;if(R.inv>0)return false;R.stum=28;R.inv=80;R.shk=10;sfx('hurt');kind=kind||'hit';R.fails[kind]=(R.fails[kind]||0)+1;
  if(!E){P.hp-=n;if(P.hp<=0){P.hp=P.max;rnBack(LP().rz||0,'Oops! A rainbow hug puts you back on your feet!');return true;}}
  toast(msg,140);if(R.fails[kind]===2){const tip={log:'Tip: tap ⤒ a little before the log!',branch:'Tip: tap ▼ to slide when you see a low branch!',dart:'Tip: darts fly high. Slide under them with ▼!',crit:'Tip: tap 👊 to spin when a snake or monkey is close!',gap:'Tip: jump ⤒ right before the water!',tnt:'Tip: jump over POP crates, or spin them away with 👊!'}[kind];if(tip)rnHint(tip);}return true;}
-function rnBack(z,msg){const R=RN;R.z=Math.max(0,z);R.v=0;R.jy=0;R.jv=0;R.sl=0;R.fall=0;R.stum=0;R.inv=90;R.stop=false;rnIdx();for(const o of R.obj)if(o.z>R.z-200&&o.z<R.z+60000){o.hit=false;if(o.t==='crumb'){o.st=0;o.fy=0;}if(o.t==='chase'&&o.z>R.z)o.done=false;if(o.t==='hint'&&o.z>R.z)o.done=o.done;}
+function rnBack(z,msg){const R=RN;R.z=Math.max(0,z);R.v=0;R.jy=0;R.jv=0;R.sl=0;R.fall=0;R.stum=0;R.inv=30;R.stop=false;rnIdx();for(const o of R.obj)if(o.z>R.z-200&&o.z<R.z+60000){o.hit=false;if(o.t==='crumb'){o.st=0;o.fy=0;}if(o.t==='chase'&&o.z>R.z)o.done=false;if(o.t==='hint'&&o.z>R.z)o.done=o.done;}
  if(R.ch){R.ch=null;rnView(1);}R.cave=R.cave&&R.z<R.caveEnd&&R.z>0;if(msg)toast(msg,150);R.trans=Math.max(R.trans,20);}
 function rnView(v){const R=RN;if(R.view===v&&!R.trans)return;R.nview=v;R.trans=26;}
 function rnFall(o){const R=RN;if(R.fall)return;R.fall=46;R.fo=o;sfx('water');R.fails.gap=(R.fails.gap||0)+1;}
@@ -1915,7 +1915,7 @@ function rnCaught(fell){const R=RN,c=R.ch,E=R.E;if(!c)return;c.caught=(c.caught|
 function rnPortal(o){const R=RN;R.stop=false;if(o.kind==='water'){mode='play';enterBonus({th:'river',id:'j2',x:Math.round(LV.W/2),cool:false});if(mode!=='sea')mode='run';}
  else{mode='play';enterSpace({x:Math.round(LV.W/2),r:{id:'jrun'},cool:false,go:false});if(mode!=='space')mode='run';}}
 function rnReturn(){if(!RN||!RN.on)return;mode='run';RN.inv=90;RN.trans=26;RN.nview=RN.view;RN.v=0;RN.jy=0;RN.jv=0;keys={};}
-function rnFinish(){const lp=LP();RN.on=false;RN.done=true;lp.rdone=true;lp.rz=0;lp.cp=0;save();startPlay(3);banner={t:200,title:'🛕 Temple Courtyard!',sub:'The Jungle Guardian is just ahead!'};say('You made it to the temple, '+hero()+'! The Jungle Guardian is just ahead!',{queue:true});}
+function rnFinish(){const lp=LP(),hp=P.hp,mx=P.max;RN.on=false;RN.done=true;lp.rdone=true;lp.rz=0;lp.cp=0;save();startPlay(3);if(P){P.max=Math.max(P.max,mx);P.hp=clamp(hp,1,P.max);}banner={t:200,title:'🛕 Temple Courtyard!',sub:'The Jungle Guardian is just ahead!'};say('You made it to the temple, '+hero()+'! The Jungle Guardian is just ahead!',{queue:true});}
 function rnBreak(o,how){const R=RN,k=o.kind,sx=o.sx||480,sy=o.sy||300;if(k==='b'&&how==='jump'){R.jv=46;R.jy=Math.max(R.jy,1);sfx('spring');rnText('BOING!',sx,sy-30,'#fff');o.bn=(o.bn||0)+1;rnFruit(1,{sx,sy});return;}
  if(k==='t'){if(how==='jump'){if(!o.cd){o.cd=90;R.jv=30;sfx('tick');rnText('3...',sx,sy-40,'#ffe066');}return;}if(how==='spin'){o.fly=1;o.br=true;sfx('kick');return;}o.br=true;rnFX(sx,sy,30);sfx('pop');rnText('POP! 🎉',sx,sy-30,'#fff');rnHurt(1,'Pop! Jump over POP crates, or spin them away with 👊!','tnt');return;}
  o.br=true;o.bt=0;sfx('smash');rnFX(sx,sy,14,'#c98a3e',{sp:1.2});
@@ -1935,10 +1935,10 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
  if(R.go>0){R.go--;if(R.go===40)sfx('tick');if(R.go===1)sfx('spring');}
  if(R.fall){R.fall--;R.jy-=26;if(R.fall===0)rnFallDone();return;}
  const tx=rnLX(R.lane);R.px+=(tx-R.px)*.28;if(Math.abs(tx-R.px)<2)R.px=tx;
- if(R.jb>0){R.jb--;if(R.jy<=0){R.jv=E?31:30;R.jy=.01;R.sl=0;R.jb=0;sfx('jump');}}
+ if(R.jb>0){R.jb--;if(R.jy<=0){R.jv=E?27:28;R.jy=.01;R.sl=0;R.jb=0;sfx('jump');}}
  if(R.sb>0){R.sb--;if(R.jy<=0){R.sl=E?52:44;R.sb=0;sfx('kick');}else R.jv=Math.min(R.jv,-20);}
  if(R.pb>0){R.pb--;if(R.spc<=0){R.sp=24;R.spc=32;R.pb=0;sfx('kick');}}
- if(R.jy>0){R.jy+=R.jv;R.jv-=E?1.22:1.3;if(R.jy<=0){R.jy=0;R.jv=0;}}if(R.sl>0)R.sl--;if(R.sp>0)R.sp--;if(R.spc>0)R.spc--;
+ if(R.jy>0){R.jy+=R.jv;R.jv-=E?1.5:1.7;if(R.jy<=0){R.jy=0;R.jv=0;}}if(R.sl>0)R.sl--;if(R.sp>0)R.sp--;if(R.spc>0)R.spc--;
  // speed
  const base=(E?32:44)*(rev?.84:1);let tgt=R.go>0?0:base;if(R.stum>0){R.stum--;tgt=base*.45;}
  let door=null;for(let i=R.oi;i<R.obj.length;i++){const o=R.obj[i];if(o.z>R.z+2400)break;if(o.t==='door'){if(o.gate&&o.gate.open&&!o.open){o.open=true;sfx('earth');R.shk=8;}if(!o.open&&o.z>R.z){door=o;break;}}}
@@ -1959,20 +1959,20 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
     if(o.br){if(o.fly)o.fly++;if(o.fly===26){rnFX(sx||480,(sy||300)-80,30);sfx('pop');rnText('POP! 🎉',sx||480,(sy||300)-90,'#fff');}break;}
     if(o.cd){o.cd--;if(o.cd%30===0&&o.cd>0){sfx('tick');rnText((o.cd/30)+'...',sx||480,(sy||300)-50,'#ffe066');}if(o.cd===0){o.br=true;rnFX(sx||480,sy||300,30);sfx('pop');rnText('POP! 🎉',sx||480,(sy||300)-40,'#fff');}break;}
     if(R.sp>6&&dz>0&&dz<720&&rnInL(o.lane)){rnBreak(o,'spin');break;}
-    if(Math.abs(dz)<95&&rnInL(o.lane)){if(R.jy>190&&R.jv<=0)rnBreak(o,'jump');else if(R.jy<=190&&!o.hit){o.hit=true;rnBreak(o,'run');}}break;
-   case 'log':if(E&&!o.hit&&dz>0&&dz<200&&R.jy<=0&&rnInM(o.m)){R.jv=31;R.jy=.01;sfx('jump');}
-    if(!o.hit&&Math.abs(dz)<80&&rnInM(o.m)&&R.jy<150){o.hit=true;if(rnHurt(1,'Oops! Jump ⤒ over the logs!','log'))R.trip=20;}break;
+    if(Math.abs(dz)<95&&rnInL(o.lane)){if(R.jy>110&&R.jv<=0)rnBreak(o,'jump');else if(R.jy<=110&&!o.hit){o.hit=true;rnBreak(o,'run');}}break;
+   case 'log':if(E&&!o.hit&&dz>0&&dz<200&&R.jy<=0&&rnInM(o.m)){R.jv=27;R.jy=.01;sfx('jump');}
+    if(!o.hit&&Math.abs(dz)<80&&rnInM(o.m)&&R.jy<90){o.hit=true;if(rnHurt(1,'Oops! Jump ⤒ over the logs!','log'))R.trip=20;}break;
    case 'branch':if(!o.hit&&Math.abs(dz)<80&&rnInM(o.m)&&!R.sl&&R.jy<700){o.hit=true;rnHurt(1,'Bonk! Slide ▼ under low branches!','branch');}break;
    case 'dart':if(!o.hit&&Math.abs(dz)<80&&rnInM(o.m)&&!R.sl){o.hit=true;rnHurt(1,'Ouch, a dart! Slide ▼ under the darts!','dart');}break;
-   case 'gap':if(E&&dz>-RS*.5&&o.z0-R.z>0&&o.z0-R.z<240&&R.jy<=0&&rnInM(o.m)){R.jv=31;R.jy=.01;sfx('jump');}
+   case 'gap':if(E&&dz>-RS*.5&&o.z0-R.z>0&&o.z0-R.z<240&&R.jy<=0&&rnInM(o.m)){R.jv=27;R.jy=.01;sfx('jump');}
     if(R.z>o.z0+50&&R.z<o.z1-50&&R.jy<=0&&rnInM(o.m))rnFall(o);break;
    case 'crumb':{const d0=o.z0-R.z;if(o.st===0&&d0<1900){o.st=1;sfx('tick');}if(o.st===1&&d0<560){o.st=2;o.fy=0;sfx('smash');}if(o.st===2)o.fy=(o.fy||0)+1;
-    if(E&&o.st===2&&d0>0&&d0<240&&R.jy<=0&&rnInL(o.lane)){R.jv=31;R.jy=.01;sfx('jump');}
+    if(E&&o.st===2&&d0>0&&d0<240&&R.jy<=0&&rnInL(o.lane)){R.jv=27;R.jy=.01;sfx('jump');}
     if(o.st===2&&R.z>o.z0+40&&R.z<o.z1-40&&R.jy<=0&&rnInL(o.lane))rnFall(o);break;}
    case 'snake':case 'monkey':if(o.ko){o.kt++;if(o.kt===24){rnFX(sx||480,(sy||300)-60,26);sfx('pop');}break;}
     if(o.t==='monkey'&&!E&&dz>700&&dz<2600&&(T+o.id2*13)%55===0){o.lane=clamp(o.lane+((o.id2+T)%2?1:-1),0,2);o.hop=14;}if(o.hop>0)o.hop--;
     if(R.sp>6&&dz>0&&dz<720&&rnInL(o.lane)){rnKO(o);break;}
-    if(Math.abs(dz)<90&&rnInL(o.lane)){if(R.jy>140&&R.jv<=0){rnKO(o);R.jv=24;}else{rnKO(o);rnHurt(1,'Ouch! Spin 👊 or jump on snakes and monkeys!','crit');}}break;
+    if(Math.abs(dz)<90&&rnInL(o.lane)){if(R.jy>90&&R.jv<=0){rnKO(o);R.jv=22;}else{rnKO(o);rnHurt(1,'Ouch! Spin 👊 or jump on snakes and monkeys!','crit');}}break;
    case 'portal':if(!o.used&&Math.abs(dz)<110&&rnInL(o.lane)){o.used=true;rnPortal(o);return;}break;
    case 'fork':if(!o.done&&dz<0){o.done=true;if(rnInL(2)||R.lane===2){R.cave=true;R.caveEnd=o.z1;sfx('chime');rnHint('A secret cave! Look for the Big Star 🌟');}}break;
    case 'big':if(R.cave&&!o.got&&Math.abs(dz)<130&&rnInL(o.lane)){o.got=true;const lp=LP();if(!lp.bigs.includes(o.id)){lp.bigs.push(o.id);addStars(20);addXP(30);}sfx('harmony');banner={t:200,title:'🌟 BIG STAR! '+lp.bigs.length+'/3',sub:'The secret cave Big Star!'};save();}break;
@@ -2081,7 +2081,7 @@ function drawRunHUD(){const R=RN;if(!R)return;
   // warnings for what is coming (she runs toward the screen)
   let w=null;for(let i=R.oi;i<R.obj.length;i++){const o=R.obj[i],dz=o.z-R.z;if(dz>2600)break;if(dz<0)continue;if((o.t==='log'&&rnInM(o.m))||(o.t==='gap'&&rnInM(o.m))){w='⤒';break;}if((o.t==='branch'||o.t==='dart')&&rnInM(o.m)){w='▼';break;}if(o.t==='crate'&&!o.br&&rnInL(o.lane)){w='👊';break;}}
   if(w&&R.psx){rr(R.psx-26,R.psy-200,52,44,12);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();txt(w,R.psx,R.psy-178,28,'#2b2b55','center');}}
- if(R.hint){const a=clamp(Math.min(R.hint.t/10,(330-R.hint.t)/20),0,1);ctx.globalAlpha=a;ctx.font=F(17);const ls=wrapLines(R.hint.s,360),h=ls.length*21+18;rr(12,118,430,Math.max(62,h),14);ctx.fillStyle='rgba(255,253,242,.95)';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#2b2b55';ctx.stroke();
+ if(!R.hint)R.hb=0;if(R.hint){const a=clamp(Math.min(R.hint.t/10,(330-R.hint.t)/20),0,1);ctx.globalAlpha=a;ctx.font=F(17);const ls=wrapLines(R.hint.s,360),h=ls.length*21+18;R.hb=118+Math.max(62,h)+8;rr(12,118,430,Math.max(62,h),14);ctx.fillStyle='rgba(255,253,242,.95)';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#2b2b55';ctx.stroke();
   dogSprite(46,118+Math.max(62,h)-14,1,.55,T,{});ls.forEach((l,i)=>txt(l,80,138+i*21,17,'#2b2b55','left'));ctx.globalAlpha=1;}}
 /* ---- swipes ---- */
 let RSW=null;
@@ -2506,7 +2506,7 @@ function drawHUD(){const pr=PR(),p=P;if(p.stageT>0)stageLights(p.stageT);
  const ap=activePet();if(ap){rr(264,8,52,52,12);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();if(mode==='play')NUI.push({x:258,y:2,w:68,h:68,fn:()=>openPets('play')});if(PH.blk<=0)txt('🛡',306,16,13);petSprite(ap.def.id,290,52,1,.75,T);txt('♥'+ap.lv,290,64,12,'#ffd','center','#2b2b55');}
  drawDogUI();drawRoomHUD();
  {const cb=cornerSz(),live=mode==='play'||mode==='run';btn(SV.mute?'🔇':'🔊',VW-(live?2:1)*(cb+6),8,cb,cb,toggleMute,{size:22});if(live){btn('🐾',VW-3*(cb+6),8,cb,cb,()=>openPets('play'),{size:22});btn('⏸',VW-cb-6,8,cb,cb,()=>{mode='pause';pmoves=false;},{size:22});}}
- drawToasts(142);
+ drawToasts(mode==="run"&&RN&&RN.hb?Math.max(142,RN.hb):142);
  toasts=toasts.filter(t=>t.t>0);
  if(banner){if(!banner.said){banner.said=1;say(banner.title+' '+banner.sub,{queue:true});}banner.t--;const a=clamp(banner.t/30,0,1);ctx.globalAlpha=a;rr(180,180,600,130,24);ctx.fillStyle='rgba(255,224,102,.96)';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='#e08a00';ctx.stroke();txt(banner.title,480,222,48,'#e0409a','center','#fff');wrap(banner.sub,480,276,560,26,22,'#2b2b55');ctx.globalAlpha=1;if(banner.t<=0)banner=null;}}
 let TOASTR=null,SIGNR=null;
