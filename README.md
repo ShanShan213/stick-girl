@@ -4,6 +4,20 @@ Single-file HTML5 canvas game (`index.html`, no dependencies) for two sisters (a
 Open `index.html` in a browser (or serve the folder over http/https to enable "Add to Home Screen" via
 `manifest.webmanifest` + `sw.js` + `icon.svg`). Progress is saved in `localStorage` (key `stickgirl.v1`).
 
+## v8-qa9 (2026-10-18): Level 3 Jungle Temple
+* **Level 3 Jungle Temple** (unlocks after Level 2, Level Select card no longer "coming soon"; button on the L2 end screen):
+  a Crash Bandicoot-style temple run. Vine swings (jump to grab, tap ⤒ to let go: assisted launch across the pit; age4 always
+  flies forward), crumbling stone ledges, dart statues you duck under with ▼ (▼ button appears near them), and a rolling-boulder chase
+  with logs to jump (a ⚠️ peek shows the boulder when it is off screen; age4 just respawns, age7 loses 1 heart).
+* Temple maze rooms: **Golden Key Ledge** (push crate, climb, grab key 🔑, E at the key door), **Twin Lever Maze** (timed
+  lever raises stone steps to an upper floor lever), **Twin Plate Door** (crate on one plate, Stormi told to stay on the other).
+* Cartoon monkeys (coconut throwers), snakes and stone guards that spin away into confetti. Jungle music track (marimba/bongos).
+* Exactly 3 Big Stars: secret pipe cave (`j1`), river water portal (`j2`, Amazon facts) and the space portal (`j3`).
+* New pet **Stripes the Tiger Cub** (🍖, Pounce stuns an enemy), 4 rainforest Fact Scrolls, jungle quiz gates
+  (age7 `QB.age7.jungle`, age4 picture bank `PB.jungle`), Mossy the Jungle Guardian maths duel + Earth finale
+  (rebuild the temple steps), end story with Fact Scroll lines.
+* Age4: fewer enemies, wider/lower ledges, slower darts and boulder, no damage from jungle pits.
+
 ## v7 (2026-10-12): read-aloud, ocean portals, finale, Level 2
 * **Read aloud** (Web Speech, en-AU voice if available): ON by default for `age4`, toggle (🗣) on the title/pause screens for `age7` (off by default).
   Speaks story, Stormi, signs, prompts, toasts, questions + every answer option; 🔊 replay buttons on quizzes, rooms, scrolls.
