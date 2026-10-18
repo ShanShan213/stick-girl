@@ -1987,9 +1987,15 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
 function rQuad(x1,y1,w1,x2,y2,w2,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x1-w1,y1);ctx.lineTo(x2-w2,y2);ctx.lineTo(x2+w2,y2);ctx.lineTo(x1+w1,y1);ctx.closePath();ctx.fill();}
 const RPAL={plank:['#cf9b5a','#bb8646','#8f8c7c','#7b786a'],stone:['#bdb6a3','#aba491','#6f9a4a','#5e8a3e'],cave:['#6b6478','#5d576b','#3d3848','#332e3e']};
 const RSIDE={water:['#2fa7c9','#3ab7d8'],grass:['#5cb848','#50ab3f'],cave:['#2a2633','#231f2c']};
+// draw only the visible slice of a 1920-wide looping parallax strip (2 small blits instead of 2 full-width ones)
+function rStrip(img,ox,y){ox=Math.floor(ox);const w1=Math.min(VW,img.width-ox);if(w1>0)ctx.drawImage(img,ox,0,w1,img.height,0,y,w1,img.height);if(w1<VW)ctx.drawImage(img,0,0,VW-w1,img.height,Math.max(0,w1),y,VW-Math.max(0,w1),img.height);}
+// mipmaps: big cached sprites drawn tiny are pre-halved once, so far scenery is cheap to blit
+function rMip(img,h){if(h>=img.height*.55)return img;const m=img._mip||(img._mip=[img]);let l=0,H=img.height;while(H*.5>=h*1.1&&l<6){l++;H*=.5;if(!m[l]){const p=m[l-1],c=document.createElement('canvas');c.width=Math.max(1,p.width>>1);c.height=Math.max(1,p.height>>1);c.getContext('2d').drawImage(p,0,0,c.width,c.height);m[l]=c;}}return m[l];}
+// opaque column runs of an overlay (so the empty middle of the canopy is never blitted)
+function rRuns(img){if(img._runs)return img._runs;let r=[[0,img.width]];try{const d=img.getContext('2d').getImageData(0,0,img.width,img.height).data,W=img.width,H=img.height,col=new Uint8Array(W);for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>0)col[x]=1;r=[];let st=-1;for(let x=0;x<=W;x++){const on=x<W&&col[x];if(on&&st<0)st=x;if(!on&&st>=0){const L=r[r.length-1];if(L&&st-L[1]<24)L[1]=x;else r.push([st,x]);st=-1;}}}catch(e){}img._runs=r;return r;}
 function drawRun(){const R=RN;R.df=(R.df||0)+1;const E=R.E,rev=R.view<0,cave=R.cave,HZ=VH*RHZ,K=VW/2;ctx.save();if(R.shk>0)ctx.translate(rnd(-R.shk,R.shk)*.5,rnd(-R.shk,R.shk)*.5);
  // background
- if(cave)ctx.drawImage(RART.cave(),0,0);else{ctx.drawImage(RART.sky(),0,0);const fa=RART.far(),ne=RART.near(),ox=((R.bgx*.35)%1920+1920)%1920,nx=((R.bgx*.7)%1920+1920)%1920;ctx.drawImage(fa,-ox,HZ-fa.height+18);ctx.drawImage(fa,1920-ox,HZ-fa.height+18);ctx.drawImage(ne,-nx,HZ-ne.height+26);ctx.drawImage(ne,1920-nx,HZ-ne.height+26);}
+ if(cave)ctx.drawImage(RART.cave(),0,0);else{const sh=Math.ceil(HZ+32);ctx.drawImage(RART.sky(),0,0,VW,sh,0,0,VW,sh);const fa=RART.far(),ne=RART.near(),ox=((R.bgx*.35)%1920+1920)%1920,nx=((R.bgx*.7)%1920+1920)%1920;rStrip(fa,ox,HZ-fa.height+18);rStrip(ne,nx,HZ-ne.height+26);}
  const S=R.segs,N=S.length;let camZ,camX,camY;const pl=[];
  if(!rev){camZ=R.z-RPD;const b=Math.max(0,Math.floor(camZ/RS));let x=0,dx=-(S[b].c*((camZ-b*RS)/RS));const xs=[];for(let n=0;n<RDD&&b+n<N;n++){const s=S[b+n];xs.push([s,x,x+dx]);x+=dx;dx+=s.c;}
   const pi=Math.min(xs.length-1,Math.floor((R.z/RS))-b),pq=xs[Math.max(0,pi)],pt=(R.z-pq[0].i*RS)/RS;R.pxo=lerp(pq[1],pq[2],pt);camX=R.pxo+R.px*.55;camY=rnRoadY(R.z)+RCH;
@@ -2003,7 +2009,7 @@ function drawRun(){const R=RN;R.df=(R.df||0)+1;const E=R.E,rev=R.view<0,cave=R.c
  const pz=R.z,pjy=R.jy,anim=Math.floor(T/6);let drawnP=false;
  const pr=(o,wx,wy)=>{const q=o._q;const t=rev?clamp(((q.s.i+1)*RS-o.z)/RS,0,1):clamp((o.z-q.s.i*RS)/RS,0,1),d=rev?camZ-o.z:o.z-camZ;if(d<60)return null;const c=RDEP/d,xo=lerp(q.x1,q.x2,t),yy=rnRoadY(o.z);
   return{x:rev?K-c*(wx-camX)*K:K+c*(xo+wx-camX)*K,y:HZ-c*(yy+wy-camY)*K,k:c*K};};
- const spr=(img,x,yb,h,flip)=>{if(h<2)return;const w=img.width/img.height*h;if(x+w/2<0||x-w/2>VW)return;if(flip){ctx.save();ctx.translate(x,0);ctx.scale(-1,1);ctx.drawImage(img,-w/2,yb-h,w,h);ctx.restore();}else ctx.drawImage(img,x-w/2,yb-h,w,h);};
+ const spr=(img0,x,yb,h,flip)=>{if(h<2)return;const w=img0.width/img0.height*h;if(x+w/2<0||x-w/2>VW||yb-h>VH)return;const img=rMip(img0,h);if(flip){ctx.save();ctx.translate(x,0);ctx.scale(-1,1);ctx.drawImage(img,-w/2,yb-h,w,h);ctx.restore();}else ctx.drawImage(img,x-w/2,yb-h,w,h);};
  for(let n=pl.length-1;n>=0;n--){const q=pl[n],s=q.s,alt=(s.i+(s.sd==='water'?anim:0))%2,thm=cave&&!s.gapCave?'cave':s.th,P2=RPAL[cave?'cave':thm],SD=RSIDE[cave?'cave':s.sd];
   const W1=q.c1*R.rw*K,W2=q.c2*R.rw*K;
   if(q.Y1>q.Y2-1){ctx.fillStyle=SD[alt];ctx.fillRect(0,q.Y2,VW,q.Y1-q.Y2+1);
@@ -2025,7 +2031,7 @@ function drawRun(){const R=RN;R.df=(R.df||0)+1;const E=R.E,rev=R.view<0,cave=R.c
   if(!drawnP&&(rev?s.i*RS<=pz:(s.i*RS)<=pz)&&(rev?true:true)){const inS=pz>=s.i*RS&&pz<(s.i+1)*RS;if(inS){q._pl=1;rnDrawPlayer(pr,rev,q);drawnP=true;}}
   if(rev&&R.ch&&q.s.i===Math.floor((pz-rnBG())/RS))rnDrawBoulder(pr,q);}
  if(!drawnP)rnDrawPlayer(pr,rev,null);
- if(!cave)ctx.drawImage(RART.top(),0,0);
+ if(!cave){const tp=RART.top();for(const[x0,x1]of rRuns(tp))ctx.drawImage(tp,x0,0,x1-x0,tp.height,x0,0,x1-x0,tp.height);}
  for(const f of R.fx){ctx.globalAlpha=clamp(f.l/20,0,1);if(f.s)txt(f.s,f.x,f.y,24,f.c,'center','rgba(0,0,0,.45)');else{ctx.fillStyle=f.c;ctx.fillRect(f.x-f.r/2,f.y-f.r/2,f.r,f.r);}}ctx.globalAlpha=1;
  ctx.restore();
  if(R.trans>0){const a=1-Math.abs(R.trans-13)/13;ctx.fillStyle='rgba(255,255,240,'+(a*.95).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
