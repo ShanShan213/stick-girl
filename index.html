@@ -1917,7 +1917,7 @@ function rnPortal(o){const R=RN;R.stop=false;if(o.kind==='water'){mode='play';en
 function rnReturn(){if(!RN||!RN.on)return;mode='run';RN.inv=90;RN.trans=26;RN.nview=RN.view;RN.v=0;RN.jy=0;RN.jv=0;keys={};}
 function rnFinish(){const lp=LP(),hp=P.hp,mx=P.max;RN.on=false;RN.done=true;lp.rdone=true;lp.rz=0;lp.cp=0;save();startPlay(3);if(P){P.max=Math.max(P.max,mx);P.hp=clamp(hp,1,P.max);}banner={t:200,title:'🛕 Temple Courtyard!',sub:'The Jungle Guardian is just ahead!'};say('You made it to the temple, '+hero()+'! The Jungle Guardian is just ahead!',{queue:true});}
 function rnBreak(o,how){const R=RN,k=o.kind,sx=o.sx||480,sy=o.sy||300;if(k==='b'&&how==='jump'){R.jv=46;R.jy=Math.max(R.jy,1);sfx('spring');rnText('BOING!',sx,sy-30,'#fff');o.bn=(o.bn||0)+1;rnFruit(1,{sx,sy});return;}
- if(k==='t'){if(how==='jump'){if(!o.cd){o.cd=90;R.jv=30;sfx('tick');rnText('3...',sx,sy-40,'#ffe066');}return;}if(how==='spin'){o.fly=1;o.br=true;sfx('kick');return;}o.br=true;rnFX(sx,sy,30);sfx('pop');rnText('POP! 🎉',sx,sy-30,'#fff');rnHurt(1,'Pop! Jump over POP crates, or spin them away with 👊!','tnt');return;}
+ if(k==='t'){if(how==='jump'){if(!o.cd){o.cd=60;R.jv=30;(R.pops=R.pops||[]).push(o);sfx('tick');rnText('3...',sx,sy-40,'#ffe066');}return;}if(how==='spin'){o.fly=1;o.br=true;sfx('kick');return;}o.br=true;rnFX(sx,sy,30);sfx('pop');rnText('POP! 🎉',sx,sy-30,'#fff');rnHurt(1,'Pop! Jump over POP crates, or spin them away with 👊!','tnt');return;}
  o.br=true;o.bt=0;sfx('smash');rnFX(sx,sy,14,'#c98a3e',{sp:1.2});
  if(k==='k'){rnFX(sx,sy,18);return;}
  if(k==='q'){const r=(o.id2*7)%3;if(r===0&&P.hp<P.max){P.hp=Math.min(P.max,P.hp+2);rnText('+❤',sx,sy-40,'#ff5a8a');sfx('lvl');}else rnFruit(how==='run'?6:12,{sx,sy});return;}
@@ -1939,6 +1939,8 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
  if(R.sb>0){R.sb--;if(R.jy<=0){R.sl=E?52:44;R.sb=0;sfx('kick');}else R.jv=Math.min(R.jv,-20);}
  if(R.pb>0){R.pb--;if(R.spc<=0){R.sp=24;R.spc=32;R.pb=0;sfx('kick');}}
  if(R.jy>0){R.jy+=R.jv;R.jv-=E?1.5:1.7;if(R.jy<=0){R.jy=0;R.jv=0;}}if(R.sl>0)R.sl--;if(R.sp>0)R.sp--;if(R.spc>0)R.spc--;
+ // POP crates counting down (keep ticking even once she has run past)
+ if(R.pops&&R.pops.length){for(const o of R.pops){o.cd--;const on=o.z>R.z-80&&o.sx,x=on?o.sx:R.psx||480,y=on?o.sy:(R.psy||400)-170;if(o.cd%20===0&&o.cd>0){sfx('tick');rnText((o.cd/20)+'...',x,y-50,'#ffe066');}if(o.cd<=0){o.br=true;rnFX(x,y,34);sfx('pop');rnText('POP! 🎉',x,y-40,'#fff');}}R.pops=R.pops.filter(o=>o.cd>0);}
  // speed
  const base=(E?32:44)*(rev?.84:1);let tgt=R.go>0?0:base;if(R.stum>0){R.stum--;tgt=base*.45;}
  let door=null;for(let i=R.oi;i<R.obj.length;i++){const o=R.obj[i];if(o.z>R.z+2400)break;if(o.t==='door'){if(o.gate&&o.gate.open&&!o.open){o.open=true;sfx('earth');R.shk=8;}if(!o.open&&o.z>R.z){door=o;break;}}}
@@ -1957,7 +1959,7 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
    case 'fruit':if(!o.got&&Math.abs(dz)<120&&rnInL(o.lane)){const top=R.jy+(R.sl?260:620);if(o.y>R.jy-120&&o.y<top+60){o.got=true;rnFruit(1);rnFX(sx||480,sy||300,4,'#ffd23f',{sp:.6});}}break;
    case 'crate':if(o.chk&&!o.on&&dz<0){o.on=true;const lp=LP();if(o.z-300>(lp.rz||0)){lp.rz=o.z-300;}P.hp=Math.min(P.max,P.hp+1);save();toast('⛳ Checkpoint!',90);sfx('chime');if(!o.br){o.br=true;rnFX(sx||480,sy||300,16);}}
     if(o.br){if(o.fly)o.fly++;if(o.fly===26){rnFX(sx||480,(sy||300)-80,30);sfx('pop');rnText('POP! 🎉',sx||480,(sy||300)-90,'#fff');}break;}
-    if(o.cd){o.cd--;if(o.cd%30===0&&o.cd>0){sfx('tick');rnText((o.cd/30)+'...',sx||480,(sy||300)-50,'#ffe066');}if(o.cd===0){o.br=true;rnFX(sx||480,sy||300,30);sfx('pop');rnText('POP! 🎉',sx||480,(sy||300)-40,'#fff');}break;}
+    if(o.cd)break;
     if(R.sp>6&&dz>0&&dz<720&&rnInL(o.lane)){rnBreak(o,'spin');break;}
     if(Math.abs(dz)<95&&rnInL(o.lane)){if(R.jy>110&&R.jv<=0)rnBreak(o,'jump');else if(R.jy<=110&&!o.hit){o.hit=true;rnBreak(o,'run');}}break;
    case 'log':if(E&&!o.hit&&dz>0&&dz<200&&R.jy<=0&&rnInM(o.m)){R.jv=27;R.jy=.01;sfx('jump');}
