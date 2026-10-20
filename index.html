@@ -441,10 +441,11 @@ const SCROLLS={
  grav:['Gravity Scroll','Gravity pulls you down the ramp. The higher you start, the faster you go at the bottom!'],
  fric:['Friction Scroll','Friction is a rubbing force that slows things down. Smooth ground means less friction, so you roll further!'],
  moment:['Momentum Scroll','Moving things want to keep moving. That is momentum! It carries you up the other side of the half pipe.'],
+ bearing:['Bearing Scroll','Inside each wheel are ball bearings: tiny steel balls that roll around so the wheel spins smoothly with less friction!'],
  helmet:['Helmet Scroll','Skaters wear a helmet, knee pads and wrist guards. Safety gear protects you when you fall!'],
  geyser:['Geyser Scroll','A geyser is a hot spring that shoots water and steam high into the air, like Old Faithful in America.']
 };
-const LVSCROLLS={1:['cloud','sun','plant','rain','bee','bolt'],2:['lava','pumice','crystal','geyser'],3:['rain3','canopy','sloth','frog'],4:['wheel','grav','fric','moment','helmet']};
+const LVSCROLLS={1:['cloud','sun','plant','rain','bee','bolt'],2:['lava','pumice','crystal','geyser'],3:['rain3','canopy','sloth','frog'],4:['wheel','grav','fric','moment','bearing','helmet']};
 const REWARDS={2:'DOUBLE JUMP! Press jump again in the air.',3:'STRONGER SPECIAL! Bigger bending powers.',4:'STAR MAGNET! Stars fly to you.',5:'TRIPLE STAR THROW!',6:'RAINBOW AURA! Slowly heals your hearts.'};
 const ELEMS=[{n:'Fire',ic:'🔥',c:'#ff5a1f',c2:'#ffd23f',mv:'Fire Fist',ab:'Flame Burst',sh:'Burns thorn walls, lights up dark caves, big damage.',hint:'🔥 Fire burns thorns away'},
  {n:'Water',ic:'💧',c:'#2ea8ff',c2:'#aef',mv:'Water Whip',ab:'Healing Wave',sh:'Heals you, bubble shield, faster swimming, douses fires.',hint:'💧 Water puts out fire walls'},
@@ -2640,7 +2641,7 @@ function revTopics(lv){const tier=PL().tier,L=LOG(lv),pr=PR(),out=[],key=new Set
  /* missed ones first (max 2), then the things she read, then a fallback from the level bank */
  sel.push(...gates.slice(0,2));for(const t of rest){if(sel.length>=N)break;sel.push(t);}let g=0;while(sel.length<N&&g++<9)sel.push({k:'bank',cat:pick(cats)});return sel;}
 function revFact(t){return t.k==='sc'?SCROLLS[t.id]:t.k==='rf'?t.fact:t.k==='df'?['Stormi fact',DOGFACTS[t.id]]:null;}
-const SCRIC={cloud:['☁️','cloud'],sun:['☀️','sun'],plant:['🌱','plant'],rain:['🌈','rainbow'],bee:['🐝','bee'],bolt:['⚡','lightning'],lava:['🌋','lava'],pumice:['🪨','pumice rock'],crystal:['💎','crystal'],geyser:['⛲','geyser'],rain3:['🌧️','rain'],canopy:['🌳','treetops'],sloth:['🦥','sloth'],frog:['🐸','frog'],wheel:['🛞','wheel'],grav:['🛝','slide'],fric:['🧽','sponge'],moment:['🛹','skateboard'],helmet:['⛑️','helmet']};
+const SCRIC={cloud:['☁️','cloud'],sun:['☀️','sun'],plant:['🌱','plant'],rain:['🌈','rainbow'],bee:['🐝','bee'],bolt:['⚡','lightning'],lava:['🌋','lava'],pumice:['🪨','pumice rock'],crystal:['💎','crystal'],geyser:['⛲','geyser'],rain3:['🌧️','rain'],canopy:['🌳','treetops'],sloth:['🦥','sloth'],frog:['🐸','frog'],wheel:['🛞','wheel'],grav:['🛝','slide'],fric:['🧽','sponge'],moment:['🛹','skateboard'],helmet:['⛑️','helmet'],bearing:['⚙️','ball bearings']};
 /* age 4: a met Fact Scroll becomes a read-aloud picture question (find the thing the fact was about); different wording + distractors on a re-ask */
 function picFactQ(t,seen){const m=SCRIC[t.id];if(!m)return null;const f=SCROLLS[t.id],first=f[1].split(/(?<=[.!?])\s/)[0];const ask=['Which picture is the '+m[1]+'?','Find the '+m[1]+'!','Tap the '+m[1]+'!'];
  for(const a of ask){const sy='Remember the '+f[0]+'? '+first+' '+a;if(seen&&seen.includes(sy))continue;const ws=shuffle(Object.keys(SCRIC).filter(k=>k!==t.id&&SCRIC[k][0]!==m[0])).slice(0,2).map(k=>SCRIC[k]),os=shuffle([m,...ws]);
@@ -2888,7 +2889,11 @@ function resetRun(){resetRunState();save();startPlay();}
 const SKCOL=['#ff4fa3','#3ad0ff','#7be34a','#ffd23f','#c26bff','#ff7a3c','#2b2b55','#ffffff'],SKCN=['pink','blue','green','yellow','purple','orange','navy','white'];
 const SKPAT=[['none','plain'],['stripes','stripes'],['stars','stars'],['flames','flames'],['hearts','hearts'],['dots','dots']],SKGRIP=[['none','no sticker'],['⭐','star sticker'],['🌈','rainbow sticker'],['⚡','lightning sticker'],['🐶','puppy sticker'],['🦄','unicorn sticker']];
 const SKDEF=()=>({type:'board',deck:0,pat:2,wheel:3,grip:1,boot:4,swheel:1,laces:7});
-const SKG=()=>PR().skate||SKDEF();
+/* the saved ride is validated on every read: missing/corrupt fields fall back to defaults (B-qa12 robustness) */
+function skFix(g){const d=SKDEF(),o={};if(!g||typeof g!=='object')g={};o.type=g.type==='skates'?'skates':'board';
+ const lim={deck:SKCOL.length,pat:SKPAT.length,wheel:SKCOL.length,grip:SKGRIP.length,boot:SKCOL.length,swheel:SKCOL.length,laces:SKCOL.length};
+ for(const k in lim){const v=g[k];o[k]=Number.isInteger(v)&&v>=0&&v<lim[k]?v:d[k];}return o;}
+const SKG=()=>{const p=PR();if(!p.skate)return SKDEF();const f=skFix(p.skate);for(const k in f)if(p.skate[k]!==f[k]){p.skate=f;break;}return p.skate;};
 /* draw her board/skates; (x,y)=feet, rot=angle, fl=kickflip phase 0..1 */
 function drawGear(x,y,rot,fl,face,g,sc){g=g||SKG();sc=sc||1;ctx.save();ctx.translate(x,y);ctx.rotate(rot||0);ctx.scale(sc,sc);
  if(g.type==='skates'){for(const dx of[-8,7]){ctx.fillStyle=SKCOL[g.boot];rr(dx-8,-15,15,13,4);ctx.fill();ctx.fillRect(dx-8,-22,9,9);ctx.strokeStyle=SKCOL[g.laces];ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(dx-6,-18);ctx.lineTo(dx,-12);ctx.moveTo(dx,-18);ctx.lineTo(dx-6,-12);ctx.stroke();
@@ -2902,10 +2907,10 @@ function drawGear(x,y,rot,fl,face,g,sc){g=g||SKG();sc=sc||1;ctx.save();ctx.trans
  ctx.restore();if(fy<0&&SKGRIP[g.grip][0]!=='none')txt(SKGRIP[g.grip][0],0,-2,9);else if(fy>=0){ctx.fillStyle='rgba(30,30,40,.55)';ctx.fillRect(-28,-7,56,2);}ctx.restore();}
 /* ---- board / skates picker (before Level 4, editable from Level Select) ---- */
 let SKP=null;
-function openSkPick(onDone,from){SKP={g:Object.assign(SKDEF(),PR().skate||{}),onDone,from:from||mode,tab:0,t:0};mode='skpick';sfx('tick');
+function openSkPick(onDone,from){SKP={g:skFix(PR().skate),onDone,from:from||mode,tab:0,t:0};mode='skpick';sfx('tick');
  say(easy()?'Pick a skateboard or roller skates! Then pick your colours.':'Choose a skateboard or roller skates, then make it yours!',{again:true,force:easy()});}
 function skSet(k,v,nm){SKP.g[k]=v;sfx('tick');if(nm)say(nm+'!',{again:true,force:easy()});}
-function skDone(){PR().skate=Object.assign({},SKP.g);save();const f=SKP.onDone;SKP=null;sfx('star');say(PR().skate.type==='board'?'Cool board! Let\'s skate!':'Cool skates! Let\'s roll!',{again:true,force:easy()});if(f)f();else mode='levels';}
+function skDone(){PR().skate=skFix(SKP.g);save();const f=SKP.onDone;SKP=null;sfx('star');say(PR().skate.type==='board'?'Cool board! Let\'s skate!':'Cool skates! Let\'s roll!',{again:true,force:easy()});if(f)f();else mode='levels';}
 function drawSkPick(){SKP.t++;sat=1;drawBGscene(T);const g=SKP.g,e=easy(),mh=MH();panel(30,14,900,512,'#e0409a');
  txt(e?'🛹 or 🛼 ?':'Choose your ride!',480,46,30,'#e0409a');
  btn('🛹 Skateboard',60,70,220,64,()=>skSet('type','board','Skateboard'),{size:22,col:g.type==='board'?'#fff4a8':'#fff',line:g.type==='board'?'#ff9a1f':null,lw:g.type==='board'?6:0});
@@ -2958,7 +2963,9 @@ function skAfter(p,L){const E=easy(),fx=p.x+p.w/2,s=skSurfAt(L,fx),prev=p.onSurf
     if(p.skE==null)p.skE=.5*(p.vx/c)**2+.6*hg;let dir=Math.sign(p.vx)||p.face;const ax=p.hurtT>0?0:(keys.right?1:0)-(keys.left?1:0);
     if(ax===dir||(E&&p.skGo&&!ax))p.skE+=.28;else if(ax===-dir)p.skE-=.45;p.skE*=.9994;let v2=2*(p.skE-.6*hg);
     if(v2<=.4){dir=d>0?1:-1;v2=.4;p.skE=.6*hg+.2;}const v=Math.min(17,Math.sqrt(v2));p.vx=dir*v*c;p.skV=v;}
-   else{p.skE=null;p.vx+=.62*d/(1+d*d);}}
+   else{p.skE=null;p.vx+=.62*d/(1+d*d);
+    // ramp assist (B-qa12-1): rolling uphill with ▶/◀ held (age 4: also while cruising) never drops below a climbing speed
+    const ax=p.hurtT>0?0:(keys.right?1:0)-(keys.left?1:0),dir=ax||(E&&p.skGo?p.face:0);if(dir&&d*dir<-.05){const mn=E?3.6:2.6;if(p.vx*dir<mn)p.vx=dir*mn;}}}
   else if(prev===s)p.onSurf=null;}
  if(!s&&p.onSurf)p.onSurf=null;
  if(p.onGround&&!p.onSurf&&p.trk&&p.vy>=0)skLand(p);
@@ -2966,6 +2973,7 @@ function skAfter(p,L){const E=easy(),fx=p.x+p.w/2,s=skSurfAt(L,fx),prev=p.onSurf
  for(const c of L.cones){if(c.hit)continue;const dx=c.x-fx;if(E&&p.onGround&&Math.sign(dx)===Math.sign(p.vx)&&Math.abs(dx)<34+Math.abs(p.vx)*6&&Math.abs(p.vx)>.8){p.vy=-10;p.onGround=false;p.y-=2;sfx('jump');}
   if(Math.abs(dx)<14&&p.y+p.h>440-24){c.hit=1;c.ht=30;if(E){p.vx*=.4;sfx('tick');floatText('Bump!',c.x,400,'#fff');}else{hurt(1,-Math.sign(p.vx||1),null,'Oops, a cone! Jump ⤒ over the cones!');}}}
  for(const c of L.cones)if(c.ht>0)c.ht--;
+ if(!Number.isFinite(p.vx))p.vx=0;if(!Number.isFinite(p.vy))p.vy=0;if(p.skE!=null&&!Number.isFinite(p.skE))p.skE=null;if(!Number.isFinite(p.skA))p.skA=0;
  // the view switch
  if(L.sw&&!L.swT&&fx>L.sw){L.swT=1;p.vx=Math.max(p.vx,3);sfx('harmony');say(easy()?'Whoa! Into the screen!':'Whoa! The skate park goes INTO the screen! Swipe to change lanes!',{again:true});}}
 function skSwitchStep(){const L=LV;L.swT++;P.x+=3;P.vy=0;cam.x=clamp(P.x-400,0,L.W-VW);if(L.swT>=70){const lp=LP();lp.half=true;lp.cp=0;lp.rz=0;save();startRun();if(RN){RN.vs=50;}}}
@@ -2984,8 +2992,8 @@ function drawSkHUD(){if(!SK||!PL())return;const lp=LP();rr(VW/2-110,56,220,38,14
 /* ---- the side-view half ---- */
 function L4build(L,api){const {G,CK,SG,GT,SC,HS,BU,row,arc,TR,BONUS}=api,Ez=easy();let s;L.skate=true;L.surf=[];L.cones=[];L.tunnels=[];
  const SURF=(x0,x1,f,o)=>{const q=Object.assign({x0,x1,f},o||{});L.surf.push(q);return q;};
- const KICK=(x,h)=>{h=h||(Ez?50:60);SURF(x,x+130,X=>440-h*((X-x)/130)**1.5,{kick:1});};
- const HP=(x,H,W)=>{H=H||170;W=W||640;const r=260; // up-ramp, left deck, U, right deck, down-ramp
+ const KICK=(x,h)=>{h=h||(Ez?50:60);SURF(x,x+130,X=>440-h*Math.pow(clamp((X-x)/130,0,1),1.5),{kick:1});};
+ const HP=(x,H,W)=>{H=(H||170)*(Ez?.8:1);W=W||640;const r=260; // up-ramp, left deck, U, right deck, down-ramp
   SURF(x,x+r,X=>440-H*(.5-.5*Math.cos(Math.PI*(X-x)/r)));SURF(x+r,x+r+110,()=>440-H);const u0=x+r+110,u1=u0+W;SURF(u0+1,u1-1,X=>{const v=(X-u0)/W*2-1;return 440-H*v*v;},{lip:1});SURF(u1,u1+110,()=>440-H);
   SURF(u1+110,u1+110+r,X=>440-H*(.5+.5*Math.cos(Math.PI*(X-u1-110)/r)));row(u0+W/2-60,440-40,4);arc(u0+W/2-90,200,6,60);return u1+110+r;};
  const CONE=x=>L.cones.push({x});const TUN=(x,w)=>L.tunnels.push({x,w});
@@ -2998,7 +3006,11 @@ function L4build(L,api){const {G,CK,SG,GT,SC,HS,BU,row,arc,TR,BONUS}=api,Ez=easy
  s=G(2600);CK(s+60);SG(s+120,'A BIG half pipe! Go back and forth for big air!');e=HP(s+300,190,700);SC('grav',e+120,400);CONE(e+300);GT(e+520,'reading');
  BONUS('k2','sea');
  s=G(1800);CK(s+60);KICK(s+300);KICK(s+700);arc(s+450,320,5,70);arc(s+850,320,5,70);TUN(s+1050,400);SC('moment',s+1250,400);if(!Ez)CONE(s+1500);
- s=G(1400);CK(s+60);SG(s+200,'Look! The skate park goes INTO the screen!');row(s+300,400,5);L.sw=s+1000;
+ if(!Ez){ // qa12b: more side-view skating for Amari
+  s=G(2200);CK(s+60);SG(s+120,'Cone slalom! Hop ⤒ the cones and keep your combo going!');for(let i=0;i<5;i++)CONE(s+400+i*260);row(s+420,330,8);KICK(s+1750);arc(s+1900,300,6,90);SC('bearing',s+2050,330);
+  s=G(2600);CK(s+60);SG(s+120,'A mini half pipe! Pump with ▶ and ◀ for more air!');e=HP(s+300,140,520);TUN(e+120,600);row(e+180,400,10);CONE(e+520);GT(e+900,'smixed');
+  s=G(1800);CK(s+60);KICK(s+300);KICK(s+650);KICK(s+1000);arc(s+420,300,5,80);arc(s+770,300,5,80);arc(s+1120,300,5,80);SG(s+150,'Kicker run! Do a trick off every ramp!');}
+ s=G(1400);CK(s+60);SG(s+200,'Look! The skate park goes INTO the screen!');row(s+300,400,5);if(Ez)SC('bearing',s+600,400);L.sw=s+1000;
  s=G(900);L.bossX=1e9;}
 /* ---- the runner half (into-the-screen) ---- */
 function rnBuild4(E){
@@ -3012,12 +3024,14 @@ function rnBuild4(E){
  const RAIL=(s,l,n)=>{O(s,'rail',{lane:l,z0:s*RS,z1:(s+n)*RS});fruit(s+1,n-1,l,330);};
  const TUN=(s,n)=>{for(let i=0;i<n;i+=2)O(s+i,'tunnel',{});};
  const CONES=(s,m)=>O(s,'log',{m,sk:1}),BAR=(s,m)=>O(s,'branch',{m,sk:1});
- const blk=()=>{const k=RP(['cones','bar','ramp','rail','tun','crate']);const n=40,s=sec(n,RP([0,1.5,-1.5,2.5,-2.5]),RP([0,0,400,-400]));
+ const blk=()=>{const k=RP(E?['cones','bar','ramp','rail','tun','crate']:['cones','bar','ramp','rail','tun','crate','slalom','rails2']);const n=40,s=sec(n,RP([0,1.5,-1.5,2.5,-2.5]),RP([0,0,400,-400]));
   if(k==='cones'){CONES(s+10,E?1<<RI(0,2):RP([3,6,5]));CONES(s+26,E?1<<RI(0,2):7);fruit(s+14,6,RI(0,2),100);}
   else if(k==='bar'){BAR(s+12,E?1<<RI(0,2):7);fruit(s+18,6,1,50);if(!E)BAR(s+28,RP([3,6]));}
   else if(k==='ramp'){RAMP(s+12);CONES(s+30,E?2:5);}
   else if(k==='rail'){const l=RI(0,2);RAIL(s+8,l,14);fruit(s+26,6,(l+1)%3,100);}
   else if(k==='tun'){TUN(s+6,24);fruit(s+8,16,RI(0,2),100);if(!E)CONES(s+22,RP([1,2,4]));}
+  else if(k==='slalom'){for(let i=0;i<5;i++)CONES(s+6+i*6,1<<((i+RI(0,1))%3));fruit(s+5,30,1,100);}
+  else if(k==='rails2'){RAIL(s+6,0,12);RAIL(s+6,2,12);RAMP(s+26,1);}
   else{O(s+12,'crate',{lane:RI(0,2),kind:'q'});O(s+24,'crate',{lane:RI(0,2),kind:'c'});fruit(s+15,6,1,100);}};
  let s=sec(26,0,0);hint(s+1,E?'Swipe ◀ ▶ to change lanes!':'Into the screen! Swipe or tap ◀ ▶ to change lanes. 100 mangoes = an extra heart!');fruit(s+8,6,1,100);fruit(s+16,6,0,100);
  s=sec(30,1.5,0);hint(s+1,'A ramp! Roll up it for BIG AIR, then tap 👊 for a spin trick!');RAMP(s+12);
@@ -3029,7 +3043,7 @@ function rnBuild4(E){
  blk();if(!E)blk();
  s=sec(38,0,0);hint(s+3,'A rainbow space portal! Roll into it for a space trip 🚀');O(s+24,'portal',{lane:1,kind:'space'});
  blk();DOOR(sec(30,0,0)+20,'smixed','g6');
- blk();blk();
+ blk();blk();if(!E){s=sec(36,0,0);hint(s+2,'Rail park! Grind ⚡ then jump to the next rail!');RAIL(s+4,0,8);RAIL(s+14,1,8);RAIL(s+24,2,8);CHK(s+34);blk();blk();blk();blk();}
  s=sec(40,0,0);hint(s+2,'The finish line! You can do it!');RAMP(s+8);RAIL(s+20,0,10);RAIL(s+20,2,10);fruit(s+20,10,1,100);O(s+34,'end',{});sec(RDD+4,0,0);
  for(const g of segs){for(const side of[-1,1]){if(R()<.5)g.dec.push({k:RP(['bush','flower','rock','bush','flower']),o:side*(1.3+R()*.5),f:R()<.5?1:-1});if(g.i%3===0)g.dec.push({k:RP(['tree','tree','pillar','palm']),o:side*(2.2+R()*1.8),f:1});}g.dec.sort((a,b)=>Math.abs(b.o)-Math.abs(a.o));}
  obj.sort((a,b)=>a.z-b.z);obj.forEach((o,i)=>{o.id2=i;const g=segs[Math.min(segs.length-1,Math.floor(o.z/RS))];g.ob.push(o);});
