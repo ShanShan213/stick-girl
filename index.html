@@ -2983,7 +2983,7 @@ function selfTest(){const log=[];try{
   log.push(tier+' gates ok, mode '+mode);
   mode='play';for(const g of LV.gates)if(!g.open){g.open=true;LV.plats=LV.plats.filter(q=>q!==g.barrier);}frames(60);P.x=LV.bossX+30;frames(3);log.push('boss mode '+mode);
   if(mode==='duel'){for(let i=0;i<4000&&mode==='duel';i++){if(D.ph==='ask'){if(i%2)duelAnswer(D.q.c);else duelAnswer((D.q.c+1)%D.q.opts.length);}if(D.ph==='meter'&&D.m&&!D.m.res&&Math.random()<.05)duelStop();tick();if(D.ph==='win'&&D.t>20)D.t=999;if(mode==='story'){STY.i=STY.lines.length-1;STY.t=0;storyAdv();}}}
-  const fin=()=>{ok_(()=>mode==='play'&&LV.fin,'finale after duel '+mode);keys={};hit={};P.face=1;P.atk=null;PR().elem=LV.fin.el;P.ch=100;press('special');frames(3);rel('special');frames(120);ok_(()=>LV.fin.ph!=='wait','finale special hit');LV.fin.t=320;frames(20);
+  const fin=()=>{ok_(()=>mode==='play'&&LV.fin,'finale after duel '+mode);keys={};hit={};P.face=1;P.atk=null;PR().elem=LV.fin.el;P.ch=100;press('special');frames(3);rel('special');frames(120);ok_(()=>LV.fin.ph!=='wait','finale special hit');LV.fin.t=320;frames(20);ok_(()=>mode==='review','review quiz after finale '+mode);revAuto();
    for(let i=0;i<60&&mode==='story';i++){STY.t=1e4;storyAdv();tick();}ok_(()=>mode==='end','end screen '+mode);frames(3);};
   fin();log.push(tier+' L1 end, unl '+PR().unl);
   startPlay(2);ok_(()=>curLv()===2,'level 2 start');if(mode==='dogtalk'){for(let i=0;i<30&&mode==='dogtalk';i++){dogTalkAdv();dogTalkAdv();tick();}}
