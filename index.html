@@ -1517,7 +1517,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
  for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);logSc(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';say(SCROLLS[c.id][0]+'! '+SCROLLS[c.id][1],{again:true});}}
  L.scrolls=L.scrolls.filter(c=>!c.got);
  for(const c of L.checks)if(!c.reached&&p.x>c.x){c.reached=true;const lp=LP();if(c.x>(lp.cp||0)){lp.cp=c.x;L.checks.forEach(o=>o.on=o===c);p.hp=Math.min(p.max,p.hp+2);if(c.x>100){floatText(easy()?'⚑ ✔':'⚑ Checkpoint',c.x+20,440-150,'#bfffbf');{const lt=parts[parts.length-1];lt.life=lt.max=72;lt.vy=-.5;lt.ck=1;}fireworks(c.x+18,440-130);sfx('chime');}save();}} // one-way: each flag fires once; only the furthest counts
- if(!pr.tipMoves&&p.onGround&&!activeRoom()&&++tipT>300){pr.tipMoves=true;const tc=tcEl.classList.contains('on');toast(tc?'🦶💨 Flying Kick: tap 🦶 while running or jumping!':'🦶💨 Flying Kick: press X while running or jumping!',330);toast(tc?'🦸 Superman Punch: tap 👊 while running or jumping!':'🦸 Superman Punch: press Z while running or jumping!',330);toast(tc?'▼ Hold to duck, tap to drop through ledges, tap in the air to ground-pound!':'S / ↓: hold to duck, tap to drop through ledges or ground-pound in the air!',330);save();}
+ if(!pr.tipMoves&&!L.skate&&p.onGround&&!activeRoom()&&++tipT>300){pr.tipMoves=true;const tc=tcEl.classList.contains('on');toast(tc?'🦶💨 Flying Kick: tap 🦶 while running or jumping!':'🦶💨 Flying Kick: press X while running or jumping!',330);toast(tc?'🦸 Superman Punch: tap 👊 while running or jumping!':'🦸 Superman Punch: press Z while running or jumping!',330);toast(tc?'▼ Hold to duck, tap to drop through ledges, tap in the air to ground-pound!':'S / ↓: hold to duck, tap to drop through ledges or ground-pound in the air!',330);save();}
  updRooms();if(mode!=='play')return;
  // gates
  for(const g of L.gates)if(!g.open&&p.gcool<=0&&p.x+p.w>g.x-70&&Math.abs(p.y-300)<400){if(g.kind==='might')startBoards(g);else startQuiz(g.kind,g);return;}
@@ -2118,7 +2118,8 @@ function rnDrawPlayer(pr,rev){const R=RN;if(R.pdrawn===R.df)return;R.pdrawn=R.df
  const x=rev?K-c*(R.px-cx)*K:K+c*(xo+R.px-cx)*K,yg=VH*RHZ-c*(rnRoadY(R.z)-R.cam.camY)*K,k=c*K,y=yg-R.jy*k;let sc=(600*k)/150*(rev?1.35:1);
  ctx.globalAlpha=.3;rEl(x,yg,48*sc,12*sc,'#000');ctx.globalAlpha=1;
  if(R.inv>0&&R.inv%8<4&&!R.go){ctx.globalAlpha=.55;}
- rnGirl(x,y,sc,{ph:R.z/90,front:rev,slide:R.sl>0,air:R.jy>0,spin:R.sp>0});ctx.globalAlpha=1;R.psx=x;R.psy=y;}
+ if(R.L4){const g=SKG(),k=sc*1.7;ctx.save();ctx.translate(x,y);ctx.scale(k,k);if(g.type==='board'){ctx.fillStyle=SKCOL[g.wheel];for(const wx of[-16,16]){ctx.beginPath();ctx.arc(wx,2,4.5,0,7);ctx.fill();}ctx.fillStyle=SKCOL[g.deck];rr(-20,-8,40,8,4);ctx.fill();}else for(const dx of[-9,9]){ctx.fillStyle=SKCOL[g.boot];rr(dx-6,-16,12,14,4);ctx.fill();ctx.fillStyle=SKCOL[g.swheel];ctx.beginPath();ctx.arc(dx,1,3.5,0,7);ctx.fill();}ctx.restore();}
+ rnGirl(x,R.L4?y-9*sc*1.7:y,sc,{ph:R.L4&&R.jy<=0?0:R.z/90,front:rev,slide:R.sl>0,air:R.jy>0,spin:R.sp>0||R.skT>0});ctx.globalAlpha=1;R.psx=x;R.psy=y;}
 function drawRunHUD(){const R=RN;if(!R)return;
  // mango counter
  rr(VW/2+70,10,150,40,14);ctx.fillStyle='rgba(20,20,60,.4)';ctx.fill();ctx.drawImage(RART.mango(),VW/2+76,12,36,36);txt(R.fruit+' / 100',VW/2+165,31,20,'#fff','center');
