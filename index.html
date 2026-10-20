@@ -2572,8 +2572,8 @@ function drawQuiz(){drawWorld();drawHUD();const e=easy(),col={maths:'#ff7a3c',re
   btn('◀',74,48,62,42,()=>{shush();mode='play';P.x=Math.max(10,QZ.gate.x-170);P.vx=0;P.gcool=150;},{size:20,col:'#fff',hit:1});return;}
  wrap(q.q,480,e?150:140,760,e?52:42,e?42:32,'#2b2b55');
  const n=q.opts.length;
- if(e){for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+'   '+q.opts[i],220,230+i*82,520,70,()=>quizAnswer(i),{size:34,col:rm?'#ddd':null,tc:rm?'#aaa':null,dis:rm});}}
- else{for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>quizAnswer(i),{size:28,col:rm?'#ddd':null,tc:rm?'#aaa':null,dis:rm});}}
+ if(e){for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+'   '+q.opts[i],220,230+i*82,520,70,()=>quizAnswer(i),{size:34,col:'#fff'});}}
+ else{for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>quizAnswer(i),{size:28,col:'#fff'});}}
  drawFB(QZ.fb,e?440:430,760);
  if(QZ.dm)txt('🐶 '+QZ.dm,480,e?503:497,e?16:17,'#2d5f8a');
  dogSprite(850,98,-1,.62,T,{fast:QZ.done,mouth:QZ.done});
@@ -2641,7 +2641,7 @@ function drawRev(){sat=1;drawBGscene(T);const e=easy(),col='#3b6ea8';panel(60,40
  btn('🔊',740,40,66,66,()=>sayQ(q,true),{size:22,col:'#fff'});
  if(q.pics){drawPQ(q,[],i=>revAnswer(i),262,168);drawFB(RV.fb?Object.assign({},RV.fb):null,442,700);return;}
  wrap(q.q,480,e?150:140,760,e?44:36,e?36:q.cl?24:30,'#2b2b55');const n=q.opts.length;
- for(let i=0;i<n;i++)btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>revAnswer(i),{size:26});
+ for(let i=0;i<n;i++)btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>revAnswer(i),{size:26,col:'#fff'});
  drawFB(RV.fb,430,760);}
 window.revAuto=()=>{let g=0;while(RV&&!RV.done&&g++<40)revAnswer(RV.qs[RV.i].q.c);if(RV)revEnd();};
 /* ================= PET FEEDING / BEFRIENDING ================= */
@@ -2660,7 +2660,7 @@ function drawFeed(){if(FD.ret==='pets')drawPetsBG();else{drawWorld();drawHUD();}
  wrap('📖 '+d.fact,570,128,520,26,20,'#2b2b55');
  txt('⚡ Superpower: '+d.pw,570,222,22,'#2b7a2b');wrap(d.pwd,570,252,520,22,17,'#2b2b55');
  if(FD.ok){const b=PR().pets[d.id].bond;txt(FD.first?'Yum! '+d.name+' is your friend now!':'Yum! They love '+d.foodName+'!',480,370,30,'#e0409a');txt('Bond: '+'♥'.repeat(bondLv(b))+'♡'.repeat(5-bondLv(b)),480,414,30,'#ff3b5c');btn('Yay!',380,440,200,56,endFeed,{col:'#ffe066',size:26});}
- else{txt('What does '+d.name.split(' ')[0]+' like to eat?',480,330,26,'#2b2b55');FD.foods.forEach((f,i)=>btn((i+1)+' '+f,190+i*210,360,190,80,()=>feedAnswer(i),{size:40}));
+ else{txt('What does '+d.name.split(' ')[0]+' like to eat?',480,330,26,'#2b2b55');FD.foods.forEach((f,i)=>btn((i+1)+' '+f,190+i*210,360,190,80,()=>feedAnswer(i),{size:40,col:'#fff'}));
   if(FD.hint)wrap('💡 Not quite! '+FD.hint,480,468,740,22,19,'#7a4a00');if(FD.first)btn('Not now',104,44,96,36,endFeed,{size:16,hit:1});}}
 
 /* ================= PETS SCREEN ================= */
@@ -2716,7 +2716,7 @@ function drawBoards(){const e=easy();ctx.save();if(shake>0){ctx.translate(rnd(-s
  if(BD.reset>0)txt('So close! The boards grew back. Try again!',480,170,26,'#fff','center','#a22');
  if(BD.done){rr(180,140,600,250,24);ctx.fillStyle='rgba(255,253,242,.97)';ctx.fill();txt('CRASH! 💥',480,200,56,'#e0409a','center','#fff');txt('All boards smashed! Best combo: x'+BD.best,480,266,26,'#2b2b55');txt('+40 XP   +'+(5+BD.best*2)+' ⭐   +1 🍎',480,306,24,'#2b7a2b');btn('Awesome!',380,330,200,54,()=>{BD.t=999;},{col:'#ffe066',size:26});}
  else{rr(30,425,900,105,16);ctx.fillStyle='rgba(255,253,242,.95)';ctx.fill();const q=BD.q,n=q.opts.length;
-  q.opts.forEach((o,i)=>{const rm=BD.rem.includes(i),w=n===3?270:205;if(e)btn('',50+i*(w+14),436,w,84,()=>boardAnswer(i),{col:rm?'#ddd':null,dis:rm,draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.3:1;txt(o,X+W/2-50,Y+H/2,44,'#2b2b55');dotRow(+o,X+W/2+50-Math.min(5,+o)*7.8+7.8,Y+H/2-(+o>5?8:0),6);ctx.globalAlpha=1;}});else btn((i+1)+')  '+o,50+i*(w+14),440,w,60,()=>boardAnswer(i),{size:28,col:rm?'#ddd':null,dis:rm});});
+  q.opts.forEach((o,i)=>{const rm=BD.rem.includes(i),w=n===3?270:205;if(e)btn('',50+i*(w+14),436,w,84,()=>boardAnswer(i),{col:'#fff',draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.3:1;txt(o,X+W/2-50,Y+H/2,44,'#2b2b55');dotRow(+o,X+W/2+50-Math.min(5,+o)*7.8+7.8,Y+H/2-(+o>5?8:0),6);ctx.globalAlpha=1;}});else btn((i+1)+')  '+o,50+i*(w+14),440,w,60,()=>boardAnswer(i),{size:28,col:'#fff'});});
   if(e&&q.sum){rr(300,118,360,84,18);ctx.fillStyle='rgba(255,253,242,.92)';ctx.fill();drawPic({k:'sum',e:'⭐',a:q.sum[0],b:q.sum[1]},480,160,.75);btn('🔊',672,138,46,44,()=>say(q.q.replace(' = ?','').replace('+',' plus '),{force:true,again:true}),{size:18,hit:1});}
   drawFB(BD.fb,e?362:366,760);
   btn('Back',20,16,90,36,()=>{mode='play';P.x=Math.max(10,BD.gate.x-170);P.vx=0;P.gcool=150;},{size:18,hit:1});}}
@@ -2777,9 +2777,9 @@ function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.
  if(D.ph==='intro'){txt('FINAL FIGHT: TEST YOUR MIGHT!',480,395,34,'#e0409a');wrap('Answer fast to land big hits. Three right in a row unleashes a SPECIAL move! Don\'t worry - you can\'t lose, you just get back up!',480,440,820,28,20,'#2b2b55');btn('Fight!',400,478,160,44,()=>{duelNext();},{size:24,col:'#ffe066',hit:1});}
  else if(D.ph==='ask'){const q=D.q;bar(40,358,880,12,D.qt/D.qmax,D.qt/D.qmax<.3?'#ff5a3c':'#7be34a');const n=q.opts.length,w=n===3?280:204;
   if(easy()&&q.sum){drawPic({k:'sum',e:'⭐',a:q.sum[0],b:q.sum[1]},400,394,.7);txt(q.q,780,394,30,'#2b2b55');btn('🔊',880,372,46,40,()=>say(q.q.replace(' = ?','').replace('+',' plus '),{force:true,again:true}),{size:18,hit:1});
-   q.opts.forEach((o,i)=>{const rm=D.rem.includes(i);btn('',48+i*(w+20),420,w,96,()=>duelAnswer(i),{col:rm?'#ddd':null,dis:rm,draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.3:1;txt(o,X+W/2-50,Y+H/2,46,'#2b2b55');dotRow(+o,X+W/2+50-Math.min(5,+o)*7.8+7.8,Y+H/2-(+o>5?8:0),6);ctx.globalAlpha=1;}});});}
+   q.opts.forEach((o,i)=>{const rm=D.rem.includes(i);btn('',48+i*(w+20),420,w,96,()=>duelAnswer(i),{col:'#fff',draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.3:1;txt(o,X+W/2-50,Y+H/2,46,'#2b2b55');dotRow(+o,X+W/2+50-Math.min(5,+o)*7.8+7.8,Y+H/2-(+o>5?8:0),6);ctx.globalAlpha=1;}});});}
   else{txt(q.q,480,396,easy()?46:40,'#2b2b55');
-  q.opts.forEach((o,i)=>{const rm=D.rem.includes(i);btn((i+1)+')  '+o,48+i*(w+20),425,w,easy()?84:64,()=>duelAnswer(i),{size:easy()?38:30,col:rm?'#ddd':null,dis:rm});});}
+  q.opts.forEach((o,i)=>{const rm=D.rem.includes(i);btn((i+1)+')  '+o,48+i*(w+20),425,w,easy()?84:64,()=>duelAnswer(i),{size:easy()?38:30,col:'#fff'});});}
   drawFB(D.fb,288,700);}
  else if(D.ph==='meter'||(D.ph==='anim'&&false)){const m=D.m;txt('POWER METER: stop on  '+m.q.replace(' = ?','')+(easy()?'':' !'),480,392,30,'#2b2b55');if(easy())txt('Find the answer number and stop on it!',480,420,18,'#7a4a00');
   const cw=860/m.N;for(let i=0;i<m.N;i++){const dd=Math.abs(i+1-m.target);ctx.fillStyle='#ffe9b0';rr(50+i*cw+2,440,cw-4,46,8);ctx.fill();ctx.strokeStyle='#2b2b55';ctx.lineWidth=3;ctx.stroke();txt(String(i+1),50+i*cw+cw/2,463,26,'#2b2b55');}
