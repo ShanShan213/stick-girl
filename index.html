@@ -2927,14 +2927,14 @@ function skScore(k,x,y){const t=SKTR[k];if(!SK)skReset();SK.cb=SK.cbT>0?SK.cb+1:
  sfx(SK.cb>2?'harmony':'star');skPop(t.ic+' '+t.n+'! +'+pts+(m>1?'  x'+m+' COMBO':''),x,y,m>2?'#ffe066':'#fff');if(SK.cb===3)say('Combo! '+pick(['Awesome!','Rad!','So cool, '+hero()+'!']),{queue:true});addStars(1);}
 /* start a trick (side view). On the ground it pops an ollie first; age 4 always lands it */
 function skTrick(k){const p=P,E=easy();if(!SK)skReset();if(p.trk)return;if(p.onGround){p.vy=E?-11:-10.5;p.onGround=false;p.coy=0;p.jumps=1;p.y-=2;sfx('jump');}
- p.trk={k,t:0,d:Math.round(SKTR[k].d*(E?.7:1))};sfx('kick');}
+ p.spr=true;p.trk={k,t:0,d:Math.round(SKTR[k].d*(E?.7:1))};sfx('kick');}
 function skLand(p){const t=p.trk;if(!t)return;p.trk=null;if(t.t>=t.d*.7||easy()){skScore(t.k,p.x+10,p.y-30);}else{sfx('hurt');p.hurtT=10;p.vx*=.5;if(SK)SK.cb=0,SK.cbT=0;floatText('Bail! Try the trick a bit higher',p.x,p.y-20,'#ffd0d8');}}
 /* ---- surfaces: ramps, half pipes, decks (curves above the 440 ground) ---- */
 function skSurfAt(L,x){if(!L.surf)return null;for(const s of L.surf)if(x>=s.x0&&x<=s.x1)return s;return null;}
 function skStep(p,ax,w,L){const E=easy();if(!SK)skReset();if(SK.cbT>0)SK.cbT--;
  const top=E?6:7.2,sf=p.onSurf;
  if(p.hurtT>0)ax=0;
- if(p.onGround){if(ax){p.vx+=ax*(Math.sign(p.vx)===-ax&&Math.abs(p.vx)>.5?.34:(E?.17:.21));p.face=ax;}else p.vx*=sf?.996:.988;
+ if(p.onGround){if(ax){p.vx+=ax*(Math.sign(p.vx)===-ax&&Math.abs(p.vx)>.5?.34:(E?.17:.21));p.face=ax;}else p.vx*=sf?.996:.993;
   if(E&&!ax&&!sf&&p.skGo&&Math.abs(p.vx)<2.4)p.vx+=p.face*.08; // age 4 cruise: keeps gently rolling
   if(!sf&&Math.abs(p.vx)>top)p.vx*=.97;}
  else if(ax)p.vx+=ax*.06;
@@ -2944,18 +2944,23 @@ function skStep(p,ax,w,L){const E=easy();if(!SK)skReset();if(SK.cbT>0)SK.cbT--;
  if(p.trk){p.trk.t++;if(p.trk.t>=p.trk.d&&!p.onGround){const t=p.trk;p.trk=null;skScore(t.k,p.x+10,p.y-30);}}
  if(p.sbt>0)p.sbt--;}
 /* after moveBody: glue her to ramps/pipes, slope gravity, lip launches, cones */
-function skAfter(p,L){const E=easy(),fx=p.x+p.w/2,s=skSurfAt(L,fx),prev=p.onSurf;p.skA=(p.skA||0)*.7;
- if(s){const sy=s.f(fx),feet=p.y+p.h;if(p.vy>=-1&&feet>=sy-8&&feet<=sy+46){p.y=sy-p.h;if(p.vy>3&&!prev)p.sq=.2;if(!p.onGround||p.trk)skLand(p);p.vy=0;p.onGround=true;p.gnd={t:'s',x:s.x0,w:s.x1-s.x0,y:sy};p.onSurf=s;
-   const d=(s.f(fx+2)-s.f(fx-2))/4;p.vx+=.62*d/(1+d*d);p.skA=Math.atan(d);p.skD=d;}
-  else if(p.onSurf===s&&feet<sy-8)p.onSurf=null;}
- if(prev&&(!s||s!==prev)&&!(s&&p.onSurf===s)){ // left a surface
-  const d=p.skD||0;if(prev.lip&&Math.abs(d)>.6&&Math.abs(p.vx)>3&&(fx>=prev.x1||fx<=prev.x0)){const dir=Math.sign(p.vx),fwd=(dir>0&&(keys.right||(E&&(prev.airs=(prev.airs||0)+1)>=2)))||(dir<0&&keys.left);
-    p.vy=-Math.min(17,Math.abs(p.vx)*Math.abs(d)*1.1+4);p.vx=fwd?dir*2.4:-dir*.35;p.onGround=false;p.gnd=null;p.y-=4;sfx('jump');skPop('🚀 AIR!',fx,p.y-30,'#bff4ff');
-    if(!p.skTip){p.skTip=1;toast(E?'Tap 🛹 🌀 ✋ for a trick!':'Big air! Tap 🛹 Flip, 🌀 Spin or ✋ Grab (▼) in the air!',150);}}
-  else if(prev.kick&&p.vx>3&&fx>=prev.x1){p.vy=-Math.min(14,p.vx*1.2+3);p.onGround=false;p.gnd=null;p.y-=3;sfx('jump');skPop('🚀',fx,p.y-20,'#bff4ff');}
-  if(p.onSurf===prev)p.onSurf=null;}
+function skAfter(p,L){const E=easy(),fx=p.x+p.w/2,s=skSurfAt(L,fx),prev=p.onSurf,glued=p.skLast===T-1&&!!prev;p.skA=(p.skA||0)*.7;let launched=false;
+ if(prev&&s!==prev&&glued){const d=p.skD||0,dir=Math.sign(p.vx);
+  if(prev.lip&&Math.abs(d)>.6){const v=p.skV||Math.abs(p.vx);if(v>=2.2){const fwd=(dir>0&&(keys.right||(E&&(prev.airs=(prev.airs||0)+1)>=2)))||(dir<0&&keys.left);
+    p.vy=-Math.min(18,Math.max(10,v*1.05));p.spr=true;p.skE=null;p.vx=fwd?dir*2.6:-dir*.3;p.onGround=false;p.gnd=null;p.y-=4;launched=true;sfx('jump');skPop('🚀 AIR!',fx,p.y-30,'#bff4ff');
+    if(!p.skTip){p.skTip=1;toast(E?'Tap 🛹 or 🌀 for a trick!':'Big air! Tap 🛹 Flip, 🌀 Spin or ▼ Grab in the air!',150);}}}
+  else if(prev.kick&&p.vx>3&&fx>=prev.x1){p.vy=-Math.min(14,p.vx*1.2+3);p.spr=true;p.onGround=false;p.gnd=null;p.y-=3;launched=true;sfx('jump');skPop('🚀',fx,p.y-20,'#bff4ff');}
+  p.onSurf=null;}
+ if(s&&!launched){const sy=s.f(fx),feet=p.y+p.h,tol=glued&&prev===s?34:8;if(p.vy>=-1&&feet>=sy-tol&&feet<=sy+46){const d=(s.f(fx+2)-s.f(fx-2))/4,c=1/Math.sqrt(1+d*d),hg=440-sy,air=!(glued&&prev===s);
+   if(air&&s.lip)p.skE=.5*(p.vx*p.vx/(c*c)+p.vy*p.vy*.6)+.6*hg;p.y=sy-p.h;if(p.vy>3&&air)p.sq=.2;if(air)skLand(p);p.vy=0;p.onGround=true;p.gnd={t:'s',x:s.x0,w:s.x1-s.x0,y:sy};p.onSurf=s;p.skLast=T;p.skA=Math.atan(d);p.skD=d;
+   if(s.lip){ // energy model in the half pipe: speed comes from height, pump with the arrow you are rolling towards
+    if(p.skE==null)p.skE=.5*(p.vx/c)**2+.6*hg;let dir=Math.sign(p.vx)||p.face;const ax=p.hurtT>0?0:(keys.right?1:0)-(keys.left?1:0);
+    if(ax===dir||(E&&p.skGo&&!ax))p.skE+=.28;else if(ax===-dir)p.skE-=.45;p.skE*=.9994;let v2=2*(p.skE-.6*hg);
+    if(v2<=.4){dir=d>0?1:-1;v2=.4;p.skE=.6*hg+.2;}const v=Math.min(17,Math.sqrt(v2));p.vx=dir*v*c;p.skV=v;}
+   else{p.skE=null;p.vx+=.62*d/(1+d*d);}}
+  else if(prev===s)p.onSurf=null;}
  if(!s&&p.onSurf)p.onSurf=null;
- if(p.onGround&&!p.onSurf&&p.trk)skLand(p);
+ if(p.onGround&&!p.onSurf&&p.trk&&p.vy>=0)skLand(p);
  // cones: jump them (age 4: auto hop, never loses a heart)
  for(const c of L.cones){if(c.hit)continue;const dx=c.x-fx;if(E&&p.onGround&&Math.sign(dx)===Math.sign(p.vx)&&Math.abs(dx)<34+Math.abs(p.vx)*6&&Math.abs(p.vx)>.8){p.vy=-10;p.onGround=false;p.y-=2;sfx('jump');}
   if(Math.abs(dx)<14&&p.y+p.h>440-24){c.hit=1;c.ht=30;if(E){p.vx*=.4;sfx('tick');floatText('Bump!',c.x,400,'#fff');}else{hurt(1,-Math.sign(p.vx||1),null,'Oops, a cone! Jump ⤒ over the cones!');}}}
@@ -2990,7 +2995,7 @@ function L4build(L,api){const {G,CK,SG,GT,SC,HS,BU,row,arc,TR,BONUS}=api,Ez=easy
  // hidden pipe cave (Big Star k1)
  s=G(1200);CK(s+60);BU(s+230,440,1.05);L.pipes.push({id:'k1',x:s+300,out:s+1000});HS(s+120,'Psst! That drain pipe hole by the bush looks suspicious... Stand on it and tap ▼!',1);row(s+560,400,4);
  s=G(2600);CK(s+60);SG(s+120,'A BIG half pipe! Go back and forth for big air!');e=HP(s+300,190,700);SC('grav',e+120,400);CONE(e+300);GT(e+520,'reading');
- BONUS('k2','ocean');
+ BONUS('k2','sea');
  s=G(1800);CK(s+60);KICK(s+300);KICK(s+700);arc(s+450,320,5,70);arc(s+850,320,5,70);TUN(s+1050,400);SC('moment',s+1250,400);if(!Ez)CONE(s+1500);
  s=G(1400);CK(s+60);SG(s+200,'Look! The skate park goes INTO the screen!');row(s+300,400,5);L.sw=s+1000;
  s=G(900);L.bossX=1e9;}
