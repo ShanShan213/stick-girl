@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="sg-build" content="v8-qa10-2026-10-18">
+<meta name="sg-build" content="v8-qa11-2026-10-20">
 <title>Stick Girl: Colour Quest</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#4cc3ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -367,7 +367,7 @@ const COLNAMES=['Red','Orange','Yellow','Green','Blue','Purple'];
 const FOODS=['🍓','🐭','🎋','🐟','🌶️','🥕','🍕','🍫','🍪','🍦','🍌','🍔','🌰','🐛'];
 const PETS=[
  {id:'fox',name:'Ember the Fox',real:true,food:'🍓',foodName:'berries',pw:'Hint Whisper',
-  pwd:'Removes wrong answers in quizzes (2 at bond 3+).',
+  pwd:'Bonus stars for right quiz answers (more at bond 3+).',
   fact:'Foxes have super hearing. They can hear a mouse squeak from far away, even under snow!',
   hint:'Foxes eat berries, bugs and small animals. Which one is a fruit?'},
  {id:'owl',name:'Hoot the Owl',real:true,food:'🐭',foodName:'mice',pw:'Night Light',
@@ -905,7 +905,7 @@ const DOGFACTS=[
  "Puppies are born with their eyes and ears shut. They open up after about two weeks.",
  "Dogs talk with their tails, ears and eyes. A wagging tail often means happy, but check the whole dog!",
  "Dogs dream too! If a sleeping pup twitches her paws, she might be chasing something in her dreams."];
-const DOGUNL=['','Friend for life! Pops in with hints when you are stuck.','Secret-path tips + a 2nd quiz clue!','Crosses out a wrong answer + speed cheer!','Helps at the start of every question!','MAX! Her cheer can make a bubble shield!'];
+const DOGUNL=['','Friend for life! Pops in with hints when you are stuck.','Secret-path tips + extra quiz cheering!','Speed cheer + bonus quiz stars!','Cheers you on at the start of every question!','MAX! Her cheer can make a bubble shield!'];
 const newSF=x=>({st:'away',corner:-1,hold:0,x:x,y:440,gy:440,face:1,vx:0,ph:0,wag:0,mouth:0,pc:0,cheer:1500,cd:0});
 let SF=newSF(0),DB={cur:null,q:[]},DT=null;
 function dogBark(){sfx('bark');SF.wag=70;SF.mouth=32;}
@@ -913,14 +913,12 @@ function dogBond(n){const d=DG(),b=dogLv();d.bond+=n;const a=dogLv();if(a>b){toa
 function dogSay(text,o){o=o||{};say(text,{queue:true});if(SF.st==='away'&&P&&mode==='play')stormiIn(-P.face);const m={text,fact:!!o.fact,t:0,ttl:o.ttl||Math.min(620,170+text.length*5),bark:o.bark!==false};
  if(DB.cur){if(DB.q.length>=2){const i=DB.q.findIndex(x=>x.fact);DB.q.splice(i>=0?i:0,1);}DB.q.push(m);}else{DB.cur=m;if(m.bark)dogBark();}}
 function dogNext(){DB.cur=DB.q.shift()||null;if(DB.cur&&DB.cur.bark)dogBark();}
-function dogFact(){const d=DG(),left=DOGFACTS.map((f,i)=>i).filter(i=>!d.facts.includes(i));if(!left.length)return;const i=left[0];d.facts.push(i);addXP(5);dogSay('📜 Fact Scroll: '+DOGFACTS[i],{fact:true});save();}
+function dogFact(){const d=DG(),left=DOGFACTS.map((f,i)=>i).filter(i=>!d.facts.includes(i));if(!left.length)return;const i=left[0];d.facts.push(i);try{LOG().df.push(i);}catch(e){}addXP(5);dogSay('📜 Fact Scroll: '+DOGFACTS[i],{fact:true});save();}
 function petDog(){if(mode!=='play'||!P||SF.st!=='in'||Math.abs(SF.x-P.x)>190)return;SF.wag=90;SF.mouth=60;sfx('yip');floatText('♥',SF.x,SF.y-62,'#ff5a8a');
  if(SF.pc<=0){SF.pc=2400;dogBond(1);dogSay(pick(['Woof! Thanks for the pat, '+PL().name+'!','Wag wag wag! I love you, '+PL().name+'!','Best pat ever! Let\'s go find colours!']),{bark:false});}}
-function dogQuizHelp(start){if(!QZ||QZ.done||SV.hints==='off')return;const q=QZ.qs[QZ.i],lv=dogLv();const left=q.opts.map((o,i)=>i).filter(i=>i!==q.c&&!QZ.rem.includes(i));
- if(start){QZ.dm=QZ.i===0?DN()+': Take your time. I believe in you!':'';if(lv>=4&&left.length>=2){QZ.rem.push(left[ri(0,left.length-1)]);QZ.dm=DN()+' crossed one out for you!';}return;}
- if(lv>=3&&left.length>=2){QZ.rem.push(left[ri(0,left.length-1)]);QZ.dm=DN()+' crossed out a wrong answer!';}
- else if(lv>=2&&QZ.wrong>=2&&!q.pics){QZ.dm=DN()+' sniffs: the answer starts with "'+Array.from(String(q.opts[q.c]))[0]+'"';}
- else if(lv>=2)QZ.dm=DN()+': Read the clue again, you are close!';}
+function dogQuizHelp(start){if(!QZ||QZ.done||SV.hints==='off')return;const lv=dogLv();
+ if(start){QZ.dm=QZ.i===0?DN()+': Take your time. I believe in you!':lv>=4?DN()+': You can do it!':'';return;}
+ QZ.dm=lv>=2?DN()+': New question! You are learning!':'';}
 function dogTalk(lines,onEnd,ret){if(SF.st==='away'){SF.st='in';SF.corner=-1;SF.hold=0;SF.x=P?P.x-60:24;}DT={lines,i:0,t:0,onEnd,ret:ret||'play'};mode='dogtalk';SF.wag=60;if(lines[0].b)sfx('bark');}
 function dogTalkEnd(){shush();const f=DT.onEnd,r=DT.ret;DT=null;mode=r==='play'?PM():r;if(f)f();}
 function dogTalkAdv(){const full=DT.lines[DT.i].s.length*1.2;if(DT.t<full){DT.t=1e4;return;}DT.i++;DT.t=0;if(DT.i>=DT.lines.length){dogTalkEnd();return;}SF.wag=60;if(DT.lines[DT.i].b)sfx('bark');else sfx('yip');}
@@ -1491,7 +1489,7 @@ if(p.shield>0)p.shield--;if(p.speedT>0)p.speedT--;if(p.lightT>0)p.lightT--;if(p.
    else if(it.k==='gem'){addStars(3);P.ch=Math.min(100,P.ch+8);sfx('star');floatText('+3',it.x,it.y,it.c||'#6ff');addParts(it.x,it.y,6,it.c||'#6ff',{star:true});}
    else if(it.k==='heart'){if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);}floatText('+♥',it.x,it.y,'#f66');sfx('pet');}}}
  L.items=L.items.filter(i=>!i.got);
- for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';say(SCROLLS[c.id][0]+'! '+SCROLLS[c.id][1],{again:true});}}
+ for(const c of L.scrolls){if(Math.abs(c.x-p.x)<30&&Math.abs(c.y-(p.y+28))<50){c.got=true;pr.scrolls.push(c.id);logSc(c.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);STO={sc:SCROLLS[c.id],t:0};prevMode='play';mode='scroll';say(SCROLLS[c.id][0]+'! '+SCROLLS[c.id][1],{again:true});}}
  L.scrolls=L.scrolls.filter(c=>!c.got);
  for(const c of L.checks)if(!c.reached&&p.x>c.x){c.reached=true;const lp=LP();if(c.x>(lp.cp||0)){lp.cp=c.x;L.checks.forEach(o=>o.on=o===c);p.hp=Math.min(p.max,p.hp+2);if(c.x>100){floatText(easy()?'⚑ ✔':'⚑ Checkpoint',c.x+20,440-150,'#bfffbf');{const lt=parts[parts.length-1];lt.life=lt.max=72;lt.vy=-.5;lt.ck=1;}fireworks(c.x+18,440-130);sfx('chime');}save();}} // one-way: each flag fires once; only the furthest counts
  if(!pr.tipMoves&&p.onGround&&!activeRoom()&&++tipT>300){pr.tipMoves=true;const tc=tcEl.classList.contains('on');toast(tc?'🦶💨 Flying Kick: tap 🦶 while running or jumping!':'🦶💨 Flying Kick: press X while running or jumping!',330);toast(tc?'🦸 Superman Punch: tap 👊 while running or jumping!':'🦸 Superman Punch: press Z while running or jumping!',330);toast(tc?'▼ Hold to duck, tap to drop through ledges, tap in the air to ground-pound!':'S / ↓: hold to duck, tap to drop through ledges or ground-pound in the air!',330);save();}
@@ -1611,7 +1609,7 @@ function updRooms(){const p=P,L=LV,E=easy();
   if(fol.length>near.length&&!r2.done&&++po.wait<150){if(po.wait===2){floatText('🧚 ⏳',po.x,320,'#7a4ab0');say(easy()?'Wait for your sprite friends!':'Waiting for your sprites to catch up...',{queue:true});}continue;}
   if(near.length){for(const s of near){s.gone=true;RSC().push(s.id);addParts(s.x+8,s.y+10,12,s.col,{star:true});}L.sprites=L.sprites.filter(s=>!s.gone);const n=near.length;toast('Rescued '+n+' sprite'+(n>1?'s':'')+'! '+RSC().length+'/'+RESC_TOTAL,160);sfx('lvl');addXP(8*n);addStars(3*n);rescueBonus();save();}
   po.go=false;po.cool=true;
-  if(!r2.done){roomApplyDone(L,r2);RDN2()[r2.id]=true;if(SF.st==='stay')stormiOut();addXP(25);addStars(8);sfx('lvl');save();const q=r2.q;RQ={po,r:r2,step:0,sel:0,rem:[],ok:false,t:0,msg:'',opts:shuffle(q.o.map((t,i)=>({t,ok:i===q.c,ic:q.ic?q.ic[i]:null})))};mode='rq';say(r2.name+' solved! '+r2.fact[0]+'. '+r2.fact[1],{again:true});return;}
+  if(!r2.done){roomApplyDone(L,r2);RDN2()[r2.id]=true;if(SF.st==='stay')stormiOut();addXP(25);addStars(8);sfx('lvl');save();const q=r2.q;if(r2.fact)try{LOG().rf.push(r2.fact);}catch(e){}RQ={po,r:r2,step:0,sel:0,rem:[],ok:false,t:0,msg:'',opts:shuffle(q.o.map((t,i)=>({t,ok:i===q.c,ic:q.ic?q.ic[i]:null})))};mode='rq';say(r2.name+' solved! '+r2.fact[0]+'. '+r2.fact[1],{again:true});return;}
   enterSpace(po);return;}
  // crumbs
  for(const s of L.stones)if(s.plat&&s.half===1&&!s.crumb&&s.r.phase==='in'&&p.onGround&&p.gnd===s.plat){s.crumb=true;sfx('star');}
@@ -1621,13 +1619,22 @@ function rqDone(){const po=RQ&&RQ.po;mode='play';RQ=null;P.gcool=20;if(po&&!po.s
 function portalLock(po){const r=po.r;if(r.done)return '';if(LV.doors.some(d=>d.r===r&&!d.open&&d.x<po.x&&P.x+10<d.x))return easy()?'Solve the room first!':'Solve the puzzle room first to open the way!';return '';}
 function rescueBonus(){const n=RSC().length,pr=PR(),lp=LP();lp.rbon=lp.rbon||[];for(const b of RBON)if(n>=b.n&&!lp.rbon.includes(b.n)){lp.rbon.push(b.n);pr.treats+=b.t;addStars(b.s);addXP(b.n*5);banner={t:260,title:'Rescue bonus!',sub:b.m};sfx('harmony');}}
 function rqSay(force){const q=RQ.r.q;say(q.q,{again:true,force});RQ.opts.forEach((o,i)=>say(o.t,{queue:true,again:true,force,onstart:()=>{QHL=i;},onend:i===RQ.opts.length-1?()=>{QHL=-1;}:null}));}
-function rqPick(i){if(RQ.ok)return;const o=RQ.opts[i];if(!o||RQ.rem.includes(i))return;if(o.ok){RQ.ok=true;sfx('lvl');addXP(15);addStars(5);save();say('Yes! Great thinking, '+hero()+'!',{again:true});}else{RQ.rem.push(i);RQ.msg='Almost! Think again, you can try another one.';say(RQ.msg,{again:true});sfx('bad');const n=RQ.opts.map((x,k)=>k).filter(k=>!RQ.rem.includes(k));RQ.sel=n[0]===undefined?0:n[0];}}
+function rqPick(i){if(RQ.ok)return;const o=RQ.opts[i];if(!o||RQ.rem.includes(i))return;if(o.ok){RQ.ok=true;RQ.fb=null;sfx('lvl');addXP(15);addStars(5);save();say('Yes! Great thinking, '+hero()+'!',{again:true});}
+ else{sfx('bad');RQ.miss=(RQ.miss||0)+1;const rt=RQ.opts.find(x=>x.ok).t;RQ.seen=RQ.seen||[RQ.r.q.q];const nq=rqAlt(RQ.r,RQ.seen,RQ.miss>=3);RQ.seen.push(nq.q.q);RQ.r=Object.assign({},RQ.r,{q:nq.q});RQ.opts=nq.opts;RQ.rem=[];RQ.sel=0;RQ.msg='';RQ.fb={rt,t:200,easier:RQ.miss>=3};
+  say('Not quite! The answer was '+rt+'. '+(RQ.miss>=3?'Here is an easier one!':'Here is a new question!'),{again:true});setTimeout(()=>{if(RQ&&!RQ.ok&&RQ.opts===nq.opts)rqSay();},2600);}}
+/* a DIFFERENT room question on the same lesson: a fill-the-gap about this room's Fact Scroll, or (age 4 / no fact) another room question from this level; 2 choices when easier */
+function rqAlt(r,seen,easier){let q=null;const pool=(LV&&LV.rooms?LV.rooms:[]).filter(x=>x.q&&x!==r&&!seen.includes(x.q.q)&&(!easy()||!r.q.ic||x.q.ic));
+ if(!easy()&&r.fact){const z=clozeQ(r.fact[1],r.fact[0],seen);if(z)q={q:z.q,o:z.opts,c:z.c};}
+ if(!q&&pool.length){const x=pick(pool);q=x.q;}
+ if(!q)q=r.q;let opts=shuffle(q.o.map((t,i)=>({t,ok:i===q.c,ic:q.ic?q.ic[i]:null})));if(easier&&opts.length>2){const ok=opts.find(o=>o.ok);opts=shuffle([ok,pick(opts.filter(o=>!o.ok))]);}
+ return{q,opts};}
 function updRQ(){T++;RQ.t++;const n=RQ.opts.length;
  if(RQ.step===0){if(tap('interact')||tap('jump')){RQ.step=1;rqSay();}return;}
  if(RQ.ok){if(tap('interact')||tap('jump')){rqDone();}return;}
  if(digit>=0&&digit<n)rqPick(digit);
- if(tap('left')){do{RQ.sel=(RQ.sel+n-1)%n;}while(RQ.rem.includes(RQ.sel));}
- if(tap('right')){do{RQ.sel=(RQ.sel+1)%n;}while(RQ.rem.includes(RQ.sel));}
+ if(RQ.fb&&RQ.fb.t>0)RQ.fb.t--;
+ if(tap('left')){RQ.kb=1;do{RQ.sel=(RQ.sel+n-1)%n;}while(RQ.rem.includes(RQ.sel));}
+ if(tap('right')){RQ.kb=1;do{RQ.sel=(RQ.sel+1)%n;}while(RQ.rem.includes(RQ.sel));}
  if(tap('interact'))rqPick(RQ.sel);}
 function drawRQ(){drawWorld();drawHUD();const r=RQ.r;panel(110,52,740,456,'#a36b1d');
  txt('🧩 '+r.name+' solved!',480,96,32,'#e0409a','center','#fff');
@@ -1635,9 +1642,10 @@ function drawRQ(){drawWorld();drawHUD();const r=RQ.r;panel(110,52,740,456,'#a36b
  if(RQ.step===0){txt('📜 '+r.fact[0],480,160,32,'#a36b1d');wrap(r.fact[1],480,230,620,36,26,'#2b2b55');txt('+25 XP  +8 ⭐',480,350,20,'#2b7a2b');btn('Next ▶',380,390,200,52,()=>{RQ.step=1;rqSay();},{col:'#ffe066',size:26});return;}
  const q=r.q;
  if(easy()&&RQ.opts[0].ic){const pq={pics:true,q:q.q,pic:null,opts:RQ.opts.map(o=>Object.assign({},icSpec(o.ic),{nm:o.t}))};drawPQ(pq,RQ.rem,i=>rqPick(i),200,160);
-  if(RQ.ok){txt('✔ ⭐',480,400,30,'#2b7a2b');btn('▶ ▶',380,416,200,52,()=>{shush();rqDone();},{size:26,col:'#ffe066'});}else if(RQ.msg)txt('💡 🔁',480,420,26,'#a36b1d');return;}
+  if(RQ.ok){txt('✔ ⭐',480,400,30,'#2b7a2b');btn('▶ ▶',380,416,200,52,()=>{shush();rqDone();},{size:26,col:'#ffe066'});}else drawFB(RQ.fb,420,700);return;}
  wrap(q.q,480,160,640,34,26,'#2b2b55');
- RQ.opts.forEach((o,i)=>{const rem=RQ.rem.includes(i),y=250+i*66;btn((RQ.ok&&o.ok?'✔ ':'')+o.t,230,y,500,56,()=>rqPick(i),{size:24,col:rem?'#ddd':RQ.ok&&o.ok?'#b8f5b8':RQ.sel===i?'#ffe066':'#fff',dis:rem});});
+ RQ.opts.forEach((o,i)=>{const rem=RQ.rem.includes(i),y=250+i*66;btn((RQ.ok&&o.ok?'✔ ':'')+o.t,230,y,500,56,()=>rqPick(i),{size:24,col:RQ.ok&&o.ok?'#b8f5b8':'#fff',line:!RQ.ok&&RQ.sel===i&&RQ.kb?'#ff9a1f':null,lw:!RQ.ok&&RQ.sel===i&&RQ.kb?5:0});});
+ drawFB(RQ.fb,446,740);
  if(RQ.ok){txt('Yes! Great thinking, '+hero()+'! +5 ⭐',390,471,22,'#2b7a2b');btn('Keep going ▶',600,446,220,50,()=>{shush();rqDone();},{size:16,col:'#ffe066'});}else if(RQ.msg)txt(RQ.msg,480,468,20,'#a36b1d');}
 /* ---- drawing ---- */
 function drawRooms(){const L=LV,p=P,x0=cam.x-160,x1=cam.x+VW+160,vis=(x,w)=>x+(w||60)>x0&&x<x1;
@@ -1979,7 +1987,7 @@ function updRun(){const R=RN,E=R.E;T++;R.t++;
    case 'fork':if(!o.done&&dz<0){o.done=true;if(rnInL(2)||R.lane===2){R.cave=true;R.caveEnd=o.z1;sfx('chime');rnHint('A secret cave! Look for the Big Star 🌟');}}break;
    case 'big':if(R.cave&&!o.got&&Math.abs(dz)<130&&rnInL(o.lane)){o.got=true;const lp=LP();if(!lp.bigs.includes(o.id)){lp.bigs.push(o.id);addStars(20);addXP(30);}sfx('harmony');banner={t:200,title:'🌟 BIG STAR! '+lp.bigs.length+'/3',sub:'The secret cave Big Star!'};save();}break;
    case 'pet':if(!o.done&&Math.abs(dz)<130&&rnInL(o.lane)){o.done=true;if(!PR().pets.tiger){startFeed(petOf('tiger'),true,'run');R.v=0;return;}else rnText('🐯 Stripes says hi!',sx||480,(sy||300)-60,'#ffe066');}break;
-   case 'scroll':if(!o.got&&Math.abs(dz)<130&&rnInL(o.lane)){o.got=true;const pr=PR();if(!pr.scrolls.includes(o.id)&&SCROLLS[o.id]){pr.scrolls.push(o.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);save();STO={sc:SCROLLS[o.id],t:0};prevMode='run';mode='scroll';R.v=0;say(SCROLLS[o.id][0]+'! '+SCROLLS[o.id][1],{again:true});return;}}break;
+   case 'scroll':if(!o.got&&Math.abs(dz)<130&&rnInL(o.lane)){o.got=true;const pr=PR();if(!pr.scrolls.includes(o.id)&&SCROLLS[o.id]){pr.scrolls.push(o.id);logSc(o.id);dogBond(1);sfx('lvl');addXP(15);addStars(5);save();STO={sc:SCROLLS[o.id],t:0};prevMode='run';mode='scroll';R.v=0;say(SCROLLS[o.id][0]+'! '+SCROLLS[o.id][1],{again:true});return;}}break;
    case 'chase':if(!o.done&&!R.ch&&dz<0){o.done=true;R.ch={z0:o.z,z1:o.z1,gap:E?1900:1500,max:E?1900:1500,rot:0,no:o.no};rnView(-1);toast(E?'RUN! ➜':'A giant boulder! RUN! Dodge everything!',150);say(E?'Run! Run!':'Uh oh! A rolling boulder! Run and dodge!',{again:true});R.shk=12;sfx('earth');}break;
    case 'end':if(dz<0&&!R.done){rnFinish();return;}break;}}
 }
@@ -2533,43 +2541,117 @@ function toggleIdol(){SV.idol=!SV.idol;save();audioInit();if(P&&mode==='play'){P
 const volBtns=(x,y,w,h,sz)=>{btn('🎵 Music '+Math.round(SV.mv*100)+'%',x,y,w,h,()=>cycVol('mv'),{size:sz});btn('🔔 SFX '+Math.round(SV.sv*100)+'%',x+w+8,y,w,h,()=>cycVol('sv'),{size:sz});};
 
 /* ================= QUIZ GATE ================= */
-function startQuiz(kind,gate){const tier=PL().tier,cats=GATE[tier][kind]||GATE[tier].mixed;const n=easy()?2:3;const qs=[];
- for(let i=0;i<n;i++){let q,g=0;do{if(tier==='age7'&&(kind==='maths'||kind==='mixed'||kind==='vmixed')&&Math.random()<.4){const m=genMath(tier,PR().lvl>5?1:0);q={q:m.q,opts:m.opts,c:m.c,h:m.h};}else q=drawQ(tier,cats[i%cats.length]);}while(g++<6&&qs.some(o=>(o.say||o.q)===(q.say||q.q)));qs.push(q);}
- QZ={kind,gate,qs,i:0,hint:'',rem:[],ok:0,wrong:0,done:false,t:0,msg:'',dm:'',sh:0};quizFox();dogQuizHelp(true);mode='quiz';
+const qTxt=q=>q?(q.say||q.q||''):'';
+const ansTxt=q=>{const o=q.opts[q.c];return q.pics?(o.nm||''):String(o);};
+/* one gate question of a category, avoiding texts already seen at this gate */
+function mkGateQ(tier,kind,cat,avoid){avoid=avoid||[];let q,g=0;do{if(tier==='age7'&&(kind==='maths'||kind==='mixed'||kind==='vmixed'||cat==='maths')&&(cat==='maths'||Math.random()<.4)){const m=genMath(tier,PR().lvl>5?1:0);q={q:m.q,opts:m.opts,c:m.c,h:m.h};}else q=drawQ(tier,cat);}while(g++<14&&avoid.includes(qTxt(q)));q.cat=cat;return q;}
+/* easier fallback after 3 misses in a row: simpler content and only 2 choices (positions still shuffled) */
+function easierQ(q){const w=q.opts.map((o,i)=>i).filter(i=>i!==q.c),keep=shuffle([q.c,pick(w)]);return Object.assign({},q,{opts:keep.map(i=>q.opts[i]),c:keep.indexOf(q.c),easier:true});}
+function easyGateQ(tier,kind,cat,avoid){let q;if(tier==='age7'&&(cat==='maths'||kind==='maths')){let g=0;do{const m=genMath(tier,0,'arith');q={q:m.q,opts:m.opts,c:m.c,h:m.h};}while(g++<10&&avoid.includes(q.q));}else if(tier==='age4'){let g=0;do q=makePQ(pick(['counting','colours','shapes']));while(g++<10&&avoid.includes(qTxt(q)));}else q=mkGateQ(tier,kind,cat,avoid);q.cat=cat;return easierQ(q);}
+function startQuiz(kind,gate){const tier=PL().tier,cats=GATE[tier][kind]||GATE[tier].mixed;const n=easy()?2:3;const qs=[],seen=[];
+ for(let i=0;i<n;i++){const q=mkGateQ(tier,kind,cats[i%cats.length],seen);seen.push(qTxt(q));qs.push(q);}
+ QZ={kind,gate,qs,i:0,hint:'',rem:[],ok:0,wrong:0,miss:0,seen,fb:null,done:false,t:0,msg:'',dm:'',sh:0};quizFox();dogQuizHelp(true);mode='quiz';
  say((easy()?'':GATENAME[kind]+'! ')+(qs[0].pics?'':''),{again:true});sayQ(qs[0]);}
-function quizFox(){const f=hasPet('fox');QZ.rem=[];QZ.msg='';if(!f)return;const q=QZ.qs[QZ.i];const wr=q.opts.map((o,i)=>i).filter(i=>i!==q.c);shuffle(wr);const n=Math.min(f>=3?2:1,q.opts.length-2);QZ.rem=wr.slice(0,n);if(n>0)QZ.msg=petOf('fox').name+' whispers: "Not those!" 🦊';}
+function quizFox(){QZ.rem=[];QZ.msg='';}
 function quizAnswer(i){if(!QZ||QZ.done)return;const q=QZ.qs[QZ.i];if(i<0||i>=q.opts.length||QZ.rem.includes(i))return;
- if(i===q.c){sfx('ok');QZ.yay=40;say(pick(['Yes, '+hero()+'!','Well done, '+hero()+'!','Great job, '+hero()+'!','You got it, '+hero()+'!']),{again:true});addXP(QZ.wrong?8:15);addStars(2);addStars(0);QZ.i++;QZ.hint='';QZ.wrong=0;if(QZ.i>=QZ.qs.length){QZ.done=true;QZ.t=0;
+ if(i===q.c){sfx('ok');QZ.yay=40;QZ.fb=null;QZ.miss=0;logQ(q,true);{const f=hasPet('fox');if(f)addStars(f>=3?2:1);}say(pick(['Yes, '+hero()+'!','Well done, '+hero()+'!','Great job, '+hero()+'!','You got it, '+hero()+'!']),{again:true});addXP(QZ.wrong?8:15);addStars(2);addStars(0);QZ.i++;QZ.hint='';QZ.wrong=0;if(QZ.i>=QZ.qs.length){QZ.done=true;QZ.t=0;
    const g=QZ.gate;g.open=true;if(g.barrier){const bi=LV.plats.indexOf(g.barrier);if(bi>=0)LV.plats.splice(bi,1);}LP().gates.push(g.id);addXP(20);addStars(5);bumpBond(1);dogBond(1);dogBark();save();addParts(g.x,300,50,'#fff',{star:true,sp:2});say('The gate opens! A colour flies back into the world!',{queue:true});}else{quizFox();dogQuizHelp(true);bumpBond(0);const nq=QZ.qs[QZ.i];setTimeout(()=>{if(QZ&&QZ.qs[QZ.i]===nq)sayQ(nq);},700);}}
- else{sfx('bad');QZ.wrong++;QZ.hint=q.h;QZ.rem.push(i);QZ.sh=18;dogQuizHelp(false);say('Not quite! '+q.h+(QZ.dm?' '+QZ.dm:''),{again:true});}}
-function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.sh>0)QZ.sh--;if(QZ.yay>0)QZ.yay--;if(QZ.done&&(tap('interact')||QZ.t>400)){mode=PM();P.gcool=30;toast('A colour returns to the world! 🌈',150);}}
+ else{sfx('bad');QZ.wrong++;QZ.miss++;logQ(q,false);const rt=ansTxt(q),tier=PL().tier;QZ.seen.push(qTxt(q));
+  const nq=QZ.miss>=3?easyGateQ(tier,QZ.kind,q.cat,QZ.seen):mkGateQ(tier,QZ.kind,q.cat,QZ.seen);QZ.seen.push(qTxt(nq));QZ.qs[QZ.i]=nq;QZ.rem=[];QZ.hint='';QZ.sh=18;QZ.fb={rt,t:200,easier:!!nq.easier};dogQuizHelp(false);
+  say('Not quite! The answer was '+rt+'. '+(nq.easier?'Here is an easier one!':'Here is a new question!'),{again:true});setTimeout(()=>{if(QZ&&QZ.qs[QZ.i]===nq&&!QZ.done)sayQ(nq);},2600);}}
+function drawFB(fb,y,w){if(!fb||fb.t<=0)return;rr(480-w/2,y,w,52,14);ctx.fillStyle='#ffe3ec';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#e0409a';ctx.stroke();wrap('Not quite! The answer was: '+fb.rt+'   ➜ '+(fb.easier?'Try this easier one!':'New question!'),480,y+26,w-30,22,19,'#a0205a');}
+function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.fb&&QZ.fb.t>0)QZ.fb.t--;if(QZ.sh>0)QZ.sh--;if(QZ.yay>0)QZ.yay--;if(QZ.done&&(tap('interact')||QZ.t>400)){mode=PM();P.gcool=30;toast('A colour returns to the world! 🌈',150);}}
 function panel(x,y,w,h,col){ctx.fillStyle='rgba(10,10,40,.55)';ctx.fillRect(0,0,VW,VH);rr(x,y,w,h,26);ctx.fillStyle='#fffdf2';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle=col||'#2b2b55';ctx.stroke();}
 function drawQuiz(){drawWorld();drawHUD();const e=easy(),col={maths:'#ff7a3c',reading:'#3aa8ff',science:'#2fc46b',mixed:'#a35cff',world:'#1f9ac9',volcano:'#e2551f',vmixed:'#e0409a',jungle:'#2f9e4a',jmixed:'#8a6a2a'}[QZ.kind]||'#a35cff';panel(60,40,840,470,col);
  rr(60,40,840,58,26);ctx.fillStyle=col;ctx.fill();ctx.fillRect(60,70,840,28);txt(GATENAME[QZ.kind]+'  ('+Math.min(QZ.i+1,QZ.qs.length)+'/'+QZ.qs.length+')',480,70,28,'#fff','center','rgba(0,0,0,.3)');
  if(QZ.done){txt('🌈',480,190,80);txt(easy()?'🔓 ✨':'The gate opens!',480,280,48,col,'center','#fff');txt('A colour flies back into the world!',480,336,26,'#2b2b55');btn(easy()?'▶ ▶ ▶':'Yay! Keep going',330,400,300,64,()=>{QZ.t=999;},{col:'#ffe066',size:26});return;}
  const q=QZ.qs[QZ.i];btn('🔊',740,40,66,66,()=>sayQ(q,true),{size:22,col:'#fff'});
  if(q.pics){ctx.save();if(QZ.sh>0)ctx.translate(Math.sin(QZ.sh*1.6)*6,0);drawPQ(q,QZ.rem,i=>quizAnswer(i),262,168);ctx.restore();
-  if(QZ.hint){rr(150,442,660,50,14);ctx.fillStyle='#fff3b0';ctx.fill();txt('💡',180,467,26);wrap(QZ.hint,500,467,580,20,17,'#7a4a00');}
-  else if(QZ.msg)txt('🦊 ✖',480,467,22,'#7a4a00');
+  drawFB(QZ.fb,442,700);
   dogSprite(850,98,-1,.62,T,{fast:QZ.done||QZ.yay>0,mouth:QZ.done||QZ.yay>0});
   btn('◀',74,48,62,42,()=>{shush();mode='play';P.x=Math.max(10,QZ.gate.x-170);P.vx=0;P.gcool=150;},{size:20,col:'#fff',hit:1});return;}
  wrap(q.q,480,e?150:140,760,e?52:42,e?42:32,'#2b2b55');
  const n=q.opts.length;
  if(e){for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+'   '+q.opts[i],220,230+i*82,520,70,()=>quizAnswer(i),{size:34,col:rm?'#ddd':null,tc:rm?'#aaa':null,dis:rm});}}
  else{for(let i=0;i<n;i++){const rm=QZ.rem.includes(i);btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>quizAnswer(i),{size:28,col:rm?'#ddd':null,tc:rm?'#aaa':null,dis:rm});}}
- if(QZ.hint){rr(100,e?440:430,760,52,14);ctx.fillStyle='#fff3b0';ctx.fill();wrap('💡 Not quite - try again! '+QZ.hint,480,e?466:456,720,22,e?20:19,'#7a4a00');}
- else if(QZ.msg){txt(QZ.msg,480,e?466:456,20,'#7a4a00');}
+ drawFB(QZ.fb,e?440:430,760);
  if(QZ.dm)txt('🐶 '+QZ.dm,480,e?503:497,e?16:17,'#2d5f8a');
  dogSprite(850,98,-1,.62,T,{fast:QZ.done,mouth:QZ.done});
  btn('Back',40,40,110,66,()=>{shush();mode='play';P.x=Math.max(10,QZ.gate.x-170);P.vx=0;P.gcool=150;},{size:18,col:'#fff'});}
 
+
+/* ================= LEARNING LOG + END-OF-LEVEL REVIEW QUIZ ================= */
+let LLOG={};const LOG=lv=>{lv=lv||curLv();const k=(PL()?PL().name:'')+'|'+lv;return LLOG[k]||(LLOG[k]={sc:[],df:[],rf:[],q:[]});};
+function logQ(q,ok){try{LOG().q.push({cat:q.cat,t:qTxt(q),a:ansTxt(q),ok,pics:!!q.pics});}catch(e){}}
+function logSc(id){try{const l=LOG();if(!l.sc.includes(id))l.sc.push(id);}catch(e){}}
+const CLSTOP=new Set(['about','after','their','there','these','those','which','while','where','other','every','could','would','things','thing','because','really','called','makes','than','them','they','when','what','your','with','from','into','have','this','that','more','most','some','even','only','also','very','just','like','many','much','people','being','often','little']);
+const clTok=t=>(t.match(/[A-Za-z][A-Za-z'-]{4,}|\d[\d,]*/g)||[]).filter(w=>!CLSTOP.has(w.toLowerCase()));
+function clPool(){const a=[];for(const k in SCROLLS)a.push(SCROLLS[k][1]);for(const f of DOGFACTS)a.push(f);if(LV&&LV.rooms)for(const r of LV.rooms)if(r.fact)a.push(r.fact[1]);return a;}
+/* fill-the-gap question rephrasing a fact (not a verbatim repeat); distractors are same-kind words from other facts */
+function clozeQ(text,title,seen,n){n=n||(PL().tier==='age4'?3:4);const sents=(text.match(/[^.!?]+[.!?]?/g)||[text]).map(x=>x.trim()).filter(x=>clTok(x).length);const cands=[];
+ for(const st of sents)for(const w of clTok(st))cands.push([st,w]);shuffle(cands);
+ const pool=[...new Set(clPool().flatMap(clTok))];
+ for(const [st,w] of cands){const num=/^\d/.test(w),others=shuffle(pool.filter(x=>/^\d/.test(x)===num&&x.toLowerCase()!==w.toLowerCase()&&!text.toLowerCase().includes(x.toLowerCase())));
+  const ds=[];for(const x of others){if(ds.length>=n-1)break;if(!ds.some(d=>d.toLowerCase()===x.toLowerCase()))ds.push(x);}if(ds.length<n-1)continue;
+  const q=(title?'Remember the '+title+'? ':'')+'Fill the gap: "'+st.replace(w,'_____')+'"';if(seen&&seen.includes(q))continue;
+  const opts=shuffle([w,...ds]);return{q,opts,c:opts.indexOf(w),h:title||'',cl:true};}
+ return null;}
+const REVCATS={age7:{1:['science','world','reading','maths'],2:['volcano','world','maths'],3:['jungle','science','maths']},age4:{1:['animals','colours','counting'],2:['volcano','shapes','sums'],3:['jungle','letters','counting']}};
+function revTopics(lv){const tier=PL().tier,L=LOG(lv),pr=PR(),out=[],key=new Set(),add=t=>{const k=t.k+':'+(t.id!==undefined?t.id:t.cat);if(key.has(k)&&t.k!=='gate')return;key.add(k);out.push(t);};
+ const pic=tier==='age4',cats=REVCATS[tier][lv]||REVCATS[tier][1];
+ for(const x of L.q.filter(x=>!x.ok))add({k:'gate',cat:x.cat||cats[0],miss:x});
+ const sc=[...L.sc,...(LVSCROLLS[lv]||[]).filter(id=>pr.scrolls.includes(id)&&!L.sc.includes(id))];
+ for(const id of sc)if(SCROLLS[id])add({k:'sc',id,cat:cats[0]});
+ for(const f of L.rf)add({k:'rf',id:f[0],fact:f,cat:cats[0]});
+ for(const i of L.df)add({k:'df',id:i,cat:cats[0]});
+ const okc=[...new Set(L.q.filter(x=>x.ok).map(x=>x.cat).filter(Boolean))];for(const c of okc)add({k:'gate',cat:c});
+ for(const c of cats)add({k:'bank',cat:c});
+ const N=pic?3:5;const sel=[];const gates=out.filter(t=>t.k==='gate'&&t.miss),rest=out.filter(t=>!(t.k==='gate'&&t.miss));
+ /* missed ones first (max 2), then the things she read, then a fallback from the level bank */
+ sel.push(...gates.slice(0,2));for(const t of rest){if(sel.length>=N)break;sel.push(t);}let g=0;while(sel.length<N&&g++<9)sel.push({k:'bank',cat:pick(cats)});return sel;}
+function revFact(t){return t.k==='sc'?SCROLLS[t.id]:t.k==='rf'?t.fact:t.k==='df'?['Stormi fact',DOGFACTS[t.id]]:null;}
+function revQ(t,seen,easier){const tier=PL().tier;let q=null;const f=revFact(t);
+ if(f&&tier!=='age4'){q=clozeQ(f[1],f[0],seen);if(q)q.cat=t.cat;}
+ if(!q)q=mkGateQ(tier,'mixed',t.cat,seen);
+ if(easier&&q.opts.length>2)q=easierQ(q);return q;}
+let RV=null;
+function startReview(lv,onDone){const tp=revTopics(lv),seen=LOG(lv).q.map(x=>x.t);const qs=tp.map(t=>{const q=revQ(t,seen);seen.push(qTxt(q));return{t,q,tries:0};});
+ RV={lv,qs,i:0,N:qs.length,first:0,seen,fb:null,done:false,t:0,missed:[],onDone,prev:mode};mode='review';shush();
+ say((easy()?'What did you learn? ':'Review time! What did you learn in this level? ')+'',{again:true});setTimeout(()=>{if(RV&&mode==='review'&&RV.i===0)sayQ(RV.qs[0].q);},1600);}
+function revAnswer(i){if(!RV||RV.done)return;const it=RV.qs[RV.i],q=it.q;if(i<0||i>=q.opts.length)return;
+ if(i===q.c){sfx('ok');RV.fb=null;if(!it.tries)RV.first++;RV.i++;addXP(5);say(pick(['Yes!','You remembered!','Great memory, '+hero()+'!']),{again:true});
+  if(RV.i>=RV.qs.length)revFinish();else{const nq=RV.qs[RV.i].q;setTimeout(()=>{if(RV&&RV.qs[RV.i]&&RV.qs[RV.i].q===nq)sayQ(nq);},800);}}
+ else{sfx('bad');const rt=ansTxt(q);RV.seen.push(qTxt(q));if(!RV.missed.includes(it.t))RV.missed.push(it.t);
+  /* that topic comes back LATER in this quiz with a different question (easier after 2 misses) */
+  const nq=revQ(it.t,RV.seen,it.tries>=2);RV.seen.push(qTxt(nq));RV.qs.push({t:it.t,q:nq,tries:it.tries+1});RV.i++;RV.fb={rt,t:200,easier:false,later:true};
+  say('Not quite! The answer was '+rt+'. We will come back to this one!',{again:true});const nx=RV.qs[RV.i].q;setTimeout(()=>{if(RV&&!RV.done&&RV.qs[RV.i]&&RV.qs[RV.i].q===nx)sayQ(nx);},2800);}}
+function revStars(r){return r.first>=r.N?3:r.first>=Math.ceil(r.N*.6)?2:1;}
+function revFinish(){RV.done=true;RV.t=0;const pr=PR();pr.rev=pr.rev||{};const b=pr.rev[RV.lv];if(!b||RV.first>b.s)pr.rev[RV.lv]={s:RV.first,n:RV.N};addStars(revStars(RV)*2);save();sfx('win');SF.wag=200;
+ const ls=[];for(const it of RV.qs){const f=revFact(it.t);let l=f?f[0]+': '+f[1]:it.q.pics?'':(it.q.cl?'':it.q.q.replace(/ = \?$/,' = ')+(/ = $/.test(it.q.q.replace(/ = \?$/,' = '))?'':' → ')+ansTxt(it.q));if(it.q.pics)l=(it.q.say||'')+' → '+ansTxt(it.q);if(l&&!ls.includes(l))ls.push(l);}RV.learned=ls.slice(0,4);
+ say((RV.first>=RV.N?'Perfect! ':'Well done! ')+'You got '+RV.first+' out of '+RV.N+' right first time!',{again:true});}
+function revEnd(){const f=RV&&RV.onDone;RV=null;if(f)f();else mode='levels';}
+function updRev(){T++;RV.t++;if(SF.wag>0)SF.wag--;if(RV.fb&&RV.fb.t>0)RV.fb.t--;if(RV.done){if(tap('interact')&&RV.t>30)revEnd();return;}if(digit>=0)revAnswer(digit);}
+function drawRev(){sat=1;drawBGscene(T);const e=easy(),col='#3b6ea8';panel(60,40,840,470,col);
+ if(RV.done){txt('What did you learn?',480,78,32,col);txt(RV.first+' / '+RV.N+' right first time',480,124,30,'#2b2b55');for(let k=0;k<3;k++)starShape(420+k*60,170,22,k<revStars(RV)?'#ffd23f':'#d8d8e0',0);
+  const b=(PR().rev||{})[RV.lv];if(b)txt('Best: '+b.s+' / '+b.n,480,206,16,'#7a4a00');
+  dogSprite(830,470,-1,1.3,T,{fast:true,mouth:true,hop:-Math.abs(Math.sin(T/5))*6});rr(700,230,180,40,12);ctx.fillStyle='#3b6ea8';ctx.fill();txt('🐶 Woof! Yay!',790,250,18,'#fff');
+  txt('Things you learned:',120,240,20,'#2b7a2b','left');let y=268;for(const l of RV.learned){const ls=wrapLines(l,540);ctx.font=F(15);ls.slice(0,2).forEach((x,j)=>{txt((j?'   ':'⭐ ')+x,110,y,15,'#2b2b55','left');y+=20;});y+=4;}
+  btn(e?'▶ ▶':'Continue ▶',360,440,240,56,()=>revEnd(),{col:'#ffe066',size:24});return;}
+ const it=RV.qs[RV.i],q=it.q;rr(60,40,840,58,26);ctx.fillStyle=col;ctx.fill();ctx.fillRect(60,70,840,28);txt('What did you learn?  ('+Math.min(RV.i+1,RV.qs.length)+'/'+RV.qs.length+')',480,70,26,'#fff','center','rgba(0,0,0,.3)');
+ btn('🔊',740,40,66,66,()=>sayQ(q,true),{size:22,col:'#fff'});
+ if(q.pics){drawPQ(q,[],i=>revAnswer(i),262,168);drawFB(RV.fb?Object.assign({},RV.fb):null,442,700);return;}
+ wrap(q.q,480,e?150:140,760,e?44:36,e?36:q.cl?24:30,'#2b2b55');const n=q.opts.length;
+ for(let i=0;i<n;i++)btn((i+1)+')  '+q.opts[i],80+(i%2)*420,250+Math.floor(i/2)*92,390,78,()=>revAnswer(i),{size:26});
+ drawFB(RV.fb,430,760);}
+window.revAuto=()=>{let g=0;while(RV&&!RV.done&&g++<40)revAnswer(RV.qs[RV.i].q.c);if(RV)revEnd();};
 /* ================= PET FEEDING / BEFRIENDING ================= */
 function startFeed(def,first,ret){const foods=shuffle([def.food,...shuffle(FOODS.filter(f=>f!==def.food&&!(def.avoid||[]).includes(f))).slice(0,2)]);FD={def,first,foods,hint:'',ok:false,t:0,ret:ret||'play'};mode='feed';
  say((first?'You found '+def.name+'! ':'Feeding time for '+def.name+'! ')+(first?def.fact+' ':'')+'What does '+def.name.split(' ')[0]+' like to eat?',{again:true});}
 function feedAnswer(i){if(FD.ok)return;if(FD.foods[i]===FD.def.food){FD.ok=true;sfx('pet');say('Yum! '+FD.def.name.split(' ')[0]+' loves '+FD.def.foodName+'!',{again:true});const pr=PR();
   if(FD.first){dogBond(1);pr.pets[FD.def.id]={bond:1};if(!pr.active)pr.active=FD.def.id;LV.pets=LV.pets.filter(q=>q.id!==FD.def.id);addXP(25);addStars(5);addParts(P.x,P.y,30,'#ff8ab0',{star:true,sp:2});}
   else{pr.treats--;pr.pets[FD.def.id].bond++;const b=bondLv(pr.pets[FD.def.id].bond);addXP(5);if(b>FD.lvBefore)toast('Bond level up!',100);}
-  save();}else{sfx('bad');FD.hint=FD.def.hint;say('Not quite! '+FD.def.hint,{again:true});}}
+  save();}else{sfx('bad');const nm=FD.def.name.split(' ')[0];FD.hint=nm+' eats '+FD.def.foodName+' ('+FD.def.food+')! '+FD.def.hint;say('Not quite! '+nm+' eats '+FD.def.foodName+'. Let us try again with new snacks!',{again:true});
+  const old=FD.foods.slice();let g=0;do FD.foods=shuffle([FD.def.food,...shuffle(FOODS.filter(f=>f!==FD.def.food&&!(FD.def.avoid||[]).includes(f))).slice(0,2)]);while(g++<10&&FD.foods.join()===old.join());}}
 function updFeed(){FD.t++;if(FD.lvBefore===undefined&&!FD.first)FD.lvBefore=bondLv(PR().pets[FD.def.id].bond);if(digit>=0&&digit<3)feedAnswer(digit);if(FD.ok&&tap('interact'))endFeed();}
 function endFeed(){mode=FD.ret==='pets'?'pets':PM();}
 function drawFeed(){if(FD.ret==='pets')drawPetsBG();else{drawWorld();drawHUD();}const d=FD.def;panel(90,30,780,480,'#ff5a8a');
@@ -2611,11 +2693,13 @@ function drawPets(){drawPetsBG();const pr=PR();txt('Pet Friends',480,34,40,'#e04
 /* ================= BREAK THE BOARDS (Test Your Might) ================= */
 function startBoards(gate){BD={gate,n:easy()?3:3,i:0,time:(easy()?70:60)*60,tmax:(easy()?70:60)*60,combo:0,best:0,hint:'',rem:[],anim:0,done:false,t:0,msg:'',reset:0};BD.q=genMath(PL().tier,0,'arith');mode='boards';say('Test your might! '+BD.q.q.replace(' = ?','').replace('+',' plus ').replace('−',' take away '),{again:true});}
 function boardAnswer(i){if(!BD||BD.done||BD.anim>0)return;const q=BD.q;if(i<0||i>=q.opts.length||BD.rem.includes(i))return;
- if(i===q.c){sfx('hit');sfx('ok');BD.i++;BD.combo++;BD.best=Math.max(BD.best,BD.combo);BD.anim=26;BD.hint='';BD.rem=[];addXP(6);shake=10;
+ if(i===q.c){sfx('hit');sfx('ok');BD.miss=0;BD.fb=null;BD.i++;BD.combo++;BD.best=Math.max(BD.best,BD.combo);BD.anim=26;BD.hint='';BD.rem=[];addXP(6);shake=10;
   if(BD.i>=BD.n){BD.done=true;BD.t=0;const g=BD.gate;g.open=true;LV.plats.splice(LV.plats.indexOf(g.barrier),1);LP().gates.push(g.id);addXP(40);addStars(5+BD.best*2);PR().treats++;bumpBond(2);save();sfx('lvl');}
   else{BD.q=genMath(PL().tier,0,'arith');say(BD.q.q.replace(' = ?','').replace('+',' plus ').replace('−',' take away '),{again:true});}}
- else{sfx('bad');BD.combo=0;BD.hint=q.h;BD.rem.push(i);say('Try again! '+q.h,{again:true});}}
-function updBoards(){T++;if(digit>=0)boardAnswer(digit);if(BD.anim>0)BD.anim--;
+ else{sfx('bad');BD.combo=0;BD.miss=(BD.miss||0)+1;const rt=String(q.opts[q.c]);BD.q=newMathQ(q,()=>genMath(PL().tier,0,'arith'),BD.miss);BD.rem=[];BD.hint='';BD.fb={rt,t:200,easier:!!BD.q.easier};
+  say('Not quite! It was '+rt+'. New one: '+BD.q.q.replace(' = ?','').replace('+',' plus ').replace('−',' take away '),{again:true});}}
+function newMathQ(old,gen,miss){let q,g=0;do q=miss>=3?genMath(PL().tier,-1,'arith'):gen();while(g++<12&&q.q===old.q);if(miss>=3){const e=easierQ(q);e.sum=q.sum;return e;}return q;}
+function updBoards(){T++;if(digit>=0)boardAnswer(digit);if(BD.anim>0)BD.anim--;if(BD.fb&&BD.fb.t>0)BD.fb.t--;
  if(BD.done){BD.t++;if(tap('interact')||BD.t>500){mode='play';P.gcool=30;toast('The dojo gate is smashed! A colour returns 🌈',150);}return;}
  BD.time--;if(BD.time<=0){BD.i=0;BD.time=BD.tmax;BD.combo=0;BD.reset=150;BD.q=genMath(PL().tier,0,'arith');BD.rem=[];BD.hint='';sfx('bad');}if(BD.reset>0)BD.reset--;stepParts();}
 function drawBoards(){const e=easy();ctx.save();if(shake>0){ctx.translate(rnd(-shake,shake)/2,rnd(-shake,shake)/2);shake--;}
@@ -2634,7 +2718,7 @@ function drawBoards(){const e=easy();ctx.save();if(shake>0){ctx.translate(rnd(-s
  else{rr(30,425,900,105,16);ctx.fillStyle='rgba(255,253,242,.95)';ctx.fill();const q=BD.q,n=q.opts.length;
   q.opts.forEach((o,i)=>{const rm=BD.rem.includes(i),w=n===3?270:205;if(e)btn('',50+i*(w+14),436,w,84,()=>boardAnswer(i),{col:rm?'#ddd':null,dis:rm,draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.3:1;txt(o,X+W/2-50,Y+H/2,44,'#2b2b55');dotRow(+o,X+W/2+50-Math.min(5,+o)*7.8+7.8,Y+H/2-(+o>5?8:0),6);ctx.globalAlpha=1;}});else btn((i+1)+')  '+o,50+i*(w+14),440,w,60,()=>boardAnswer(i),{size:28,col:rm?'#ddd':null,dis:rm});});
   if(e&&q.sum){rr(300,118,360,84,18);ctx.fillStyle='rgba(255,253,242,.92)';ctx.fill();drawPic({k:'sum',e:'⭐',a:q.sum[0],b:q.sum[1]},480,160,.75);btn('🔊',672,138,46,44,()=>say(q.q.replace(' = ?','').replace('+',' plus '),{force:true,again:true}),{size:18,hit:1});}
-  if(BD.hint)wrap('💡 Try again! '+BD.hint,480,e?535:520,860,20,18,'#7a4a00');
+  drawFB(BD.fb,e?362:366,760);
   btn('Back',20,16,90,36,()=>{mode='play';P.x=Math.max(10,BD.gate.x-170);P.vx=0;P.gcool=150;},{size:18,hit:1});}}
 
 /* ================= BOSS DUEL ================= */
@@ -2642,15 +2726,16 @@ function startDuel(){const lv=curLv(),g=lv===2;D={ph:'intro',t:0,php:100,bhp:100
 function duelNext(){D.turn++;D.hint='';D.rem=[];
  if(D.turn%3===0){const N=easy()?6:10;const t=ri(2,N),a=ri(1,t-1);const g={q:`${a} + ${t-a} = ?`,ans:t};
   D.m={x:0,dir:1,sp:easy()?.045:.062,target:g.ans,q:g.q,N,res:null};D.ph='meter';D.t=0;say(easy()?'Stop the arrow on the number '+g.ans+'!':'Power meter! Stop on '+g.q.replace(' = ?','').replace('+','plus'),{again:true});}
- else{D.q=genMath(PL().tier,PR().lvl>3?1:0);D.qmax=D.qt=(easy()?26:20)*60;D.ph='ask';D.t=0;say(D.q.q.replace(' = ?','').replace('+',' plus ').replace('−',' take away '),{again:true});const f=hasPet('fox');if(f){const wr=D.q.opts.map((o,i)=>i).filter(i=>i!==D.q.c);shuffle(wr);D.rem=wr.slice(0,Math.min(f>=3?2:1,D.q.opts.length-2));}}}
+ else{D.q=genMath(PL().tier,PR().lvl>3?1:0);D.qmax=D.qt=(easy()?26:20)*60;D.ph='ask';D.t=0;say(D.q.q.replace(' = ?','').replace('+',' plus ').replace('−',' take away '),{again:true});}}
 function duelAnim(who,dmg,name){if(who==='p')dmg=Math.round(dmg*(1+.06*dogLv()));D.anim={who,t:0,dmg,name,ap:false};D.ph='anim';}
 function duelDog(text,ttl,bark){D.ds={text,t:0,ttl:ttl||170};say(text,{queue:true});if(bark)sfx('bark');SF.wag=60;}
 function duelAnswer(i){if(D.ph!=='ask')return;const q=D.q;if(i<0||i>=q.opts.length||D.rem.includes(i))return;
- if(i===q.c){const f=D.qt/D.qmax;let dmg=Math.round(10+f*10+D.combo*3+(easy()?3:0));let name=pick(['Punch!','Flying Kick!','Star Barrage!']);D.combo++;
+ if(i===q.c){D.miss=0;D.fb=null;const f=D.qt/D.qmax;let dmg=Math.round(10+f*10+D.combo*3+(easy()?3:0));let name=pick(['Punch!','Flying Kick!','Star Barrage!']);D.combo++;
   if(D.combo>=3){dmg+=16;name=SV.idol?'Harmony Finale SUPER!':ELEMS[PR().elem].mv+' SUPER!';D.combo=0;sfx('spec');}else sfx('ok');addXP(3);duelAnim('p',dmg,name);}
- else{sfx('bad');D.combo=0;D.hint=q.h;D.rem.push(i);if(dogLv()>=3){const lf=q.opts.map((o,k)=>k).filter(k=>k!==q.c&&!D.rem.includes(k));if(lf.length>=2){D.rem.push(lf[ri(0,lf.length-1)]);D.hint+=' 🐶 '+DN()+' crossed one out!';}}}}
+ else{sfx('bad');D.combo=0;D.miss=(D.miss||0)+1;const rt=String(q.opts[q.c]);D.q=newMathQ(q,()=>genMath(PL().tier,PR().lvl>3?1:0),D.miss);D.rem=[];D.hint='';D.fb={rt,t:200,easier:!!D.q.easier};
+  say('Not quite! It was '+rt+'. New one: '+D.q.q.replace(' = ?','').replace('+',' plus ').replace('−',' take away '),{again:true});}}
 function duelStop(){const m=D.m;if(D.ph!=='meter'||m.res)return;const idx=Math.floor(m.x),d=Math.abs(idx+1-m.target);const dmg=d===0?28:d===1?16:7;m.res={d,dmg};D.t=0;sfx(d===0?'ok':'hit');}
-function updDuel(){T++;D.t++;if(D.ds&&++D.ds.t>D.ds.ttl)D.ds=null;if(SF.wag>0)SF.wag--;if(D.flash>0)D.flash--;if(D.sh>0)D.sh--;
+function updDuel(){T++;D.t++;if(D.fb&&D.fb.t>0)D.fb.t--;if(D.ds&&++D.ds.t>D.ds.ttl)D.ds=null;if(SF.wag>0)SF.wag--;if(D.flash>0)D.flash--;if(D.sh>0)D.sh--;
  if(digit>=0)duelAnswer(digit);
  if(D.ph==='intro'){if(D.t>110||tap('interact'))duelNext();}
  else if(D.ph==='ask'){D.qt--;if(D.qt<=0){D.combo=0;D.say='Too slow! ZAP!';duelAnim('b',easy()?6:11,bossAtk());}}
@@ -2695,9 +2780,9 @@ function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.
    q.opts.forEach((o,i)=>{const rm=D.rem.includes(i);btn('',48+i*(w+20),420,w,96,()=>duelAnswer(i),{col:rm?'#ddd':null,dis:rm,draw:(X,Y,W,H)=>{ctx.globalAlpha=rm?.3:1;txt(o,X+W/2-50,Y+H/2,46,'#2b2b55');dotRow(+o,X+W/2+50-Math.min(5,+o)*7.8+7.8,Y+H/2-(+o>5?8:0),6);ctx.globalAlpha=1;}});});}
   else{txt(q.q,480,396,easy()?46:40,'#2b2b55');
   q.opts.forEach((o,i)=>{const rm=D.rem.includes(i);btn((i+1)+')  '+o,48+i*(w+20),425,w,easy()?84:64,()=>duelAnswer(i),{size:easy()?38:30,col:rm?'#ddd':null,dis:rm});});}
-  if(D.hint)wrap('💡 Not quite! '+D.hint,480,easy()?523:506,860,20,17,'#7a4a00');}
+  drawFB(D.fb,288,700);}
  else if(D.ph==='meter'||(D.ph==='anim'&&false)){const m=D.m;txt('POWER METER: stop on  '+m.q.replace(' = ?','')+(easy()?'':' !'),480,392,30,'#2b2b55');if(easy())txt('Find the answer number and stop on it!',480,420,18,'#7a4a00');
-  const cw=860/m.N;for(let i=0;i<m.N;i++){const dd=Math.abs(i+1-m.target);ctx.fillStyle=dd===0?'#7be34a':dd===1?'#ffe066':'#f9a';rr(50+i*cw+2,440,cw-4,46,8);ctx.fill();ctx.strokeStyle='#2b2b55';ctx.lineWidth=3;ctx.stroke();txt(String(i+1),50+i*cw+cw/2,463,26,'#2b2b55');}
+  const cw=860/m.N;for(let i=0;i<m.N;i++){const dd=Math.abs(i+1-m.target);ctx.fillStyle='#ffe9b0';rr(50+i*cw+2,440,cw-4,46,8);ctx.fill();ctx.strokeStyle='#2b2b55';ctx.lineWidth=3;ctx.stroke();txt(String(i+1),50+i*cw+cw/2,463,26,'#2b2b55');}
   const cx=50+m.x*cw;ctx.fillStyle='#ff3b30';ctx.beginPath();ctx.moveTo(cx,490);ctx.lineTo(cx-12,512);ctx.lineTo(cx+12,512);ctx.fill();ctx.fillRect(cx-3,436,6,56);
   if(m.res)txt(m.res.d===0?'PERFECT!':m.res.d===1?'So close!':'Nice try!',480,420,30,'#e0409a');else btn('STOP!',800,Math.min(396,436-MH()-2),130,Math.max(38,MH()),duelStop,{size:22,col:'#ff9aa8'});}
  else if(D.ph==='ko'){txt('Stick Girl gets back up with a rainbow hug! 🌈',480,430,28,'#e0409a');}
@@ -2749,7 +2834,7 @@ function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;lp.cp=0;pr.unl
  const lines=lv===1?['WHOOSH! The Whirlwind blows the grumpy Storm Cloud far away. It shrinks into a tiny sniffly raincloud: "Okay... maybe colours are pretty," it mumbles.','The stolen colours burst back into the sky: red, orange, yellow, green, blue and purple. A giant rainbow stretches across the world!','🐶 WOOF WOOF! We did it, '+n+'! The colours are back! I am the proudest puppy in the whole world!','🐶 But look, smoke is puffing from Ember Mountain far away. A grumpy Magma Golem lives there! Will you come with me?',n+' waves to the meadow friends. "Next stop: Ember Mountain!"']
   :lv===2?['TSSSS! The cool water calms the grumpy Magma Golem. His glowing cracks fade and little flowers sprout on his rocky shoulders.','"Thank you," he rumbles softly. "I was just too hot and cranky." The lava cools into new rock and the mountain glows with colour again.','🐶 WOOF WOOF! You were so brave, '+n+'! Lava, geysers AND a golem! Best adventure ever!','🐶 The Golem says we can visit his crystal caves any time. Wag wag wag!','🐶 Listen... drums in the distance! An old Jungle Temple is waking up. Shall we go?',n+' and '+DN()+' wave goodbye to Ember Mountain. Next stop: the Jungle Temple!']
   :['THUD! The Earth power lifts the broken stones back into place, and the temple steps are whole again.','The Jungle Guardian blinks. Moss and flowers bloom on his shoulders. "My temple is fixed! I was grumpy because it was falling down," he rumbles.','📜 Fact Scroll: Rainforests cover only a small part of the land, but more than half of all the kinds of plants and animals on Earth live in them!','📜 Fact Scroll: The Amazon River, in the biggest rainforest, carries more water than any other river in the world!','🐶 WOOF WOOF! Vines, boulders, darts AND a giant guardian! You are the bravest explorer, '+n+'!',n+' and '+DN()+' wave goodbye to their jungle friends. What will the next adventure be?']
- startStory('end',lines,()=>{mode='end';sfx('bark');say(lv===1?'Level 1 complete! Level 2 is unlocked!':lv===2?'Level 2 complete! Level 3 is unlocked!':'Level 3 complete! You did it!',{again:true});});}
+ startReview(lv,()=>startStory('end',lines,()=>{mode='end';sfx('bark');say(lv===1?'Level 1 complete! Level 2 is unlocked!':lv===2?'Level 2 complete! Level 3 is unlocked!':'Level 3 complete! You did it!',{again:true});}));}
 function drawEnd(){drawStory(true);dogSprite(865,440,-1,1.7,T,{fast:true,mouth:true,hop:-Math.abs(Math.sin(T/5))*6});rr(180,50,600,400,26);ctx.fillStyle='rgba(255,253,242,.97)';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle='#e0409a';ctx.stroke();const pr=PR(),lv=curLv(),lp=LP();
  txt('LEVEL '+lv+' COMPLETE!',480,96,44,'#e0409a','center','#fff');txt(lv===1?fullName()+' freed the colours! 🌈':lv===2?fullName()+' calmed Ember Mountain! 🌋':fullName()+' fixed the Jungle Temple! 🛕',480,146,24,'#2b2b55');
  const scr=LVSCROLLS[lv].filter(id=>pr.scrolls.includes(id)).length;
@@ -2772,7 +2857,7 @@ function lvTap(L){const pr=PR();if(!lvOpen(pr,L.n)){sfx('bad');const prev=LEVELS
  pr.lv=L.n;save();sfx('tick');say('Level '+L.n+', '+L.name+'!',{again:true});titleGo();}
 function drawLevels(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,VW,VH);const pr=PR(),cur=curLv(),mh=MH();
  txt('Choose a Level · '+PL().name,480,40,34,'#e0409a','center','#fff');btn('◀ Back',16,12,Math.max(120,mh*2),mh,()=>{mode='title';sfx('tick');},{size:18});
- const n=LEVELS.length,cw=270,gap=30,x0=480-(n*cw+(n-1)*gap)/2,y=86,ch=Math.min(330,VH-y-(LSM&&LSM.t>0?70:20));
+ const n=LEVELS.length,cw=270,gap=30,x0=480-(n*cw+(n-1)*gap)/2,y=86,ch=Math.min(330,VH-y-(LSM&&LSM.t>0?70:20)-46);
  LEVELS.forEach((L,i)=>{const x=x0+i*(cw+gap),open=lvOpen(pr,L.n),done=lvDone(pr,L.n),here=open&&L.n===cur;
   btn('',x,y,cw,ch,()=>lvTap(L),{col:open?(here?'#fff4a8':'#fff'):'#d8d8e0',line:here?'#ff9a1f':'#2b2b55',lw:here?8:0,draw:(X,Y,W,H)=>{
    ctx.save();rr(X+12,Y+12,W-24,H*.5,14);ctx.clip();const g=ctx.createLinearGradient(0,Y,0,Y+H*.5);g.addColorStop(0,L.sky[0]);g.addColorStop(1,L.sky[1]);ctx.fillStyle=g;ctx.fillRect(X,Y,W,H);ctx.fillStyle=L.gr;ctx.fillRect(X,Y+12+H*.5-30,W,30);
@@ -2780,8 +2865,9 @@ function drawLevels(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.35)
    txt(L.ic,X+W/2,Y+12+H*.25,64);ctx.restore();if(!open){ctx.fillStyle='rgba(40,40,60,.45)';rr(X+12,Y+12,W-24,H*.5,14);ctx.fill();txt('🔒',X+W/2,Y+12+H*.25,58);}
    txt(L.n+'. '+L.name,X+W/2,Y+H*.5+40,22,'#2b2b55');
    ctx.globalAlpha=open?1:.5;for(let k=0;k<3;k++)starShape(X+W/2-44+k*44,Y+H*.5+84,15,k<lvBigs(pr,L.n)?'#ffd23f':'#d8d8e0',0);ctx.globalAlpha=1;
-   txt('Big Stars '+lvBigs(pr,L.n)+'/3',X+W/2,Y+H*.5+116,16,'#7a4a00');
-   txt(!open?(L.soon?'🔒 Coming soon':'🔒 Locked'):done?'✔ Done · tap to replay':here?'▶ Play':'▶ Play',X+W/2,Y+H-28,18,!open?'#666':done?'#2b7a2b':'#c0306a');}});});
+   {const rb=(pr.rev||{})[L.n];txt('Big Stars '+lvBigs(pr,L.n)+'/3'+(rb?'  ·  📝 '+rb.s+'/'+rb.n+' '+'★'.repeat(rb.s>=rb.n?3:rb.s>=Math.ceil(rb.n*.6)?2:1):''),X+W/2,Y+H*.5+116,16,'#7a4a00');}
+   txt(!open?(L.soon?'🔒 Coming soon':'🔒 Locked'):done?'✔ Done · tap to replay':here?'▶ Play':'▶ Play',X+W/2,Y+H-28,18,!open?'#666':done?'#2b7a2b':'#c0306a');}});
+  if(done){const rb=(pr.rev||{})[L.n];btn('📝 Review quiz'+(rb?' · best '+rb.s+'/'+rb.n:''),x,y+ch+6,cw,38,()=>{sfx('tick');startReview(L.n,()=>{mode='levels';});},{size:16,col:'#cfe6ff',hit:1});}});
  if(LSM&&LSM.t>0){LSM.t--;rr(120,VH-64,720,52,16);ctx.fillStyle='#fff3b0';ctx.fill();wrap(LSM.s,480,VH-38,690,20,18,'#7a4a00');}}
 let NG=null;const hasSave=pr=>!!(pr&&(pr.intro||(pr.unl||1)>=2||pr.stars>0||pr.lvl>1||Object.keys(pr.pets||{}).length));
 function askNew(i,from){NG={i,from,t:0};sfx('tick');const pl=SV.players[i];say('Start a new game for '+pl.name+'? All stars, pets and levels for '+pl.name+' go away. Tap the green tick for yes, or the red cross for no.',{again:true,force:pl.tier==='age4'});}
@@ -2848,7 +2934,7 @@ function drawPause(){drawWorld();drawHUD();BTNHIT=true;panel(110,28,740,486,'#2b
  rr(395,436,440,66,14);ctx.fillStyle='#ffe3fb';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff3df2';ctx.stroke();txt('💖 Harmony finisher (Idol style)',410,454,16,'#a0309a','left');wrap('A light-stick beam joins every special and your boss-duel super move!',470,482,350,18,13,'#2b2b55','left');}
 
 /* ================= MAIN LOOP ================= */
-function update(){switch(mode){case 'play':updPlay();break;case 'run':updRun();break;case 'quiz':updQuiz();break;case 'feed':updFeed();break;case 'pets':updPets();break;case 'boards':updBoards();break;case 'duel':updDuel();break;case 'catch':updCatch();break;case 'story':updStory();break;case 'dogtalk':updDogTalk();break;case 'rq':updRQ();break;case 'sea':updSea();break;case 'space':updSpace();break;
+function update(){switch(mode){case 'play':updPlay();break;case 'run':updRun();break;case 'quiz':updQuiz();break;case 'review':updRev();break;case 'feed':updFeed();break;case 'pets':updPets();break;case 'boards':updBoards();break;case 'duel':updDuel();break;case 'catch':updCatch();break;case 'story':updStory();break;case 'dogtalk':updDogTalk();break;case 'rq':updRQ();break;case 'sea':updSea();break;case 'space':updSpace();break;
  case 'pause':if(tap('pause')){if(pmoves)pmoves=false;else mode=PM();}break;case 'scroll':if(tap('interact'))mode=prevMode==='run'?PM():'play';break;case 'title':T++;if(tap('interact')){const b=UI.find(u=>u.w===360);b&&b.fn();}if(tap('mute'))toggleMute();break;case 'select':T++;if(tap('pause'))mode='title';break;case 'levels':T++;if(tap('pause'))mode='title';break;case 'end':T++;break;}
  if(tap('mute')&&mode!=='play')toggleMute();}
 const bSl=document.getElementById('bS'),bEl=document.getElementById('bE'),bDl=document.getElementById('bD'),bQl=document.getElementById('bQ'),bVl=document.getElementById('bV');
@@ -2866,7 +2952,7 @@ function rdy(){tcEl.classList.toggle('sea',mode==='sea');tcEl.classList.toggle('
  bVl.classList.toggle('sh',!!(pl&&(P.ch>=100||fin)));
 }
 function draw(){rdy();NUI=[];BTNHIT=false;ctx.clearRect(0,0,VW,VH);
- switch(mode){case 'play':drawWorld();drawHUD();break;case 'run':drawRun();drawHUD();drawRunHUD();break;case 'quiz':drawQuiz();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'rq':drawRQ();break;case 'sea':drawSea();break;case 'space':drawSpace();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'levels':drawLevels();break;case 'end':drawEnd();break;}
+ switch(mode){case 'play':drawWorld();drawHUD();break;case 'run':drawRun();drawHUD();drawRunHUD();break;case 'quiz':drawQuiz();break;case 'review':drawRev();break;case 'feed':drawFeed();break;case 'pets':drawPets();break;case 'boards':drawBoards();break;case 'duel':drawDuel();break;case 'catch':drawCatch();break;case 'story':drawStory();break;case 'dogtalk':drawDogTalk();break;case 'rq':drawRQ();break;case 'sea':drawSea();break;case 'space':drawSpace();break;case 'pause':drawPause();break;case 'scroll':drawScroll();break;case 'title':drawTitle();break;case 'select':drawSelect();break;case 'levels':drawLevels();break;case 'end':drawEnd();break;}
  UI=NUI;}
 function tick(){update();hit={};digit=-1;draw();}
 let last=0,acc=0;
@@ -2917,7 +3003,7 @@ function selfTest(){const log=[];try{
   ok_(()=>(PR().unl||1)>=3,'L3 unlocked after L2');startPlay(3);ok_(()=>curLv()===3&&LV.theme==='jungle','level 3 start');if(mode==='dogtalk'){for(let i=0;i<30&&mode==='dogtalk';i++){dogTalkAdv();dogTalkAdv();tick();}}
   ok_(()=>mode==='run'&&RN&&RN.on,'L3 runner mode');
   {const HZ=['log','branch','dart','gap','crumb','snake','monkey','crate'],RK=['left','right','jump','down','punch'];
-   const svc=()=>{if(mode==='quiz'){for(let k=0;k<8&&!QZ.done;k++){quizAnswer((QZ.qs[QZ.i].c+1)%QZ.qs[QZ.i].opts.length);quizAnswer(QZ.qs[QZ.i].c);}QZ.t=999;}else if(mode==='feed'){feedAnswer(FD.foods.indexOf(FD.def.food));endFeed();}else if(mode==='scroll'){hit.interact=true;}else if(mode==='dogtalk'){dogTalkAdv();}
+   const svc=()=>{if(mode==='quiz'){for(let k=0;k<8&&!QZ.done;k++){quizAnswer((QZ.qs[QZ.i].c+1)%QZ.qs[QZ.i].opts.length);quizAnswer(QZ.qs[QZ.i].c);}QZ.t=999;}else if(mode==='feed'){feedAnswer(FD.foods.indexOf(FD.def.food));endFeed();}else if(mode==='review'){revAuto();}else if(mode==='scroll'){hit.interact=true;}else if(mode==='dogtalk'){dogTalkAdv();}
     else if(mode==='sea'){const S=SEA;S.star.got=false;P.x=S.star.x;P.y=S.star.y-28;frames(3);leaveBonus();}else if(mode==='space'){spWin(SPC);leaveSpace();}else if(mode==='pause')mode=PM();};
    // fuzz: random touches on the runner, hearts topped up
    for(let i=0;i<2500&&RN&&RN.on;i++){if(i%9===0)press(pick(RK));if(i%9===2)for(const k of RK)rel(k);svc();P.hp=Math.max(P.hp,2);tick();}
