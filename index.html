@@ -3009,7 +3009,8 @@ function L4build(L,api){const {G,CK,SG,GT,SC,HS,BU,row,arc,TR,BONUS}=api,Ez=easy
  if(!Ez){ // qa12b: more side-view skating for Amari
   s=G(2200);CK(s+60);SG(s+120,'Cone slalom! Hop ⤒ the cones and keep your combo going!');for(let i=0;i<5;i++)CONE(s+400+i*260);row(s+420,330,8);KICK(s+1750);arc(s+1900,300,6,90);SC('bearing',s+2050,330);
   s=G(2600);CK(s+60);SG(s+120,'A mini half pipe! Pump with ▶ and ◀ for more air!');e=HP(s+300,140,520);TUN(e+120,600);row(e+180,400,10);CONE(e+520);GT(e+900,'smixed');
-  s=G(1800);CK(s+60);KICK(s+300);KICK(s+650);KICK(s+1000);arc(s+420,300,5,80);arc(s+770,300,5,80);arc(s+1120,300,5,80);SG(s+150,'Kicker run! Do a trick off every ramp!');}
+  s=G(1800);CK(s+60);KICK(s+300);KICK(s+650);KICK(s+1000);arc(s+420,300,5,80);arc(s+770,300,5,80);arc(s+1120,300,5,80);SG(s+150,'Kicker run! Do a trick off every ramp!');
+  s=G(2400);CK(s+60);SG(s+120,'Tunnel ride! Mind the cones in the dark!');TUN(s+300,900);row(s+340,400,12);CONE(s+700);CONE(s+1050);KICK(s+1500);arc(s+1650,300,6,90);HS(s+1900,'Nearly at the big rainbow ring! Keep rolling!',1);}
  s=G(1400);CK(s+60);SG(s+200,'Look! The skate park goes INTO the screen!');row(s+300,400,5);if(Ez)SC('bearing',s+600,400);L.sw=s+1000;
  s=G(900);L.bossX=1e9;}
 /* ---- the runner half (into-the-screen) ---- */
@@ -3043,7 +3044,7 @@ function rnBuild4(E){
  blk();if(!E)blk();
  s=sec(38,0,0);hint(s+3,'A rainbow space portal! Roll into it for a space trip 🚀');O(s+24,'portal',{lane:1,kind:'space'});
  blk();DOOR(sec(30,0,0)+20,'smixed','g6');
- blk();blk();if(!E){s=sec(36,0,0);hint(s+2,'Rail park! Grind ⚡ then jump to the next rail!');RAIL(s+4,0,8);RAIL(s+14,1,8);RAIL(s+24,2,8);CHK(s+34);blk();blk();blk();blk();}
+ blk();blk();if(!E){s=sec(36,0,0);hint(s+2,'Rail park! Grind ⚡ then jump to the next rail!');RAIL(s+4,0,8);RAIL(s+14,1,8);RAIL(s+24,2,8);CHK(s+34);blk();blk();blk();s=sec(40,2,0);hint(s+2,'Ramp to ramp! Spin 👊 in the air every time!');RAMP(s+6,0);RAMP(s+18,1);RAMP(s+30,2);CHK(s+38);blk();blk();blk();blk();}
  s=sec(40,0,0);hint(s+2,'The finish line! You can do it!');RAMP(s+8);RAIL(s+20,0,10);RAIL(s+20,2,10);fruit(s+20,10,1,100);O(s+34,'end',{});sec(RDD+4,0,0);
  for(const g of segs){for(const side of[-1,1]){if(R()<.5)g.dec.push({k:RP(['bush','flower','rock','bush','flower']),o:side*(1.3+R()*.5),f:R()<.5?1:-1});if(g.i%3===0)g.dec.push({k:RP(['tree','tree','pillar','palm']),o:side*(2.2+R()*1.8),f:1});}g.dec.sort((a,b)=>Math.abs(b.o)-Math.abs(a.o));}
  obj.sort((a,b)=>a.z-b.z);obj.forEach((o,i)=>{o.id2=i;const g=segs[Math.min(segs.length-1,Math.floor(o.z/RS))];g.ob.push(o);});
