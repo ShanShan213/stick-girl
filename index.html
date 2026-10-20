@@ -472,7 +472,7 @@ const bondLv=b=>[0,2,5,9,14].filter(t=>b>=t).length;
 const petOf=id=>PETS.find(p=>p.id===id);
 function activePet(){const a=PR().active;return a&&PR().pets[a]?{def:petOf(a),lv:bondLv(PR().pets[a].bond)}:null;}
 function hasPet(id){const a=activePet();return a&&a.def.id===id?a.lv:0;}
-if(SV&&SV.prog)SV.prog.forEach(q=>{if(q&&q.unl>3)q.unl=3;}); // qa9b: old saves recorded unl 4
+if(SV&&SV.prog)SV.prog.forEach(q=>{if(q&&q.unl>4)q.unl=4;}); // qa9b: clamp to the last level (4 since qa12)
 const MAXLV=4,UNL=p=>Math.max(p.unl||1,p.l3&&p.l3.boss?4:0),curLv=()=>{const p=PR();return Math.max(1,Math.min(p.lv||1,UNL(p),MAXLV));};
 /* per-level run state: Level 1 keeps its fields on the hero (old saves still work), Level 2 lives in prog.l2 */
 const LP=()=>{const p=PR(),n=curLv();if(n===1){if(!p.bigs)p.bigs=[];return p;}const k='l'+n;if(!p[k])p[k]={cp:0,gates:[],dug:[],rooms:{},rescued:[],rbon:[],boss:false,bigs:[]};return p[k];};
