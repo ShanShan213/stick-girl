@@ -2914,8 +2914,8 @@ function drawSkPick(){SKP.t++;sat=1;drawBGscene(T);const g=SKP.g,e=easy(),mh=MH(
   list.forEach((it,i)=>{const x=170+i*(w+6),on=g[r[1]]===i;btn(r[2]==='p'?'':r[2]==='s'?(it[0]==='none'?'✖':it[0]):'',x,y+4,w,52,()=>skSet(r[1],i,r[2]==='c'?SKCN[i]:it[1]),{size:22,col:r[2]==='c'?it:'#fff',line:on?'#ff9a1f':'#2b2b55',lw:on?6:2,draw:r[2]==='p'?(X,Y,W,H)=>{const gg=Object.assign({},g,{pat:i,grip:0});drawGear(X+W/2,Y+H/2+2,0,0,1,gg,.75);}:null});});});
  // preview
  rr(580,150,320,250,20);ctx.fillStyle='#dff3ff';ctx.fill();ctx.fillStyle='#b9b9c4';ctx.fillRect(590,330,300,60);
- const k=2.2,bob=Math.sin(SKP.t/12)*3;stick(740,330-(g.type==='board'?10*k:8*k)+bob,{col:PL().color,face:1,pose:'idle',s:k});drawGear(740,330+bob,0,0,1,g,k);
- if(g.type==='board'){ctx.save();ctx.translate(740,200);drawGear(0,0,0,.5,1,g,2);ctx.restore();txt('(under the board)',740,232,13,'#555');}
+ const k=1.9,bob=Math.sin(SKP.t/12)*3;stick(790,345-(g.type==='board'?10*k:8*k)+bob,{col:PL().color,face:1,pose:'idle',s:k});drawGear(790,345+bob,0,0,1,g,k);
+ if(g.type==='board'){ctx.save();ctx.translate(660,250);ctx.rotate(-.5);drawGear(0,0,0,.5,1,g,1.6);ctx.restore();txt(e?'⬇ 🛹':'Underneath:',660,190,14,'#555');}
  btn(e?'▶ ▶':'Let\'s skate! ▶',600,420,280,70,skDone,{size:26,col:'#9be8a9'});
  if(SKP.from==='levels')btn('◀ Back',40,450,140,mh,()=>{SKP=null;mode='levels';},{size:18});}
 /* ---- tricks + combo ---- */
@@ -2947,7 +2947,7 @@ function skStep(p,ax,w,L){const E=easy();if(!SK)skReset();if(SK.cbT>0)SK.cbT--;
 function skAfter(p,L){const E=easy(),fx=p.x+p.w/2,s=skSurfAt(L,fx),prev=p.onSurf,glued=p.skLast===T-1&&!!prev;p.skA=(p.skA||0)*.7;let launched=false;
  if(prev&&s!==prev&&glued){const d=p.skD||0,dir=Math.sign(p.vx);
   if(prev.lip&&Math.abs(d)>.6){const v=p.skV||Math.abs(p.vx);if(v>=2.2){const fwd=(dir>0&&(keys.right||(E&&(prev.airs=(prev.airs||0)+1)>=2)))||(dir<0&&keys.left);
-    p.vy=-Math.min(18,Math.max(10,v*1.05));p.spr=true;p.skE=null;p.vx=fwd?dir*2.6:-dir*.3;p.onGround=false;p.gnd=null;p.y-=4;launched=true;sfx('jump');skPop('🚀 AIR!',fx,p.y-30,'#bff4ff');
+    p.vy=-Math.min(15,Math.max(10,v*1.05));p.spr=true;p.skE=null;p.vx=fwd?dir*2.6:-dir*.3;p.onGround=false;p.gnd=null;p.y-=4;launched=true;sfx('jump');skPop('🚀 AIR!',fx,p.y-30,'#bff4ff');
     if(!p.skTip){p.skTip=1;toast(E?'Tap 🛹 or 🌀 for a trick!':'Big air! Tap 🛹 Flip, 🌀 Spin or ▼ Grab in the air!',150);}}}
   else if(prev.kick&&p.vx>3&&fx>=prev.x1){p.vy=-Math.min(14,p.vx*1.2+3);p.spr=true;p.onGround=false;p.gnd=null;p.y-=3;launched=true;sfx('jump');skPop('🚀',fx,p.y-20,'#bff4ff');}
   p.onSurf=null;}
