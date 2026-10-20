@@ -1644,8 +1644,8 @@ function drawRQ(){drawWorld();drawHUD();const r=RQ.r;panel(110,52,740,456,'#a36b
  if(easy()&&RQ.opts[0].ic){const pq={pics:true,q:q.q,pic:null,opts:RQ.opts.map(o=>Object.assign({},icSpec(o.ic),{nm:o.t}))};drawPQ(pq,RQ.rem,i=>rqPick(i),200,160);
   if(RQ.ok){txt('✔ ⭐',480,400,30,'#2b7a2b');btn('▶ ▶',380,416,200,52,()=>{shush();rqDone();},{size:26,col:'#ffe066'});}else drawFB(RQ.fb,420,700);return;}
  wrap(q.q,480,160,640,34,26,'#2b2b55');
- RQ.opts.forEach((o,i)=>{const rem=RQ.rem.includes(i),y=250+i*66;btn((RQ.ok&&o.ok?'✔ ':'')+o.t,230,y,500,56,()=>rqPick(i),{size:24,col:RQ.ok&&o.ok?'#b8f5b8':'#fff',line:!RQ.ok&&RQ.sel===i&&RQ.kb?'#ff9a1f':null,lw:!RQ.ok&&RQ.sel===i&&RQ.kb?5:0});});
- drawFB(RQ.fb,446,740);
+ const rn=RQ.opts.length,rs=rn>3?60:66,rh=rn>3?52:56;RQ.opts.forEach((o,i)=>{const rem=RQ.rem.includes(i),y=(rn>3?236:250)+i*rs;btn((RQ.ok&&o.ok?'✔ ':'')+o.t,230,y,500,rh,()=>rqPick(i),{size:24,col:RQ.ok&&o.ok?'#b8f5b8':'#fff',line:!RQ.ok&&RQ.sel===i&&RQ.kb?'#ff9a1f':null,lw:!RQ.ok&&RQ.sel===i&&RQ.kb?5:0});});
+ drawFB(RQ.fb,76,560);
  if(RQ.ok){txt('Yes! Great thinking, '+hero()+'! +5 ⭐',390,471,22,'#2b7a2b');btn('Keep going ▶',600,446,220,50,()=>{shush();rqDone();},{size:16,col:'#ffe066'});}else if(RQ.msg)txt(RQ.msg,480,468,20,'#a36b1d');}
 /* ---- drawing ---- */
 function drawRooms(){const L=LV,p=P,x0=cam.x-160,x1=cam.x+VW+160,vis=(x,w)=>x+(w||60)>x0&&x<x1;
@@ -2546,7 +2546,7 @@ const volBtns=(x,y,w,h,sz)=>{btn('🎵 Music '+Math.round(SV.mv*100)+'%',x,y,w,h
 const qTxt=q=>q?(q.say||q.q||''):'';
 const ansTxt=q=>{const o=q.opts[q.c];return q.pics?(o.nm||''):String(o);};
 /* one gate question of a category, avoiding texts already seen at this gate */
-function mkGateQ(tier,kind,cat,avoid){avoid=avoid||[];let q,g=0;do{if(tier==='age7'&&(kind==='maths'||kind==='mixed'||kind==='vmixed'||cat==='maths')&&(cat==='maths'||Math.random()<.4)){const m=genMath(tier,PR().lvl>5?1:0);q={q:m.q,opts:m.opts,c:m.c,h:m.h};}else q=drawQ(tier,cat);}while(g++<14&&avoid.includes(qTxt(q)));q.cat=cat;return q;}
+function mkGateQ(tier,kind,cat,avoid){avoid=avoid||[];if(!(tier==='age4'&&PQCATS.includes(cat))&&!(QB[tier]&&QB[tier][cat])&&!(tier==='age7'&&cat==='maths'))cat=tier==='age4'?pick(PQCATS):'world';let q,g=0;do{if(tier==='age7'&&(kind==='maths'||kind==='mixed'||kind==='vmixed'||cat==='maths')&&(cat==='maths'||Math.random()<.4)){const m=genMath(tier,PR().lvl>5?1:0);q={q:m.q,opts:m.opts,c:m.c,h:m.h};}else q=drawQ(tier,cat);}while(g++<14&&avoid.includes(qTxt(q)));q.cat=cat;return q;}
 /* easier fallback after 3 misses in a row: simpler content and only 2 choices (positions still shuffled) */
 function easierQ(q){const w=q.opts.map((o,i)=>i).filter(i=>i!==q.c),keep=shuffle([q.c,pick(w)]);return Object.assign({},q,{opts:keep.map(i=>q.opts[i]),c:keep.indexOf(q.c),easier:true});}
 function easyGateQ(tier,kind,cat,avoid){let q;if(tier==='age7'&&(cat==='maths'||kind==='maths')){let g=0;do{const m=genMath(tier,0,'arith');q={q:m.q,opts:m.opts,c:m.c,h:m.h};}while(g++<10&&avoid.includes(q.q));}else if(tier==='age4'){let g=0;do q=makePQ(pick(['counting','colours','shapes']));while(g++<10&&avoid.includes(qTxt(q)));}else q=mkGateQ(tier,kind,cat,avoid);q.cat=cat;return easierQ(q);}
@@ -2561,7 +2561,9 @@ function quizAnswer(i){if(!QZ||QZ.done)return;const q=QZ.qs[QZ.i];if(i<0||i>=q.o
  else{sfx('bad');QZ.wrong++;QZ.miss++;logQ(q,false);const rt=ansTxt(q),tier=PL().tier;QZ.seen.push(qTxt(q));
   const nq=QZ.miss>=3?easyGateQ(tier,QZ.kind,q.cat,QZ.seen):mkGateQ(tier,QZ.kind,q.cat,QZ.seen);QZ.seen.push(qTxt(nq));QZ.qs[QZ.i]=nq;QZ.rem=[];QZ.hint='';QZ.sh=18;QZ.fb={rt,t:200,easier:!!nq.easier};dogQuizHelp(false);
   say('Not quite! The answer was '+rt+'. '+(nq.easier?'Here is an easier one!':'Here is a new question!'),{again:true});setTimeout(()=>{if(QZ&&QZ.qs[QZ.i]===nq&&!QZ.done)sayQ(nq);},2600);}}
-function drawFB(fb,y,w){if(!fb||fb.t<=0)return;rr(480-w/2,y,w,52,14);ctx.fillStyle='#ffe3ec';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#e0409a';ctx.stroke();wrap('Not quite! The answer was: '+fb.rt+'   ➜ '+(fb.easier?'Try this easier one!':'New question!'),480,y+26,w-30,22,19,'#a0205a');}
+function drawFB(fb,y,w){if(!fb||fb.t<=0)return;const h=52,x=480-w/2,bs=NUI.filter(u=>u.fn&&u.w<VW-10).map(u=>u.vis||u);
+ const free=yy=>!bs.some(b=>b.x<x+w&&b.x+b.w>x&&b.y<yy+h+3&&b.y+b.h>yy-3);if(!free(y)){let best=null;for(let yy=4;yy<=VH-h-4;yy+=2)if(free(yy)&&(best===null||Math.abs(yy-y)<Math.abs(best-y)))best=yy;if(best!==null)y=best;}
+ window._fbr=[x,y,w,h];rr(x,y,w,h,14);ctx.fillStyle='#ffe3ec';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#e0409a';ctx.stroke();wrap('Not quite! The answer was: '+fb.rt+'   ➜ '+(fb.easier?'Try this easier one!':'New question!'),480,y+26,w-30,22,19,'#a0205a');}
 function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.fb&&QZ.fb.t>0)QZ.fb.t--;if(QZ.sh>0)QZ.sh--;if(QZ.yay>0)QZ.yay--;if(QZ.done&&(tap('interact')||QZ.t>400)){mode=PM();P.gcool=30;toast('A colour returns to the world! 🌈',150);}}
 function panel(x,y,w,h,col){ctx.fillStyle='rgba(10,10,40,.55)';ctx.fillRect(0,0,VW,VH);rr(x,y,w,h,26);ctx.fillStyle='#fffdf2';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle=col||'#2b2b55';ctx.stroke();}
 function drawQuiz(){drawWorld();drawHUD();const e=easy(),col={maths:'#ff7a3c',reading:'#3aa8ff',science:'#2fc46b',mixed:'#a35cff',world:'#1f9ac9',volcano:'#e2551f',vmixed:'#e0409a',jungle:'#2f9e4a',jmixed:'#8a6a2a'}[QZ.kind]||'#a35cff';panel(60,40,840,470,col);
@@ -2612,8 +2614,13 @@ function revTopics(lv){const tier=PL().tier,L=LOG(lv),pr=PR(),out=[],key=new Set
  /* missed ones first (max 2), then the things she read, then a fallback from the level bank */
  sel.push(...gates.slice(0,2));for(const t of rest){if(sel.length>=N)break;sel.push(t);}let g=0;while(sel.length<N&&g++<9)sel.push({k:'bank',cat:pick(cats)});return sel;}
 function revFact(t){return t.k==='sc'?SCROLLS[t.id]:t.k==='rf'?t.fact:t.k==='df'?['Stormi fact',DOGFACTS[t.id]]:null;}
-function revQ(t,seen,easier){const tier=PL().tier;let q=null;const f=revFact(t);
- if(f&&tier!=='age4'){q=clozeQ(f[1],f[0],seen);if(q)q.cat=t.cat;}
+const SCRIC={cloud:['☁️','cloud'],sun:['☀️','sun'],plant:['🌱','plant'],rain:['🌈','rainbow'],bee:['🐝','bee'],bolt:['⚡','lightning'],lava:['🌋','lava'],pumice:['🪨','pumice rock'],crystal:['💎','crystal'],geyser:['⛲','geyser'],rain3:['🌧️','rain'],canopy:['🌳','treetops'],sloth:['🦥','sloth'],frog:['🐸','frog']};
+/* age 4: a met Fact Scroll becomes a read-aloud picture question (find the thing the fact was about); different wording + distractors on a re-ask */
+function picFactQ(t,seen){const m=SCRIC[t.id];if(!m)return null;const f=SCROLLS[t.id],first=f[1].split(/(?<=[.!?])\s/)[0];const ask=['Which picture is the '+m[1]+'?','Find the '+m[1]+'!','Tap the '+m[1]+'!'];
+ for(const a of ask){const sy='Remember the '+f[0]+'? '+first+' '+a;if(seen&&seen.includes(sy))continue;const ws=shuffle(Object.keys(SCRIC).filter(k=>k!==t.id&&SCRIC[k][0]!==m[0])).slice(0,2).map(k=>SCRIC[k]),os=shuffle([m,...ws]);
+  return PQ(sy,{k:'ask'},os.map(o=>({k:'emo',e:o[0],nm:o[1]})),os.indexOf(m),first,f[0]+': '+a);}return null;}
+function revQ(t,seen,easier){const tier=PL().tier;let q=null;const f=revFact(t);if(tier==='age4'&&t.k==='sc'){q=picFactQ(t,seen);if(q)q.cat=t.cat;}
+ if(!q&&f&&tier!=='age4'){q=clozeQ(f[1],f[0],seen);if(q)q.cat=t.cat;}
  if(!q)q=mkGateQ(tier,'mixed',t.cat,seen);
  if(easier&&q.opts.length>2)q=easierQ(q);return q;}
 let RV=null;
@@ -2629,9 +2636,9 @@ function revAnswer(i){if(!RV||RV.done)return;const it=RV.qs[RV.i],q=it.q;if(i<0|
   say('Not quite! The answer was '+rt+'. We will come back to this one!',{again:true});const nx=RV.qs[RV.i].q;setTimeout(()=>{if(RV&&!RV.done&&RV.qs[RV.i]&&RV.qs[RV.i].q===nx)sayQ(nx);},2800);}}
 function revStars(r){return r.first>=r.N?3:r.first>=Math.ceil(r.N*.6)?2:1;}
 function revFinish(){RV.done=true;RV.t=0;const pr=PR();pr.rev=pr.rev||{};const b=pr.rev[RV.lv];if(!b||RV.first>b.s)pr.rev[RV.lv]={s:RV.first,n:RV.N};addStars(revStars(RV)*2);save();sfx('win');SF.wag=200;
- const ls=[];for(const it of RV.qs){const f=revFact(it.t);let l=f?f[0]+': '+f[1]:it.q.pics?'':(it.q.cl?'':it.q.q.replace(/ = \?$/,' = ')+(/ = $/.test(it.q.q.replace(/ = \?$/,' = '))?'':' → ')+ansTxt(it.q));if(it.q.pics)l=(it.q.say||'')+' → '+ansTxt(it.q);if(l&&!ls.includes(l))ls.push(l);}RV.learned=ls.slice(0,4);
+ const ls=[];for(const it of RV.qs){const f=revFact(it.t);let l=f?f[0]+': '+f[1]:it.q.pics?'':(it.q.cl?'':it.q.q.replace(/ = \?$/,' = ')+(/ = $/.test(it.q.q.replace(/ = \?$/,' = '))?'':' → ')+ansTxt(it.q));if(it.q.pics&&!f)l=(it.q.say||'')+' → '+ansTxt(it.q);if(l&&!ls.includes(l))ls.push(l);}RV.learned=ls.slice(0,4);
  say((RV.first>=RV.N?'Perfect! ':'Well done! ')+'You got '+RV.first+' out of '+RV.N+' right first time!',{again:true});}
-function revEnd(){const f=RV&&RV.onDone;RV=null;if(f)f();else mode='levels';}
+function revEnd(){const f=RV&&RV.onDone;RV=null;if(f)f();if(mode==='review'||!f)mode='levels';}
 function updRev(){T++;RV.t++;if(SF.wag>0)SF.wag--;if(RV.fb&&RV.fb.t>0)RV.fb.t--;if(RV.done){if(tap('interact')&&RV.t>30)revEnd();return;}if(digit>=0)revAnswer(digit);}
 function drawRev(){sat=1;drawBGscene(T);const e=easy(),col='#3b6ea8';panel(60,40,840,470,col);
  if(RV.done){txt('What did you learn?',480,78,32,col);txt(RV.first+' / '+RV.N+' right first time',480,124,30,'#2b2b55');for(let k=0;k<3;k++)starShape(420+k*60,170,22,k<revStars(RV)?'#ffd23f':'#d8d8e0',0);
