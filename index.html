@@ -15,7 +15,8 @@ canvas{background:#000;display:block;touch-action:none}
 #tc.space button:not([data-a=left]):not([data-a=right]):not([data-a=jump]):not([data-a=punch]):not([data-a=interact]):not([data-a=down]){display:none}
 #tc.sea button:not([data-a=left]):not([data-a=right]):not([data-a=jump]):not([data-a=down]){display:none}
 #tc.sea.seaexit #bE{display:block}
-#tc.skate #bS,#tc.skate #bV,#tc.skate #bQ{display:none!important}#tc.skate #bD{opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:none!important}
+#tc.skate #bS,#tc.skate #bV,#tc.skate #bQ{display:none!important}
+#tc.blast [data-a=kick]{display:none!important}#tc.blast [data-a=punch]{--c:#ffd23f;--k:#c98a00;background:#ffd23f!important;color:#2b2b55!important;opacity:1!important;font-size:17px;font-weight:900;border-color:#fff!important}#tc.skate #bD{opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:none!important}
 #tc.run button:not([data-a=left]):not([data-a=right]):not([data-a=jump]):not([data-a=punch]):not([data-a=down]){display:none}
 #tc button{--c:#7a6cff;--k:#4b3fc0;pointer-events:auto;position:absolute;width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.55) 0 18%,transparent 42%),var(--c);color:#fff;font:bold 24px/1 "Comic Sans MS","Chalkboard SE","Trebuchet MS",sans-serif;text-shadow:0 2px 0 rgba(0,0,0,.35);touch-action:none;padding:0;box-shadow:inset 0 -5px 0 var(--k),0 4px 6px rgba(0,0,0,.35);opacity:.45;transition:opacity .25s,transform .08s,visibility 0s;will-change:transform}
 #tc [data-a=left],#tc [data-a=right],#tc [data-a=down]{--c:#3aa8ff;--k:#1f6fb8}#tc [data-a=jump]{--c:#2fc46b;--k:#1c8a49;font-size:30px}
@@ -219,8 +220,8 @@ const QB={
    Q('What is the closest star to Earth?','the Sun',['the Moon','Mars','the North Star'],'It lights up our day!'),
    Q('Which planet is called the Red Planet?','Mars',['Venus','Saturn','Neptune'],'Rusty red dust covers it.'),
    Q('Which planet has big beautiful rings?','Saturn',['Mars','Mercury','Earth'],'Its rings are made of ice and rock.'),
-   Q('What does the Moon go around?','the Earth',['the Sun only','Mars','a comet'],'It is our closest neighbour.'),
-   Q('Why do you jump higher on the Moon?','weaker gravity',['stronger wind','bouncy rocks','magic shoes'],'The Moon is much smaller than Earth.'),
+   Q('What does the Moon go around?','the Earth',['Jupiter','Mars','a comet'],'It is our closest neighbour.'),
+   Q('Why do you jump higher on the Moon?','weaker gravity',['stronger wind','bouncy rocks','magic shoes'],'The Moon is smaller, so its gravity pulls on you less.'),
    Q('What is the biggest planet?','Jupiter',['Earth','Mars','Mercury'],'It has a giant red storm spot.'),
    Q('How many planets go around our Sun?','8',['5','12','3'],'Mercury to Neptune.'),
    Q('What do astronauts need to breathe in space?','air tanks',['a snorkel','a fan','nothing'],'There is no air in space.'),
@@ -449,7 +450,7 @@ const PETS=[
 ];
 const SCROLLS={
  moon5:['Moon Scroll','The Moon has no air and no wind, so the footprints astronauts left there could last for millions of years!'],
- lowg:['Low Gravity Scroll','Gravity on the Moon is about six times weaker than on Earth. You could jump six times higher there!'],
+ lowg:['Low Gravity Scroll','Gravity on the Moon is only about one-sixth as strong as on Earth. You could jump six times higher there!'],
  planet5:['Planet Scroll','Jupiter is so big that more than 1,000 Earths could fit inside it!'],
  star5:['Star Scroll','Stars twinkle because their light wiggles as it passes through the air around Earth.'],
  astro:['Astronaut Scroll','Astronauts on the space station see about 16 sunrises every day because they zoom around Earth so fast!'],
@@ -2581,7 +2582,7 @@ function drawHUD(){const pr=PR(),p=P;if(p.stageT>0)stageLights(p.stageT);
  for(let i=0;i<3;i++)heart(30+i*34,28,1.3,clamp((p.hp-i*2)/2,0,1));
  txt('Lv '+pr.lvl,22,56,18,'#fff','left','#2b2b55');bar(62,48,186,16,pr.xp/xpNeed(pr.lvl),'#7be34a');
  txt('⭐ '+pr.stars,22,82,18,'#ffe066','left','#2b2b55');txt('🍎 '+pr.treats,100,82,18,'#fff','left','#2b2b55');
- const el=ELEMS[pr.elem];bar(22,100,130,16,p.ch/100,el.c);txt(el.ic+' '+el.n+(p.ch>=100?' ✨!':''),160,108,15,'#fff','left','#2b2b55');
+ const el=ELEMS[pr.elem];bar(22,100,130,16,p.ch/100,el.c);txt((LV&&LV.lvl===5?'✨ Power':el.ic+' '+el.n)+(p.ch>=100?' ✨!':''),160,108,15,'#fff','left','#2b2b55');
  const ap=activePet();if(ap){rr(264,8,52,52,12);ctx.fillStyle='rgba(20,20,60,.35)';ctx.fill();if(mode==='play')NUI.push({x:258,y:2,w:68,h:68,fn:()=>openPets('play')});if(PH.blk<=0)txt('🛡',306,16,13);petSprite(ap.def.id,290,52,1,.75,T);txt('♥'+ap.lv,290,64,12,'#ffd','center','#2b2b55');}
  drawDogUI();drawRoomHUD();
  {const cb=cornerSz(),live=mode==='play'||mode==='run';btn(SV.mute?'🔇':'🔊',VW-(live?2:1)*(cb+6),8,cb,cb,toggleMute,{size:22});if(live){btn('🐾',VW-3*(cb+6),8,cb,cb,()=>openPets('play'),{size:22});btn('⏸',VW-cb-6,8,cb,cb,()=>{mode='pause';pmoves=false;},{size:22});}}
@@ -2808,9 +2809,9 @@ function updDuel(){T++;D.t++;if(D.fb&&D.fb.t>0)D.fb.t--;if(D.ds&&++D.ds.t>D.ds.t
  else if(D.ph==='ask'){D.qt--;if(D.qt<=0){D.combo=0;D.say='Too slow! ZAP!';duelAnim('b',easy()?6:11,bossAtk());}}
  else if(D.ph==='meter'){const m=D.m;if(!m.res){m.x+=m.dir*m.sp*(1+D.t/900);if(m.x>=m.N){m.x=m.N-.001;m.dir=-1;}if(m.x<0){m.x=0;m.dir=1;}if(tap('jump')||tap('interact')||tap('punch'))duelStop();}
   else if(D.t>50){const r=m.res;D.m=null;duelAnim('p',r.dmg,r.d===0?'PERFECT STRIKE!':r.d===1?'Good hit!':'Little tap');}}
- else if(D.ph==='anim'){const a=D.anim;a.t++;if(a.t===28&&!a.ap){a.ap=true;D.sh=14;sfx('hit');if(a.who==='p'){D.bhp=Math.max(0,D.bhp-a.dmg);D.flash=12;D.say=pick(LV&&LV.lvl===3?['Ow!','My leaves!','Rustle grrr!','Not fair!']:['Ow!','My clouds!','Grrr!','Not fair!']);duelDog(pick(['WOOF! Great hit!','Yay! Keep going!','You are so strong!','Cheer boost! Woof woof!']),120,true);}else{D.php=Math.max(0,D.php-a.dmg);D.flash=12;duelDog(pick(['Oh no! Get up! You can do it!','Shake it off! I believe in you!']),120);}}
+ else if(D.ph==='anim'){const a=D.anim;a.t++;if(a.t===28&&!a.ap){a.ap=true;D.sh=14;sfx('hit');if(a.who==='p'){D.bhp=Math.max(0,D.bhp-a.dmg);D.flash=12;D.say=pick(LV&&LV.lvl===3?['Ow!','My leaves!','Rustle grrr!','Not fair!']:LV&&LV.lvl===5?['Ow! My tentacles!','Bloop!','Squish!','Not fair!']:['Ow!','My clouds!','Grrr!','Not fair!']);duelDog(pick(['WOOF! Great hit!','Yay! Keep going!','You are so strong!','Cheer boost! Woof woof!']),120,true);}else{D.php=Math.max(0,D.php-a.dmg);D.flash=12;duelDog(pick(['Oh no! Get up! You can do it!','Shake it off! I believe in you!']),120);}}
   if(a.t>78){if(a.who==='p'){if(D.bhp<=0){D.ph='win';D.t=0;sfx('win');duelDog('WE DID IT! Woof woof woof!',400,true);}else if(D.turn%2===0)duelAnim('b',easy()?6:12,bossAtk());else duelNext();}
-   else{if(D.php<=0){D.ph='ko';D.t=0;}else{D.say=pick(curLv()===3?['Hehehe!','Rustle rustle!','Vine time!']:['Hehehe!','Grumble!','Rain on you!']);duelNext();}}}}
+   else{if(D.php<=0){D.ph='ko';D.t=0;}else{D.say=pick(curLv()===3?['Hehehe!','Rustle rustle!','Vine time!']:curLv()===5?['Ink attack!','Bloop bloop!','Squish!']:['Hehehe!','Grumble!','Rain on you!']);duelNext();}}}}
  else if(D.ph==='ko'){if(D.t>130){D.php=60;D.say='Hmph. Again!';duelNext();}}
  else if(D.ph==='win'){if(D.t>170||(D.t>60&&tap('interact'))){if(curLv()===5)endLevel();else startFinale();}}}
 function drawFighters(){const a=D.anim,sx=D.sh>0?rnd(-4,4):0;
@@ -2837,7 +2838,7 @@ function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.
  if(D.combo>0)txt('COMBO x'+D.combo+(D.combo>=2?'  (next hit = SPECIAL!)':''),480,92,22,'#ffe066','center','#a22');
  drawFighters();
  if(D.ds){const m=D.ds;ctx.font=F(16);const mw=300,ws=m.text.split(' ');let ln='',ls=[];for(const wd of ws){const t=ln?ln+' '+wd:wd;if(ctx.measureText(t).width>mw&&ln){ls.push(ln);ln=wd;}else ln=t;}ls.push(ln);const h=ls.length*20+26,by=Math.max(96,214-h);rr(16,by,330,h,12);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#3b6ea8';ctx.stroke();ctx.beginPath();ctx.moveTo(60,by+h-1);ctx.lineTo(92,268);ctx.lineTo(100,by+h-1);ctx.fillStyle='#fff';ctx.fill();ctx.stroke();ctx.fillRect(61,by+h-3,38,5);txt('🐶 '+DN(),28,by+12,13,'#3b6ea8','left');ls.forEach((l,i)=>txt(l,181,by+32+i*20,16,'#2b2b55'));}
- if(D.say&&D.ph!=='win'){rr(560,96,230,40,14);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#223';ctx.stroke();txt(D.say,675,116,17,'#223');}
+ if(D.say&&D.ph!=='win'){ctx.font='bold 17px sans-serif';const tw=ctx.measureText(D.say).width,l5=curLv()===5;if(l5){const two=tw>200,sw=two?Math.min(240,tw/2+60):tw+34,hh=two?62:40;rr(470-sw/2,205,sw,hh,14);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#223';ctx.stroke();if(two)wrap(D.say,470,226,sw-24,22,17,'#223');else txt(D.say,470,225,17,'#223');}else{const sw=Math.min(520,Math.max(150,tw+34));rr(675-sw/2,96,sw,40,14);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#223';ctx.stroke();txt(D.say,675,116,17,'#223');}}
  if(D.anim&&D.anim.t>=10&&D.anim.t<70&&D.anim.who==='p')txt(D.anim.name,480,150,38,'#ffe066','center','#a22');
  if(D.anim&&D.anim.who==='b'&&D.anim.t>8&&D.anim.t<70)txt(D.anim.name,480,150,34,'#ffe34a','center','#335');
  rr(20,350,920,180,18);ctx.fillStyle='rgba(255,253,242,.96)';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#2b2b55';ctx.stroke();
@@ -3104,7 +3105,7 @@ function rnSkDraw(o,pr){const R=RN,t=o.t;
 function drawSkFrontW(){if(!LV||!LV.tunnels)return;ctx.save();ctx.translate(-Math.round(cam.x),0);drawSkFront(LV);ctx.restore();}
 const L4INTRO=()=>{const n=fullName(),g=SKG(),r=g.type==='board'?'skateboard':'roller skates';return[{s:'Woof! Welcome to the Skate Park, '+n+'!',b:1},{s:'Your new '+r+' look amazing! Tap ▶ to push and you keep on rolling. Tap ◀ to slow down.'},{s:'Ride the half pipes up into the air and do tricks! 🛹 Flip, 🌀 Spin, or ▼ Grab. Do lots in a row for a COMBO!'},{s:'There are still question gates, Fact Scrolls and 3 Big Stars to find. Let\'s roll!'}];};
 /* skate-mode touch buttons: punch -> 🛹 flip, kick -> 🌀 spin, ▼ always shown (grab in the air, pipe hole on the ground) */
-let SKBTN=null;function skBtns(){const sk=(mode==='play'&&LV&&LV.skate&&!LV.cave)||(mode==='run'&&RN&&RN.L4),bl=!sk&&((mode==='play'&&LV&&LV.lvl===5&&!LV.cave&&!!LP().blaster)||mode==='ship'),on=sk?'sk':bl?'bl':'';if(on===SKBTN)return;SKBTN=on;const q=a=>document.querySelector('#tc [data-a='+a+']');const pu=q('punch'),ki=q('kick');if(pu)pu.textContent=sk?'🛹':bl?'🔫':'👊';if(ki)ki.textContent=sk?'🌀':bl?'🔫':'🦶';tcEl.classList.toggle('skate',!!(on&&mode==='play'));}
+let SKBTN=null;function skBtns(){const sk=(mode==='play'&&LV&&LV.skate&&!LV.cave)||(mode==='run'&&RN&&RN.L4),bl=!sk&&((mode==='play'&&LV&&LV.lvl===5&&!LV.cave&&!!LP().blaster)||mode==='ship'),on=sk?'sk':bl?'bl':'';if(on===SKBTN)return;SKBTN=on;const q=a=>document.querySelector('#tc [data-a='+a+']');const pu=q('punch'),ki=q('kick');if(pu)pu.textContent=sk?'🛹':bl?'⚡ ZAP':'👊';if(ki)ki.textContent=sk?'🌀':bl?'⚡':'🦶';tcEl.classList.toggle('skate',!!(on&&mode==='play'));tcEl.classList.toggle('blast',on==='bl');}
 
 /* ===L5BEGIN=== */
 /* ================= LEVEL 5: MOON BASE (low gravity, blaster, Stormi tantrum, ship flight, Space Squid) ================= */
@@ -3127,7 +3128,7 @@ function L5build(L,a){const {G,CK,SG,GT,SC,HS,BU,row,arc,BONUS,MV,EN,gap,CX}=a,E
  // 4 hidden crater cave (Big Star 1)
  s=G(1000);CK(s+60);L.pipes.push({id:'m1',x:s+330,out:s+850});HS(s+170,'Psst! That dark crater looks like a secret cave... Stand on it and tap ▼!',1);row(s+560,400,4);
  // 5 blaster + robots
- s=G(1400);CK(s+60);L.blX=s+260;SG(s+120,'A laser blaster! Walk over it to pick it up.');HS(s+430,Ez?'Tap 🔫 to zap! It aims for you!':'Tap 🔫 to fire. Pop the robots into sparkles!',1);
+ s=G(1400);CK(s+60);L.blX=s+260;SG(s+120,'A laser blaster! Walk over it to pick it up.');HS(s+430,Ez?'Tap ⚡ ZAP to zap! It aims by itself!':'Tap ⚡ ZAP to fire. Pop the robots into sparkles!',1);
  EN('ninja',s+720);EN('hopper',s+960);EN('cloud',s+1150,300);row(s+820,400,4);arc(s+1200,380,4,60);
  // 6 targets + force field
  s=G(1100);CK(s+60);SG(s+140,'🎯 A force field! Zap all 3 targets to switch it off.');
@@ -3140,7 +3141,7 @@ function L5build(L,a){const {G,CK,SG,GT,SC,HS,BU,row,arc,BONUS,MV,EN,gap,CX}=a,E
  // 8 Stormi's tantrum: find the star toy
  s=G(1400);CK(s+60);L.tant={x:s+950,done:!!lp.tant,seen:false,happy:0,stomp:0};
  if(Ez)L.toy={x:s+570,y:410,got:false,glow:1};else{BOULD(s+380,350,110);BOULD(s+560,270,100);L.toy={x:s+610,y:236,got:false};}
- if(!L.tant.done){L.tant.plat={x:s+1010,y:0,w:26,h:440,t:'b'};L.plats.push(L.tant.plat);}
+ if(!L.tant.done){L.tant.plat={x:s+858,y:0,w:26,h:440,t:'b'};L.plats.push(L.tant.plat);}
  row(s+1120,400,3);
  // 9 Europa ocean portal (Big Star 2)
  SG(CX()+40,'🧊 Some icy moons hide oceans under the ice!');BONUS('m2','sea');
@@ -3148,7 +3149,7 @@ function L5build(L,a){const {G,CK,SG,GT,SC,HS,BU,row,arc,BONUS,MV,EN,gap,CX}=a,E
  s=G(1100);CK(s+60);EN('hopper',s+480);EN('cloud',s+720,290);EN('ninja',s+900);SC('star5',s+620,370);arc(s+260,380,5,60);
  FIELD(3,{drift:true,ys:[380,340,360]});s=G(700);GT(s+360,'space');
  // 11 rocket dock
- s=G(1200);CK(s+60);SC('astro',s+300,380);SG(s+460,'🚀 Our rocket! Walk into it to fly up to the Space Squid!');row(s+560,400,4);L.dock={x:s+950};
+ s=G(1200);CK(s+60);SC('astro',s+300,380);SG(s+460,'🚀 Our rocket! Walk into it to fly up to the Space Squid!');row(s+560,400,4);L.dock={x:s+950};L.bushes=[];
  HS(s+640,'Walk into the rocket to blast off!',1);}
 function L5plat(s){const L=LV;if(s.t==='g'){const x0=Math.max(s.x,cam.x-20),x1=Math.min(s.x+s.w,cam.x+VW+20);ctx.fillStyle='#8a8f9e';ctx.fillRect(x0,s.y,x1-x0,s.h);ctx.fillStyle='#b8bdc9';ctx.fillRect(x0,s.y,x1-x0,9);
   ctx.fillStyle='#737888';for(let x=Math.floor(x0/120)*120;x<x1;x+=120){const k=(x/120|0)%3;ctx.beginPath();ctx.ellipse(x+40+k*20,s.y+30+k*14,14+k*6,5+k*2,0,0,7);ctx.fill();}return;}
@@ -3175,7 +3176,7 @@ function L5upd(L,p,E){const lp=LP();if(p.lcd>0)p.lcd--;
  for(const c of L.crm){if(c.st===0&&p.onGround&&p.gnd===c.p){c.st=1;c.t=0;}if(c.st===1&&++c.t>(E?100:50)){c.st=2;c.rt=0;c.fy=c.p.y;const i=L.plats.indexOf(c.p);if(i>=0)L.plats.splice(i,1);sfx('smash');addParts(c.p.x+c.p.w/2,c.p.y+10,12,'#aab',{sp:1.2});if(p.gnd===c.p){p.onGround=false;p.gnd=null;}}
   else if(c.st===2){c.rt++;c.fy+=2;if(c.rt>220){c.st=0;L.plats.push(c.p);}}}
  // blaster pickup
- if(L.blX!=null&&!lp.blaster&&Math.abs(p.x+10-L.blX)<36&&p.y>300){lp.blaster=true;save();sfx('harmony');banner={t:200,title:'🔫 LASER BLASTER!',sub:E?'Tap 🔫 to zap. It aims for you!':'Tap 🔫 to fire lasers!'};say(E?'You got a laser blaster! Tap the blaster button to zap. It aims for you!':'Laser blaster! Tap the blaster button to fire. Robots pop into sparkles!',{again:true});}
+ if(L.blX!=null&&!lp.blaster&&Math.abs(p.x+10-L.blX)<36&&p.y>300){lp.blaster=true;save();sfx('harmony');banner={t:200,title:'⚡ LASER BLASTER!',sub:E?'Tap ⚡ ZAP to zap. It aims by itself!':'Tap ⚡ ZAP to fire lasers!'};say(E?'You got a laser blaster! Tap the zap button to zap. It aims by itself!':'Laser blaster! Tap the zap button to fire. Robots pop into sparkles!',{again:true});}
  // lasers vs targets
  for(const q of L.proj){if(!q.laser||q.life<=0)continue;for(const t of L.tgts){if(!t.hit&&Math.hypot(q.x-t.x,q.y-t.y)<(E?34:26)){t.hit=true;q.life=0;sfx('chime');addParts(t.x,t.y,14,'#ffe066',{star:true,sp:1.6});floatText('🎯',t.x,t.y-20,'#fff');}}}
  for(const f of L.ffs){if(!f.open&&L.tgts.filter(t=>t.hit).length>=f.n){f.open=true;const i=L.plats.indexOf(f.plat);if(i>=0)L.plats.splice(i,1);sfx('win');toast('The force field is OFF! Go go go!',160);}}
@@ -3185,21 +3186,21 @@ function L5upd(L,p,E){const lp=LP();if(p.lcd>0)p.lcd--;
    if(!tn.seen&&d<(E?300:420)){tn.seen=true;sfx('bark');say(E?'Uh oh! '+DN()+' is having a tantrum! She wants her star toy. Look, it is right behind you! Follow the arrow and pick it up.':'Uh oh! '+DN()+' is having a tantrum and will not let us pass! She wants her star toy. Can you find it nearby? Try looking up high!',{again:true});}
    if(T%3===0)tn.stomp++;
    const ty=L.toy;if(ty&&!ty.got&&(tn.seen||!E)&&Math.abs(p.x+10-ty.x)<(E?46:34)&&Math.abs(p.y+28-ty.y)<(E?70:46)){ty.got=true;sfx('star');toast('⭐ Got the star toy! Bring it to '+DN()+'!',180);say('You found the star toy! Bring it to '+DN()+'!',{again:true});}
-   if(ty&&ty.got&&Math.abs(d)<110){tn.done=true;tn.happy=200;lp.tant=true;save();const i=L.plats.indexOf(tn.plat);if(i>=0)L.plats.splice(i,1);sfx('harmony');addParts(tn.x,400,16,'#ff7ab8',{star:true,sp:1.4});say('Yay! '+DN()+' loves her star toy! She is happy again. Wag wag wag! The path is open!',{again:true});dogBond&&dogBond(1);}
+   if(ty&&ty.got&&Math.abs(d)<110){tn.done=true;tn.happy=200;toasts=[];lp.tant=true;save();const i=L.plats.indexOf(tn.plat);if(i>=0)L.plats.splice(i,1);sfx('harmony');addParts(tn.x,400,16,'#ff7ab8',{star:true,sp:1.4});say('Yay! '+DN()+' loves her star toy! She is happy again. Wag wag wag! The path is open!',{again:true});dogBond&&dogBond(1);}
    else if(tn.seen&&!ty.got&&d<160&&d>0&&T%300===0)toast(E?'Follow the arrow to the star toy ⭐':DN()+' wants her star toy ⭐. Look around!',150);}
   else if(tn.happy>0){tn.happy--;if(tn.happy%14===0)addParts(tn.x,380,1,'#ff7ab8',{g:-.05});if(tn.happy===1){SF.st='away';}}}
  // rocket dock
  if(L.dock&&p.onGround&&Math.abs(p.x+10-L.dock.x)<40){startShip();}}
 function L5draw(L){const lp=LP(),E=easy();
  for(const c of L.crm)if(c.st===2&&c.rt<60){ctx.save();ctx.globalAlpha=1-c.rt/60;L5plat({x:c.p.x,y:c.fy,w:c.p.w,h:16,t:'p'});ctx.restore();}
- if(L.blX!=null&&!lp.blaster){const y=405+Math.sin(T/12)*5;ctx.save();ctx.shadowColor='#3df';ctx.shadowBlur=18;ctx.fillStyle='#ff5fb0';rr(L.blX-22,y-10,40,16,6);ctx.fill();ctx.fillStyle='#7ff';rr(L.blX+14,y-6,12,8,3);ctx.fill();ctx.fillStyle='#c33a86';rr(L.blX-16,y+4,12,16,4);ctx.fill();ctx.restore();txt('🔫',L.blX,y-34,20);}
+ if(L.blX!=null&&!lp.blaster){const y=405+Math.sin(T/12)*5;ctx.save();ctx.shadowColor='#3df';ctx.shadowBlur=18;ctx.fillStyle='#ff5fb0';rr(L.blX-22,y-10,40,16,6);ctx.fill();ctx.fillStyle='#7ff';rr(L.blX+14,y-6,12,8,3);ctx.fill();ctx.fillStyle='#c33a86';rr(L.blX-16,y+4,12,16,4);ctx.fill();ctx.restore();txt('⚡',L.blX,y-34,20);}
  for(const t of L.tgts){ctx.save();if(t.hit)ctx.globalAlpha=.35;for(let r=3;r>0;r--){ctx.fillStyle=r%2?'#ff4f6a':'#fff';ctx.beginPath();ctx.arc(t.x,t.y,r*7,0,7);ctx.fill();}ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(t.x,t.y+21);ctx.lineTo(t.x,440);ctx.stroke();ctx.restore();}
  for(const f of L.ffs){if(f.open)continue;const a=.35+.15*Math.sin(T/8);ctx.fillStyle=`rgba(90,200,255,${a})`;ctx.fillRect(f.x,0,30,440);ctx.strokeStyle='#bff';ctx.lineWidth=2;for(let y=(T*2)%40;y<440;y+=40){ctx.beginPath();ctx.moveTo(f.x,y);ctx.lineTo(f.x+30,y+14);ctx.stroke();}txt('🎯 '+L.tgts.filter(t=>t.hit).length+'/'+f.n,f.x+15,110,22,'#fff','center','#036');}
  const tn=L.tant;if(tn){const ty=L.toy;if(ty&&!ty.got&&(tn.seen||!ty.glow)){const b=Math.sin(T/10)*4;if(ty.glow||tn.seen){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(T/6);ctx.fillStyle='#ffe066';ctx.beginPath();ctx.arc(ty.x,ty.y+b,30,0,7);ctx.fill();ctx.restore();}starShape(ty.x,ty.y+b,16,'#ffb3e0',T/30);ctx.fillStyle='#2b2b55';ctx.beginPath();ctx.arc(ty.x-5,ty.y+b-2,2,0,7);ctx.arc(ty.x+5,ty.y+b-2,2,0,7);ctx.fill();
-   if(E&&tn.seen){if(Math.abs(P.x+10-ty.x)>140)txt(P.x+10>ty.x?'⬅':'➡',P.x+10+(P.x+10>ty.x?-60:60),P.y-10,40,'#ffe066','center','#a36b1d');}if(E&&tn.seen)txt('⬇',ty.x,ty.y-46+Math.sin(T/6)*6,34,'#ffe066','center','#a36b1d');}
+   if(E&&tn.seen){if(Math.abs(P.x+10-ty.x)>140)txt(P.x+10>ty.x?'⬅':'➡',P.x+10,P.y-50,40,'#ffe066','center','#a36b1d');}if(E&&tn.seen)txt('⬇',ty.x,ty.y-46+Math.sin(T/6)*6,34,'#ffe066','center','#a36b1d');}
   if(!tn.done){const st=tn.stomp%8<4,hop=st?-6:0,face=(P.x+10<tn.x)?-1:1;ctx.save();ctx.translate(tn.x,440);ctx.rotate(st?.06:-.06);dogSprite(0,0,face,1.05,T,{fast:true,mouth:tn.stomp%10<5,hop});ctx.restore();
    if(st){ctx.fillStyle='rgba(220,220,235,.8)';for(const k of[-1,1]){ctx.beginPath();ctx.arc(tn.x+k*30,436,8+(tn.stomp%4)*2,0,7);ctx.fill();}}
-   txt('😤',tn.x+26,370+Math.sin(T/5)*3,28);if(tn.stomp%24<12)txt('WOOF!',tn.x-34,350,22,'#fff','center','#e0409a');else txt('RUFF!',tn.x+44,342,20,'#fff','center','#e0409a');
+   txt('😤',tn.x+30,364+Math.sin(T/5)*3,28);if(tn.stomp%24<12)txt('WOOF!',tn.x-34,350,22,'#fff','center','#e0409a');else txt('RUFF!',tn.x+44,342,20,'#fff','center','#e0409a');
    if(tn.seen){const ty2=L.toy;txt(ty2&&ty2.got?'⭐ Give the toy!':'I want my ⭐ toy!',tn.x,300,18,'#2b2b55','center','#fff');}
    ctx.fillStyle='rgba(255,160,200,.18)';ctx.fillRect(tn.plat.x,200,26,240);}
   else if(tn.happy>0){dogSprite(tn.x,440,-1,1.05,T,{fast:true,mouth:true,hop:-Math.abs(Math.sin(T/5))*10});txt('💖',tn.x,350-((200-tn.happy)%40),24);starShape(tn.x+22,412,9,'#ffb3e0',T/10);}}
@@ -3219,7 +3220,7 @@ function startShip(){const E=easy(),lp=LP();lp.ship=1;save();shush();const len=E
  SH={on:true,t:0,E,len,x:170,y:270,vx:0,vy:0,inv:120,cd:0,shots:[],rocks:[],drones:[],orbs:[],stars:[],fx:[],bg:[],big:null,bigT:Math.round(len*.5),got:0,pops:0,bumps:0,boss:null};
  for(let i=0;i<90;i++)SH.bg.push([Math.random()*VW,Math.random()*VH,1+(i%3),Math.random()*6]);
  mode='ship';toasts=[];sfx('spring');
- say(E?'Blast off, '+hero()+'! Tap up and down to fly. Your blaster shoots by itself. Catch the stars!':'Blast off, '+hero()+'! Hold jump to fly up and down to fly down. Tap the blaster to zap drones and space rocks!',{again:true});}
+ say(E?'Blast off, '+hero()+'! Tap up and down to fly. Your blaster shoots by itself. Catch the stars!':'Blast off, '+hero()+'! Hold ⤒ to fly up and ▼ to fly down. Tap the zap button to zap drones and space rocks!',{again:true});}
 function shipPop(x,y,n,c){for(let i=0;i<n;i++){const a=Math.random()*7,v=rnd(1,4);SH.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:ri(20,40),c:c||pick(['#fff','#ffe066','#8ff','#ff9de0'])});}}
 function updShip(){const S=SH,E=S.E,lp=LP();T++;S.t++;tap('star');tap('special');tap('elem');
  if(tap('pause')){mode='pause';return;}
@@ -3273,7 +3274,7 @@ function drawShip(){const S=SH,E=S.E;const g=ctx.createLinearGradient(0,0,0,VH);
  if(S.boss){drawSquid(S.boss.x,250,1.1,'idle');panel(180,24,600,60,'#9a5ef0');txt('🦑 The Space Squid!',480,58,30,'#5a2a9a');}
  else{const k=clamp(S.t/S.len,0,1);rr(300,20,360,16,8);ctx.fillStyle='rgba(255,255,255,.25)';ctx.fill();rr(300,20,360*k,16,8);ctx.fillStyle='#7ff';ctx.fill();txt('🚀',300+360*k,28,20);txt('🦑',676,28,22);}
  txt('⭐ '+S.got,20,60,24,'#ffe066','left','#2b2b55');if(!E)txt('❤'.repeat(Math.max(0,P.hp)),20,92,22,'#ff4f6a','left','#fff');
- if(S.t<240)txt(E?'⤒ ▼ fly up and down':'Hold ⤒ up · ▼ down · ◀ ▶ · 🔫 fire',480,VH-40,22,'#fff','center','#2b2b55');
+ if(S.t<240)txt(E?'⤒ ▼ fly up and down':'Hold ⤒ up · ▼ down · ◀ ▶ · ⚡ ZAP',480,VH-40,22,'#fff','center','#2b2b55');
  drawToasts(110);if(banner&&banner.t>0){banner.t--;panel(230,150,500,110,'#ffd23f');txt(banner.title,480,195,36,'#a36b1d');txt(banner.sub,480,235,20,'#2b2b55');}}
 
 /* ===L5END=== */
