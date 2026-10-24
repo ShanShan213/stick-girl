@@ -2622,7 +2622,7 @@ function quizAnswer(i){if(!QZ||QZ.done)return;const q=QZ.qs[QZ.i];if(i<0||i>=q.o
 function drawFB(fb,y,w){if(!fb||fb.t<=0)return;const h=52,x=480-w/2,bs=NUI.filter(u=>u.fn&&u.w<VW-10).map(u=>u.vis||u);
  const free=yy=>!bs.some(b=>b.x<x+w&&b.x+b.w>x&&b.y<yy+h+3&&b.y+b.h>yy-3);if(!free(y)){let best=null;for(let yy=4;yy<=VH-h-4;yy+=2)if(free(yy)&&(best===null||Math.abs(yy-y)<Math.abs(best-y)))best=yy;if(best!==null)y=best;}
  window._fbr=[x,y,w,h];rr(x,y,w,h,14);ctx.fillStyle='#ffe3ec';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#e0409a';ctx.stroke();wrap('Not quite! The answer was: '+fb.rt+'   ➜ '+(fb.easier?'Try this easier one!':'New question!'),480,y+26,w-30,22,19,'#a0205a');}
-function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.fb&&QZ.fb.t>0)QZ.fb.t--;if(QZ.sh>0)QZ.sh--;if(QZ.yay>0)QZ.yay--;if(QZ.done&&(tap('interact')||QZ.t>400)){mode=PM();P.gcool=30;toast('A colour returns to the world! 🌈',150);}}
+function updQuiz(){if(digit>=0)quizAnswer(digit);QZ.t++;if(QZ.fb&&QZ.fb.t>0)QZ.fb.t--;if(QZ.sh>0)QZ.sh--;if(QZ.yay>0)QZ.yay--;if(QZ.done&&(tap('interact')||QZ.t>400)){mode=PM();P.gcool=30;toast(curLv()===5?'Gate open! Onward, astronaut! 🚀':'A colour returns to the world! 🌈',150);}}
 function panel(x,y,w,h,col){ctx.fillStyle='rgba(10,10,40,.55)';ctx.fillRect(0,0,VW,VH);rr(x,y,w,h,26);ctx.fillStyle='#fffdf2';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle=col||'#2b2b55';ctx.stroke();}
 function drawQuiz(){drawWorld();drawHUD();const e=easy(),col={maths:'#ff7a3c',reading:'#3aa8ff',science:'#2fc46b',mixed:'#a35cff',world:'#1f9ac9',volcano:'#e2551f',vmixed:'#e0409a',jungle:'#2f9e4a',jmixed:'#8a6a2a'}[QZ.kind]||'#a35cff';panel(60,40,840,470,col);
  rr(60,40,840,58,26);ctx.fillStyle=col;ctx.fill();ctx.fillRect(60,70,840,28);txt(GATENAME[QZ.kind]+'  ('+Math.min(QZ.i+1,QZ.qs.length)+'/'+QZ.qs.length+')',480,70,28,'#fff','center','rgba(0,0,0,.3)');
@@ -2829,7 +2829,7 @@ function drawFighters(){const a=D.anim,sx=D.sh>0?rnd(-4,4):0;
  else if(a&&a.who==='b'&&a.t>18&&a.t<40){ctx.strokeStyle='#ffe34a';ctx.lineWidth=8;ctx.beginPath();let x=bx-60,y=by+40;ctx.moveTo(x,y);const dx=(x-px)/6,dy=(py-60-y)/6;for(let i=0;i<6;i++){x-=dx;y+=dy;ctx.lineTo(x+rnd(-14,14),y);}ctx.stroke();}
  if(a&&a.t>=28&&a.t<40){txt('💥',a.who==='p'?bx-30:px,a.who==='p'?by:py-60,60);}
  ctx.restore();}
-function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.25)';ctx.fillRect(0,0,VW,VH);ctx.fillStyle=Hc(110,60,45);ctx.fillRect(0,335,VW,205);
+function drawDuel(){const e=easy();drawBGscene(0);ctx.fillStyle='rgba(60,60,80,.25)';ctx.fillRect(0,0,VW,VH);ctx.fillStyle=curLv()===5?'#8a8f9e':Hc(110,60,45);ctx.fillRect(0,335,VW,205);
  // health bars SF style
  const hb=(x,w,f,name,al,col)=>{rr(x,14,w,30,6);ctx.fillStyle='#300';ctx.fill();ctx.save();rr(x,14,w,30,6);ctx.clip();ctx.fillStyle='#e33';ctx.fillRect(x,14,w,30);ctx.fillStyle=col;const fw=w*f;ctx.fillRect(al==='l'?x+w-fw:x,14,fw,30);ctx.restore();ctx.lineWidth=4;ctx.strokeStyle='#ffd23f';rr(x,14,w,30,6);ctx.stroke();txt(name,al==='l'?x+8:x+w-8,58,20,'#fff',al==='l'?'left':'right','#222');};
  hb(30,390,D.php/100,PL().name,'l','#ffd23f');hb(540,390,D.bhp/100,bossName(),'r',['','#a35cff','#ff7a1f','#3fae4f'][curLv()]);
@@ -3112,10 +3112,10 @@ let SH=null;
 function L5INTRO(){const n=fullName();return[{s:'Woof! We are on the MOON, '+n+'!',b:1},{s:'Gravity is weak here, so you jump super high and float down slowly. Wheee!',b:0},{s:easy()?'Hop on the floating rocks. If you fall, I will bring you back. Easy peasy!':'Hop across the floating boulders. Some drift, and some crumble, so keep moving!',b:0},{s:'Find the laser blaster, then fly our rocket to stop the Space Squid. Let us go!',b:1}];}
 function L5build(L,a){const {G,CK,SG,GT,SC,HS,BU,row,arc,BONUS,MV,EN,gap,CX}=a,Ez=easy(),lp=LP();let s;
  L.lowg=true;L.crm=[];L.tgts=[];L.ffs=[];L.toy=null;L.tant=null;L.dock=null;L.blX=null;L.bossX=1e9;
- const BOULD=(x,y,w,crm)=>{const b={x,y,w,h:16,t:'p',rock:1};L.plats.push(b);if(crm)L.crm.push({p:b,st:0,t:0,rt:0});return b;};
+ const BOULD=(x,y,w,crm)=>{const b={x,y,w,h:16,t:'p',bld:1};L.plats.push(b);if(crm)L.crm.push({p:b,st:0,t:0,rt:0});return b;};
  const FIELD=(n,o)=>{o=o||{};const x0=CX(),sp=Ez?175:205,w=Ez?140:112;gap(sp*n+(Ez?60:110));
   for(let i=0;i<n;i++){const bx=x0+(Ez?40:70)+i*sp,by=(o.ys||[392,352,322,362,340])[i%(o.ys||[0,0,0,0,0]).length];
-   if(o.drift&&i%2===1){MV(bx+w/2,by,w,o.dx||0,o.dy||(Ez?26:42),o.sp||.022);L.movers[L.movers.length-1].rock=1;L.plats[L.plats.length-1].rock=1;}
+   if(o.drift&&i%2===1){MV(bx+w/2,by,w,o.dx||0,o.dy||(Ez?26:42),o.sp||.022);L.movers[L.movers.length-1].bld=1;L.plats[L.plats.length-1].bld=1;}
    else BOULD(bx,by,w,!!(o.crm&&i%2===0));if(i%2===0)row(bx+w/2-36,by-56,3);else arc(bx+w/2-38,by-60,3,26);}};
  // 1 landing zone
  s=G(1100);CK(s+60);SG(s+150,'🌕 Moon Base! Gravity is weak here. Tap ⤒ to jump super high!');HS(s+300,Ez?'Jump! You float like a balloon!':'Low gravity: jumps are big and slow. Hold ⤒ for a higher float!',1);arc(s+420,330,6,110);row(s+760,400,4);SG(s+880,'🪨 Floating boulders ahead! Hop from rock to rock.');
@@ -3170,7 +3170,7 @@ function L5fire(p,L,E){if(p.lcd>0)return;p.lcd=E?10:8;let vy=0,face=p.face;const
 function drawLaser(q){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#3df';ctx.shadowBlur=14;ctx.fillStyle='#7ff';rr(-15,-4,30,8,4);ctx.fill();ctx.fillStyle='#fff';rr(-10,-2,20,4,2);ctx.fill();ctx.restore();}
 function L5upd(L,p,E){const lp=LP();if(p.lcd>0)p.lcd--;
  // age4 landing assist: snap onto a boulder you nearly reached
- if(E&&!p.onGround&&p.vy>0){for(const s of L.plats){if(!s.rock)continue;const fy=p.y+p.h,cxp=p.x+p.w/2;if(fy>=s.y-2&&fy<=s.y+30&&cxp>s.x-34&&cxp<s.x+s.w+34){p.y=s.y-p.h;p.vy=0;p.onGround=true;p.gnd=s;p.jumps=0;p.x=clamp(p.x,s.x-p.w/2+4,s.x+s.w-p.w/2-4);break;}}}
+ if(E&&!p.onGround&&p.vy>0){for(const s of L.plats){if(!s.bld)continue;const fy=p.y+p.h,cxp=p.x+p.w/2;if(fy>=s.y-2&&fy<=s.y+30&&cxp>s.x-34&&cxp<s.x+s.w+34){p.y=s.y-p.h;p.vy=0;p.onGround=true;p.gnd=s;p.jumps=0;p.x=clamp(p.x,s.x-p.w/2+4,s.x+s.w-p.w/2-4);break;}}}
  // crumbling boulders
  for(const c of L.crm){if(c.st===0&&p.onGround&&p.gnd===c.p){c.st=1;c.t=0;}if(c.st===1&&++c.t>(E?100:50)){c.st=2;c.rt=0;c.fy=c.p.y;const i=L.plats.indexOf(c.p);if(i>=0)L.plats.splice(i,1);sfx('smash');addParts(c.p.x+c.p.w/2,c.p.y+10,12,'#aab',{sp:1.2});if(p.gnd===c.p){p.onGround=false;p.gnd=null;}}
   else if(c.st===2){c.rt++;c.fy+=2;if(c.rt>220){c.st=0;L.plats.push(c.p);}}}
@@ -3258,7 +3258,7 @@ function drawSquid(x,y,s,mood){ctx.save();ctx.translate(x,y);ctx.scale(s,s);cons
  const sad=mood==='sad',hit=mood==='hit';for(const k of[-1,1]){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(k*22,4,15,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#2b2b55';if(sad||hit){ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(k*22-8,4);ctx.lineTo(k*22+8,4);ctx.stroke();}else{ctx.beginPath();ctx.arc(k*22-4,6,7,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(k*22-6,3,2.5,0,7);ctx.fill();}}
  ctx.strokeStyle='#3a1f5e';ctx.lineWidth=4;ctx.beginPath();if(sad)ctx.arc(0,36,10,Math.PI*1.15,Math.PI*1.85);else ctx.arc(0,24,10,.2,Math.PI-.2);ctx.stroke();
  ctx.fillStyle='rgba(255,140,200,.6)';ctx.beginPath();ctx.ellipse(-40,26,8,5,0,0,7);ctx.ellipse(40,26,8,5,0,0,7);ctx.fill();
- ctx.strokeStyle='#ffe066';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,-90,28,8,0,0,7);ctx.stroke();ctx.restore();}
+ ctx.strokeStyle='#3a1f5e';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,-94);ctx.lineTo(0,-112);ctx.stroke();starShape(0,-118,10+Math.sin(T/8)*2,'#ffe066',T/30);ctx.restore();}
 function drawShip(){const S=SH,E=S.E;const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#060a2a');g.addColorStop(1,'#24164f');ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
  for(const b of S.bg){const x=((b[0]-S.t*b[2]*.9)%VW+VW)%VW;ctx.fillStyle=`rgba(255,255,255,${.4+.5*Math.sin(T/18+b[3])})`;ctx.fillRect(x,b[1],b[2],b[2]);}
  const px=((900-S.t*.4)%(VW+500)+VW+500)%(VW+500)-200;ctx.fillStyle='#e8806a';ctx.beginPath();ctx.arc(px,430,60,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.18)';ctx.beginPath();ctx.ellipse(px-10,410,40,8,0,0,7);ctx.fill();
