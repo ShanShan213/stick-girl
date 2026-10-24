@@ -3118,38 +3118,38 @@ function L5build(L,a){const {G,CK,SG,GT,SC,HS,BU,row,arc,BONUS,MV,EN,gap,CX}=a,E
    if(o.drift&&i%2===1){MV(bx+w/2,by,w,o.dx||0,o.dy||(Ez?26:42),o.sp||.022);L.movers[L.movers.length-1].rock=1;L.plats[L.plats.length-1].rock=1;}
    else BOULD(bx,by,w,!!(o.crm&&i%2===0));if(i%2===0)row(bx+w/2-36,by-56,3);else arc(bx+w/2-38,by-60,3,26);}};
  // 1 landing zone
- s=G(1500);CK(s+60);SG(s+150,'🌕 Moon Base! Gravity is weak here. Tap ⤒ to jump super high!');HS(s+300,Ez?'Jump! You float like a balloon!':'Low gravity: jumps are big and slow. Hold ⤒ for a higher float!',1);arc(s+420,330,6,110);row(s+900,400,5);SG(s+1250,'🪨 Floating boulders ahead! Hop from rock to rock.');
+ s=G(1100);CK(s+60);SG(s+150,'🌕 Moon Base! Gravity is weak here. Tap ⤒ to jump super high!');HS(s+300,Ez?'Jump! You float like a balloon!':'Low gravity: jumps are big and slow. Hold ⤒ for a higher float!',1);arc(s+420,330,6,110);row(s+760,400,4);SG(s+880,'🪨 Floating boulders ahead! Hop from rock to rock.');
  // 2 first hop field
- FIELD(5);s=G(900);SC('lowg',s+420,330);row(s+200,400,4);
- GT(s+700,'space');
+ FIELD(4);s=G(700);SC('lowg',s+300,330);row(s+120,400,3);
+ GT(s+520,'space');
  // 3 drifting boulders
- s=G(500);CK(s+60);SG(s+200,'Some boulders drift! Wait, then jump.');FIELD(6,{drift:true});s=G(700);SC('moon5',s+380,380);
+ s=G(500);CK(s+60);SG(s+200,'Some boulders drift! Wait, then jump.');FIELD(5,{drift:true});s=G(500);SC('moon5',s+300,380);
  // 4 hidden crater cave (Big Star 1)
- s=G(1200);CK(s+60);L.pipes.push({id:'m1',x:s+330,out:s+1000});HS(s+170,'Psst! That dark crater looks like a secret cave... Stand on it and tap ▼!',1);row(s+560,400,4);
+ s=G(1000);CK(s+60);L.pipes.push({id:'m1',x:s+330,out:s+850});HS(s+170,'Psst! That dark crater looks like a secret cave... Stand on it and tap ▼!',1);row(s+560,400,4);
  // 5 blaster + robots
- s=G(1700);CK(s+60);L.blX=s+260;SG(s+120,'A laser blaster! Walk over it to pick it up.');HS(s+430,Ez?'Tap 🔫 to zap! It aims for you!':'Tap 🔫 to fire. Pop the robots into sparkles!',1);
- EN('ninja',s+800);EN('hopper',s+1120);EN('cloud',s+1350,300);row(s+940,400,4);arc(s+1450,380,4,60);
+ s=G(1400);CK(s+60);L.blX=s+260;SG(s+120,'A laser blaster! Walk over it to pick it up.');HS(s+430,Ez?'Tap 🔫 to zap! It aims for you!':'Tap 🔫 to fire. Pop the robots into sparkles!',1);
+ EN('ninja',s+720);EN('hopper',s+960);EN('cloud',s+1150,300);row(s+820,400,4);arc(s+1200,380,4,60);
  // 6 targets + force field
- s=G(1300);CK(s+60);SG(s+140,'🎯 A force field! Zap all 3 targets to switch it off.');
+ s=G(1100);CK(s+60);SG(s+140,'🎯 A force field! Zap all 3 targets to switch it off.');
  [[s+420,Ez?330:290],[s+560,Ez?300:240],[s+700,Ez?330:300]].forEach(([x,y])=>L.tgts.push({x,y,hit:false,ff:0}));
- {const ff={x:s+950,n:3,open:false,plat:{x:s+950,y:0,w:30,h:440,t:'b'}};L.ffs.push(ff);L.plats.push(ff.plat);}
- row(s+1050,400,4);
+ {const ff={x:s+850,n:3,open:false,plat:{x:s+850,y:0,w:30,h:440,t:'b'}};L.ffs.push(ff);L.plats.push(ff.plat);}
+ row(s+920,400,3);
  s=G(500);GT(s+260,'spmixed');
  // 7 crumbling boulders
- s=G(500);CK(s+60);SG(s+200,'⚠️ Crumbly rocks! They break if you stand still.');FIELD(5,{crm:true,ys:[380,350,330,350,370]});s=G(700);SC('planet5',s+350,380);
+ s=G(500);CK(s+60);SG(s+200,'⚠️ Crumbly rocks! They break if you stand still.');FIELD(4,{crm:true,ys:[380,350,330,360]});s=G(500);SC('planet5',s+300,380);
  // 8 Stormi's tantrum: find the star toy
- s=G(1600);CK(s+60);L.tant={x:s+1050,done:!!lp.tant,seen:false,happy:0,stomp:0};
- if(Ez)L.toy={x:s+800,y:410,got:false,glow:1};else{BOULD(s+380,350,110);BOULD(s+560,270,100);L.toy={x:s+610,y:236,got:false};}
- if(!L.tant.done){L.tant.plat={x:s+1110,y:0,w:26,h:440,t:'b'};L.plats.push(L.tant.plat);}
- row(s+1250,400,4);
+ s=G(1400);CK(s+60);L.tant={x:s+950,done:!!lp.tant,seen:false,happy:0,stomp:0};
+ if(Ez)L.toy={x:s+570,y:410,got:false,glow:1};else{BOULD(s+380,350,110);BOULD(s+560,270,100);L.toy={x:s+610,y:236,got:false};}
+ if(!L.tant.done){L.tant.plat={x:s+1010,y:0,w:26,h:440,t:'b'};L.plats.push(L.tant.plat);}
+ row(s+1120,400,3);
  // 9 Europa ocean portal (Big Star 2)
  SG(CX()+40,'🧊 Some icy moons hide oceans under the ice!');BONUS('m2','sea');
  // 10 robots + drift, then gate 3
- s=G(1300);CK(s+60);EN('hopper',s+520);EN('cloud',s+800,290);EN('ninja',s+1050);SC('star5',s+700,370);arc(s+300,380,5,60);
- FIELD(4,{drift:true,ys:[380,340,360,330]});s=G(700);GT(s+360,'space');
+ s=G(1100);CK(s+60);EN('hopper',s+480);EN('cloud',s+720,290);EN('ninja',s+900);SC('star5',s+620,370);arc(s+260,380,5,60);
+ FIELD(3,{drift:true,ys:[380,340,360]});s=G(700);GT(s+360,'space');
  // 11 rocket dock
- s=G(1500);CK(s+60);SC('astro',s+300,380);SG(s+520,'🚀 Our rocket! Walk into it to fly up to the Space Squid!');row(s+600,400,5);L.dock={x:s+1050};
- HS(s+700,'Walk into the rocket to blast off!',1);}
+ s=G(1200);CK(s+60);SC('astro',s+300,380);SG(s+460,'🚀 Our rocket! Walk into it to fly up to the Space Squid!');row(s+560,400,4);L.dock={x:s+950};
+ HS(s+640,'Walk into the rocket to blast off!',1);}
 function L5plat(s){const L=LV;if(s.t==='g'){const x0=Math.max(s.x,cam.x-20),x1=Math.min(s.x+s.w,cam.x+VW+20);ctx.fillStyle='#8a8f9e';ctx.fillRect(x0,s.y,x1-x0,s.h);ctx.fillStyle='#b8bdc9';ctx.fillRect(x0,s.y,x1-x0,9);
   ctx.fillStyle='#737888';for(let x=Math.floor(x0/120)*120;x<x1;x+=120){const k=(x/120|0)%3;ctx.beginPath();ctx.ellipse(x+40+k*20,s.y+30+k*14,14+k*6,5+k*2,0,0,7);ctx.fill();}return;}
  // floating boulder: lumpy rock, flat-ish walkable top
@@ -3163,10 +3163,10 @@ function drawSpaceBG(parx){const g=ctx.createLinearGradient(0,0,0,VH);g.addColor
  const ex=((820-parx*.03)%(VW+300)+VW+300)%(VW+300)-150;ctx.fillStyle='#3a8be0';ctx.beginPath();ctx.arc(ex,110,46,0,7);ctx.fill();ctx.fillStyle='#4cc46a';ctx.beginPath();ctx.ellipse(ex-12,100,18,12,.5,0,7);ctx.ellipse(ex+16,124,12,8,0,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(ex+6,92,20,5,0,0,7);ctx.fill();
  const sx=((300-parx*.06)%(VW+400)+VW+400)%(VW+400)-200;ctx.fillStyle='#e8b86a';ctx.beginPath();ctx.arc(sx,190,30,0,7);ctx.fill();ctx.strokeStyle='#f6dca0';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(sx,190,54,12,-.25,0,7);ctx.stroke();}
 function L5fire(p,L,E){if(p.lcd>0)return;p.lcd=E?10:8;let vy=0,face=p.face;const ox=p.x+10,oy=p.y+26;
- if(E){let best=null,bd=1e9;for(const e of L.enemies){if(e.dead||e.hp<=0)continue;const dx=e.x+e.w/2-ox,dy=e.y+e.h/2-oy,d=Math.hypot(dx,dy);if(d<560&&d<bd){bd=d;best=[dx,dy];}}
+ if(E){let best=null,bd=1e9;for(const e of L.enemies){if(e.dead||e.hp<=0)continue;const dx=e.x+e.w/2-ox,dy=e.y+e.h/2-oy,d=Math.hypot(dx,dy)+(dx*p.face<0?250:0);if(Math.abs(dx)>16&&d<560&&d<bd){bd=d;best=[dx,dy];}}
   for(const t of L.tgts){if(t.hit)continue;const dx=t.x-ox,dy=t.y-oy,d=Math.hypot(dx,dy);if(d<560&&d<bd){bd=d;best=[dx,dy];}}
-  if(best){face=Math.sign(best[0])||face;p.face=face;const n=Math.hypot(best[0],best[1])||1;vy=best[1]/n*14;}}
- const vx=face*Math.sqrt(Math.max(1,196-vy*vy));L.proj.push({x:ox+face*22,y:oy,vx,vy,life:50,rot:0,w:26,h:10,dmg:2,hs:new Set(),laser:1});sfx('throw');p.sq=.08;}
+  if(best){face=Math.sign(best[0])||face;p.face=face;const n=Math.hypot(best[0],best[1])||1;vy=clamp(best[1]/n*14,-10,10);}}
+ const vx=face*Math.sqrt(Math.max(1,196-vy*vy));L.shots5=(L.shots5||0)+1;L.proj.push({x:ox+face*22,y:oy,vx,vy,life:50,rot:0,w:26,h:10,dmg:2,hs:new Set(),laser:1});sfx('throw');p.sq=.08;}
 function drawLaser(q){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(Math.atan2(q.vy,q.vx));ctx.shadowColor='#3df';ctx.shadowBlur=14;ctx.fillStyle='#7ff';rr(-15,-4,30,8,4);ctx.fill();ctx.fillStyle='#fff';rr(-10,-2,20,4,2);ctx.fill();ctx.restore();}
 function L5upd(L,p,E){const lp=LP();if(p.lcd>0)p.lcd--;
  // age4 landing assist: snap onto a boulder you nearly reached
@@ -3182,9 +3182,9 @@ function L5upd(L,p,E){const lp=LP();if(p.lcd>0)p.lcd--;
  if(L.ffs.some(f=>!f.open&&Math.abs(p.x+10-f.x)<60)&&T%240===0)toast(lp.blaster?'Zap the 3 targets 🎯 to open the force field!':'Find the blaster first!',150);
  // Stormi tantrum
  const tn=L.tant;if(tn){const d=tn.x-(p.x+10);if(!tn.done){if(Math.abs(d)<900){SF.st='away';SF.x=cam.x-300;}
-   if(!tn.seen&&d<420){tn.seen=true;sfx('bark');say(E?'Uh oh! '+DN()+' is having a tantrum! She wants her star toy. Look, it is right there! Follow the arrow and pick it up.':'Uh oh! '+DN()+' is having a tantrum and will not let us pass! She wants her star toy. Can you find it nearby? Try looking up high!',{again:true});}
+   if(!tn.seen&&d<(E?300:420)){tn.seen=true;sfx('bark');say(E?'Uh oh! '+DN()+' is having a tantrum! She wants her star toy. Look, it is right behind you! Follow the arrow and pick it up.':'Uh oh! '+DN()+' is having a tantrum and will not let us pass! She wants her star toy. Can you find it nearby? Try looking up high!',{again:true});}
    if(T%3===0)tn.stomp++;
-   const ty=L.toy;if(ty&&!ty.got&&Math.abs(p.x+10-ty.x)<(E?46:34)&&Math.abs(p.y+28-ty.y)<(E?70:46)){ty.got=true;sfx('star');toast('⭐ Got the star toy! Bring it to '+DN()+'!',180);say('You found the star toy! Bring it to '+DN()+'!',{again:true});}
+   const ty=L.toy;if(ty&&!ty.got&&(tn.seen||!E)&&Math.abs(p.x+10-ty.x)<(E?46:34)&&Math.abs(p.y+28-ty.y)<(E?70:46)){ty.got=true;sfx('star');toast('⭐ Got the star toy! Bring it to '+DN()+'!',180);say('You found the star toy! Bring it to '+DN()+'!',{again:true});}
    if(ty&&ty.got&&Math.abs(d)<110){tn.done=true;tn.happy=200;lp.tant=true;save();const i=L.plats.indexOf(tn.plat);if(i>=0)L.plats.splice(i,1);sfx('harmony');addParts(tn.x,400,16,'#ff7ab8',{star:true,sp:1.4});say('Yay! '+DN()+' loves her star toy! She is happy again. Wag wag wag! The path is open!',{again:true});dogBond&&dogBond(1);}
    else if(tn.seen&&!ty.got&&d<160&&d>0&&T%300===0)toast(E?'Follow the arrow to the star toy ⭐':DN()+' wants her star toy ⭐. Look around!',150);}
   else if(tn.happy>0){tn.happy--;if(tn.happy%14===0)addParts(tn.x,380,1,'#ff7ab8',{g:-.05});if(tn.happy===1){SF.st='away';}}}
@@ -3195,8 +3195,8 @@ function L5draw(L){const lp=LP(),E=easy();
  if(L.blX!=null&&!lp.blaster){const y=405+Math.sin(T/12)*5;ctx.save();ctx.shadowColor='#3df';ctx.shadowBlur=18;ctx.fillStyle='#ff5fb0';rr(L.blX-22,y-10,40,16,6);ctx.fill();ctx.fillStyle='#7ff';rr(L.blX+14,y-6,12,8,3);ctx.fill();ctx.fillStyle='#c33a86';rr(L.blX-16,y+4,12,16,4);ctx.fill();ctx.restore();txt('🔫',L.blX,y-34,20);}
  for(const t of L.tgts){ctx.save();if(t.hit)ctx.globalAlpha=.35;for(let r=3;r>0;r--){ctx.fillStyle=r%2?'#ff4f6a':'#fff';ctx.beginPath();ctx.arc(t.x,t.y,r*7,0,7);ctx.fill();}ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(t.x,t.y+21);ctx.lineTo(t.x,440);ctx.stroke();ctx.restore();}
  for(const f of L.ffs){if(f.open)continue;const a=.35+.15*Math.sin(T/8);ctx.fillStyle=`rgba(90,200,255,${a})`;ctx.fillRect(f.x,0,30,440);ctx.strokeStyle='#bff';ctx.lineWidth=2;for(let y=(T*2)%40;y<440;y+=40){ctx.beginPath();ctx.moveTo(f.x,y);ctx.lineTo(f.x+30,y+14);ctx.stroke();}txt('🎯 '+L.tgts.filter(t=>t.hit).length+'/'+f.n,f.x+15,110,22,'#fff','center','#036');}
- const tn=L.tant;if(tn){const ty=L.toy;if(ty&&!ty.got){const b=Math.sin(T/10)*4;if(ty.glow||tn.seen){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(T/6);ctx.fillStyle='#ffe066';ctx.beginPath();ctx.arc(ty.x,ty.y+b,30,0,7);ctx.fill();ctx.restore();}starShape(ty.x,ty.y+b,16,'#ffb3e0',T/30);ctx.fillStyle='#2b2b55';ctx.beginPath();ctx.arc(ty.x-5,ty.y+b-2,2,0,7);ctx.arc(ty.x+5,ty.y+b-2,2,0,7);ctx.fill();
-   if(E&&tn.seen)txt('⬇',ty.x,ty.y-46+Math.sin(T/6)*6,34,'#ffe066','center','#a36b1d');}
+ const tn=L.tant;if(tn){const ty=L.toy;if(ty&&!ty.got&&(tn.seen||!ty.glow)){const b=Math.sin(T/10)*4;if(ty.glow||tn.seen){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(T/6);ctx.fillStyle='#ffe066';ctx.beginPath();ctx.arc(ty.x,ty.y+b,30,0,7);ctx.fill();ctx.restore();}starShape(ty.x,ty.y+b,16,'#ffb3e0',T/30);ctx.fillStyle='#2b2b55';ctx.beginPath();ctx.arc(ty.x-5,ty.y+b-2,2,0,7);ctx.arc(ty.x+5,ty.y+b-2,2,0,7);ctx.fill();
+   if(E&&tn.seen){if(Math.abs(P.x+10-ty.x)>140)txt(P.x+10>ty.x?'⬅':'➡',P.x+10+(P.x+10>ty.x?-60:60),P.y-10,40,'#ffe066','center','#a36b1d');}if(E&&tn.seen)txt('⬇',ty.x,ty.y-46+Math.sin(T/6)*6,34,'#ffe066','center','#a36b1d');}
   if(!tn.done){const st=tn.stomp%8<4,hop=st?-6:0,face=(P.x+10<tn.x)?-1:1;ctx.save();ctx.translate(tn.x,440);ctx.rotate(st?.06:-.06);dogSprite(0,0,face,1.05,T,{fast:true,mouth:tn.stomp%10<5,hop});ctx.restore();
    if(st){ctx.fillStyle='rgba(220,220,235,.8)';for(const k of[-1,1]){ctx.beginPath();ctx.arc(tn.x+k*30,436,8+(tn.stomp%4)*2,0,7);ctx.fill();}}
    txt('😤',tn.x+26,370+Math.sin(T/5)*3,28);if(tn.stomp%24<12)txt('WOOF!',tn.x-34,350,22,'#fff','center','#e0409a');else txt('RUFF!',tn.x+44,342,20,'#fff','center','#e0409a');
@@ -3215,7 +3215,7 @@ function L5enemy(e){const cx=e.x+e.w/2;ctx.save();if(e.flash>0&&e.flash%2)ctx.gl
   const lg=Math.sin(T*.3+e.t0)*4*(Math.abs(e.vx)>.3?1:0);ctx.beginPath();ctx.moveTo(cx-7,y+h-12);ctx.lineTo(cx-7-lg,y+h);ctx.moveTo(cx+7,y+h-12);ctx.lineTo(cx+7+lg,y+h);ctx.stroke();}
  if(e.wind>0)txt('!',cx,e.y-18,26,'#ff3b30','center','#fff');ctx.restore();}
 /* ---- ship flight (side-scrolling shoot-em-up) ---- */
-function startShip(){const E=easy(),lp=LP();lp.ship=1;save();shush();const len=E?2100:2800;
+function startShip(){const E=easy(),lp=LP();lp.ship=1;save();shush();const len=E?1800:2100;
  SH={on:true,t:0,E,len,x:170,y:270,vx:0,vy:0,inv:120,cd:0,shots:[],rocks:[],drones:[],orbs:[],stars:[],fx:[],bg:[],big:null,bigT:Math.round(len*.5),got:0,pops:0,bumps:0,boss:null};
  for(let i=0;i<90;i++)SH.bg.push([Math.random()*VW,Math.random()*VH,1+(i%3),Math.random()*6]);
  mode='ship';toasts=[];sfx('spring');
