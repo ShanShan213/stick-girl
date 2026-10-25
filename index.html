@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="sg-build" content="v8-qa13-2026-10-25">
+<meta name="sg-build" content="v8-qa14-2026-10-25">
 <title>Stick Girl: Colour Quest</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#4cc3ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -503,8 +503,10 @@ const bondLv=b=>[0,2,5,9,14].filter(t=>b>=t).length;
 const petOf=id=>PETS.find(p=>p.id===id);
 function activePet(){const a=PR().active;return a&&PR().pets[a]?{def:petOf(a),lv:bondLv(PR().pets[a].bond)}:null;}
 function hasPet(id){const a=activePet();return a&&a.def.id===id?a.lv:0;}
-if(SV&&SV.prog)SV.prog.forEach(q=>{if(q&&q.unl>5)q.unl=5;}); // qa9b: clamp to the last level (5 since qa13)
-const MAXLV=5,UNL=p=>Math.max(p.unl||1,p.l3&&p.l3.boss?4:0,p.l4&&p.l4.boss?5:0),curLv=()=>{const p=PR();return Math.max(1,Math.min(p.lv||1,UNL(p),MAXLV));};
+if(SV&&SV.prog)SV.prog.forEach(q=>{if(q&&q.unl>5)q.unl=5;});
+if(SV&&SV.prog)SV.prog.forEach(q=>{if(!q)return;if(q.boss)q.won1=true;for(let n=2;n<=5;n++){const l=q['l'+n];if(l&&l.boss)l.won=true;}}); // qa14: migrate boss -> permanent won // qa9b: clamp to the last level (5 since qa13)
+const lvWon=(p,n)=>{const l=n===1?null:p['l'+n];return n===1?!!(p.won1||p.boss):!!(l&&(l.won||l.boss));}; // qa14: permanent completion flag
+const MAXLV=5,UNL=p=>Math.max(p.unl||1,lvWon(p,1)?2:0,lvWon(p,2)?3:0,lvWon(p,3)?4:0,lvWon(p,4)?5:0),curLv=()=>{const p=PR();return Math.max(1,Math.min(p.lv||1,UNL(p),MAXLV));};
 /* per-level run state: Level 1 keeps its fields on the hero (old saves still work), Level 2 lives in prog.l2 */
 const LP=()=>{const p=PR(),n=curLv();if(n===1){if(!p.bigs)p.bigs=[];return p;}const k='l'+n;if(!p[k])p[k]={cp:0,gates:[],dug:[],rooms:{},rescued:[],rbon:[],boss:false,bigs:[]};return p[k];};
 const LVNAME=['','Colour Meadow','Ember Mountain','Jungle Temple','Skate Park','Moon Base'],LVTHEME=['','meadow','lava','jungle','skate','space'];
@@ -2898,7 +2900,7 @@ function drawStory(bgOnly){const e=!STY||STY.kind==='end';const old=sat;sat=e?1:
  txt(STY.t>full.length*1.6?'Tap ▶':'',820,440,18,'#e0409a');txt((STY.i+1)+'/'+STY.lines.length,100,440,16,'#777');
  NUI.push({x:0,y:0,w:VW,h:VH,fn:storyAdv});}
 function drawScroll(){drawWorld();drawHUD();panel(130,100,700,330,'#a36b1d');btn('🔊',760,112,56,40,()=>say(STO.sc[0]+'! '+STO.sc[1],{force:true,again:true}),{size:20,hit:1});txt('📜 '+STO.sc[0],480,150,38,'#a36b1d');wrap(STO.sc[1],480,240,600,36,28,'#2b2b55');txt('+5 ⭐  +15 XP  (saved in your Pet & Scroll book)',480,340,20,'#2b7a2b');btn('Cool!',380,370,200,52,()=>{mode=prevMode==='run'?PM():'play';},{col:'#ffe066',size:26});}
-function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;lp.cp=0;pr.unl=Math.min(MAXLV,Math.max(pr.unl||1,lv+1));addXP(80);addStars(20);pr.treats+=2;save();shush();const n=fullName();
+function endLevel(){const pr=PR(),lp=LP(),lv=curLv();lp.boss=true;if(lv===1)pr.won1=true;else lp.won=true;lp.cp=0;pr.unl=Math.min(MAXLV,Math.max(pr.unl||1,lv+1));addXP(80);addStars(20);pr.treats+=2;save();shush();const n=fullName();
  const lines=lv===1?['WHOOSH! The Whirlwind blows the grumpy Storm Cloud far away. It shrinks into a tiny sniffly raincloud: "Okay... maybe colours are pretty," it mumbles.','The stolen colours burst back into the sky: red, orange, yellow, green, blue and purple. A giant rainbow stretches across the world!','🐶 WOOF WOOF! We did it, '+n+'! The colours are back! I am the proudest puppy in the whole world!','🐶 But look, smoke is puffing from Ember Mountain far away. A grumpy Magma Golem lives there! Will you come with me?',n+' waves to the meadow friends. "Next stop: Ember Mountain!"']
   :lv===2?['TSSSS! The cool water calms the grumpy Magma Golem. His glowing cracks fade and little flowers sprout on his rocky shoulders.','"Thank you," he rumbles softly. "I was just too hot and cranky." The lava cools into new rock and the mountain glows with colour again.','🐶 WOOF WOOF! You were so brave, '+n+'! Lava, geysers AND a golem! Best adventure ever!','🐶 The Golem says we can visit his crystal caves any time. Wag wag wag!','🐶 Listen... drums in the distance! An old Jungle Temple is waking up. Shall we go?',n+' and '+DN()+' wave goodbye to Ember Mountain. Next stop: the Jungle Temple!']
   :lv===5?['SPLOOSH! The Space Squid lets go of all the stars. They twinkle back into the sky!','"I only wanted a night light," Squiggles sniffles. '+n+' gives the squid one shiny star to keep. It glows happily.','📜 Fact Scroll: On the Moon you could jump about six times higher than on Earth!','🐶 WOOF WOOF! Floating rocks, robots, a rocket AND a squid! And thank you for finding my star toy, '+n+'!',n+' and '+DN()+' float home past the twinkling stars. The end... for now!']
@@ -3281,7 +3283,7 @@ function drawShip(){const S=SH,E=S.E;const g=ctx.createLinearGradient(0,0,0,VH);
 /* ================= TITLE / SELECT / PAUSE ================= */
 /* ===== LEVEL SELECT: one card per entry in LEVELS. To add a level: add an entry here (soon:false), its builder in buildLevel, its LP() progress slot. ===== */
 const LEVELS=[{n:1,name:'Colour Meadow',ic:'🌈',sky:['#8fd3ff','#d8f5ff'],gr:'#5cc85c'},{n:2,name:'Ember Mountain',ic:'🌋',sky:['#5a2a2a','#ff9a5a'],gr:'#3a2a26'},{n:3,name:'Jungle Temple',ic:'🛕',sky:['#2f7a4a','#bff0b0'],gr:'#6a5a3a'},{n:4,name:'Skate Park',ic:'🛹',sky:['#7fc8ff','#ffe0f0'],gr:'#b9b9c4'},{n:5,name:'Moon Base',ic:'🚀',sky:['#070b2e','#4a3a8e'],gr:'#9096a6'}];
-const lvProg=(pr,n)=>n===1?pr:n===2?pr.l2:pr['l'+n],lvBigs=(pr,n)=>{const l=lvProg(pr,n);return l&&l.bigs?l.bigs.length:0;},lvDone=(pr,n)=>{const l=lvProg(pr,n);return !!(l&&l.boss);};
+const lvProg=(pr,n)=>n===1?pr:n===2?pr.l2:pr['l'+n],lvBigs=(pr,n)=>{const l=lvProg(pr,n);return l&&l.bigs?l.bigs.length:0;},lvDone=(pr,n)=>lvWon(pr,n);
 const lvOpen=(pr,n)=>{const L=LEVELS.find(l=>l.n===n);return !!L&&!L.soon&&(n===1||UNL(pr)>=n);};
 let LSM=null;
 function lvTap(L){const pr=PR();if(!lvOpen(pr,L.n)){sfx('bad');const prev=LEVELS.find(l=>l.n===L.n-1);const m=L.soon?'Level '+L.n+', '+L.name+', is locked. It is coming soon!':'Level '+L.n+' is locked. Finish '+(prev?prev.name:'the level before')+' first!';LSM={t:180,s:'🔒 '+m};say(m,{again:true,force:easy()});return;}
@@ -3327,7 +3329,7 @@ function drawTitle0(){sat=.9;drawBGscene(T*1.5);const t='STICK GIRL',cols=['#ff3
  btn('New run',cx_(0),ry(2),cw,mh,()=>{const l=LP();if(l.cp||l.gates.length)resetRun();else startPlay();},{size:18});btn(SV.mute?'🔇 Sound off':'🔊 Sound on',cx_(1),ry(2),cw,mh,toggleMute,{size:18});
  btn('✨ Idol: '+(SV.idol?'ON':'off'),cx_(2),ry(2),cw,mh,toggleIdol,{size:16,col:SV.idol?'#ff9bf0':'#fff'});btn('🗣 Read aloud: '+(ttsOn()?'ON':'off'),cx_(3),ry(2),cw,mh,toggleTTS,{size:15,col:ttsOn()?'#d8f6ff':'#fff'});
  btn(HINTLBL(),cx_(0),ry(3),cw*2+8,mh,cycHints,{size:16});btn('🎵 '+Math.round(SV.mv*100)+'%',cx_(2),ry(3),cw,mh,()=>cycVol('mv'),{size:16});btn('🔔 '+Math.round(SV.sv*100)+'%',cx_(3),ry(3),cw,mh,()=>cycVol('sv'),{size:16});
- txt('Lv '+pr.lvl+'  ⭐ '+pr.stars+'  🐾 '+Object.keys(pr.pets).length+'/'+PETS.length+'  🌟 '+LEVELS.reduce((a,L)=>a+lvBigs(pr,L.n),0)+'/'+LEVELS.length*3+(lvDone(pr,LEVELS.length)?'  🏆 All done!':lvDone(pr,2)?'  🏆 Level 2 done!':pr.boss?'  🏆 Level 1 done!':''),480,ty,19,'#fff','center','#2b2b55');
+ txt('Lv '+pr.lvl+'  ⭐ '+pr.stars+'  🐾 '+Object.keys(pr.pets).length+'/'+PETS.length+'  🌟 '+LEVELS.reduce((a,L)=>a+lvBigs(pr,L.n),0)+'/'+LEVELS.length*3+(lvDone(pr,LEVELS.length)?'  🏆 All done!':lvDone(pr,2)?'  🏆 Level 2 done!':lvDone(pr,1)?'  🏆 Level 1 done!':''),480,ty,19,'#fff','center','#2b2b55');
  if(!tcEl.classList.contains('on'))txt('Keys: ←→ move · ↑/Space jump · Z punch · X kick · C star · V special · Q element · E talk · P pets · M mute',480,522,14,'#fff','center','#2b2b55');}
 function doResetHero(i){SV.prog[i]=newProg();save();}
 function drawSelect(){sat=.9;drawBGscene(T);ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(0,0,VW,VH);if(NG){drawNG();return;}txt('Choose Your Hero',480,34,40,'#e0409a','center','#fff');
